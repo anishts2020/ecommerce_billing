@@ -2,12 +2,14 @@ import { useState } from 'react'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import Vendors from './Pages/Vendors';
+import ProductSizePage from './Pages/ProductSizePage';
 
 function App() {
   return (
-    <Router>
+    <Router> 
       <Routes>
         <Route path="/login" element={<Login />} />
 
@@ -22,6 +24,8 @@ function App() {
 
         {/* default route */}
         <Route path="*" element={<Login />} />
+        <Route path='/vendors' element={<Vendors/>}></Route>
+        <Route path="/product-sizes" element={<ProductSizePage />} />
       </Routes>
     </Router>
   );
