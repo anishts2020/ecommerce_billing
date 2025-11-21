@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Dashboard() {
+
+  const navigate = useNavigate();
+
+  const openEmployeeDetails = () => {
+    navigate("/employees"); // this will open employee details page
+  };
+
+
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -40,7 +50,7 @@ export default function Dashboard() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl shadow p-4">
+              <div className="bg-white rounded-xl shadow p-4" onClick={openEmployeeDetails}>
                 <h2 className="font-semibold mb-2">Employee & Salary</h2>
                 <p className="text-sm text-slate-600">
                   Manage employees, roles, salary payments.
