@@ -1,0 +1,606 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+// Removed: import Swal from "sweetalert2"; // No longer needed
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+
+// --- START: Icon Components (for CustomAlert) ---
+const CheckCircleIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+const XCircleIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+const AlertTriangleIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+);
+// --- END: Icon Components ---
+
+// ------------------------------------------------------------------
+// CustomAlert Component
+// ------------------------------------------------------------------
+const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
+    if (!isOpen) return null;
+
+    let icon, bgColor, buttonColor, confirmText, showCancelButton = false;
+    let confirmAction = onConfirm; // Default action when clicking confirm button
+
+    switch (type) {
+        case 'confirm':
+            icon = <AlertTriangleIcon className="w-10 h-10 text-yellow-500" />;
+            bgColor = 'bg-white border-4 border-yellow-500';
+            buttonColor = 'bg-red-600 hover:bg-red-700';
+            confirmText = 'Yes, Delete it!';
+            showCancelButton = true;
+            break;
+        case 'success':
+            icon = <CheckCircleIcon className="w-10 h-10 text-green-500" />;
+            bgColor = 'bg-white border-4 border-green-500';
+            buttonColor = 'bg-green-600 hover:bg-green-700';
+            confirmText = 'Close';
+            confirmAction = onClose; // Success/Error typically just closes the modal
+            break;
+        case 'error':
+            icon = <XCircleIcon className="w-10 h-10 text-red-500" />;
+            bgColor = 'bg-white border-4 border-red-500';
+            buttonColor = 'bg-red-600 hover:bg-red-700';
+            confirmText = 'Close';
+            confirmAction = onClose; // Success/Error typically just closes the modal
+            break;
+        default:
+            icon = <AlertTriangleIcon className="w-10 h-10 text-gray-500" />;
+            bgColor = 'bg-white border-4 border-gray-500';
+            buttonColor = 'bg-blue-600 hover:bg-blue-700';
+            confirmText = 'OK';
+            confirmAction = onClose;
+    }
+
+    return (
+         <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
+            <div className={`w-full max-w-md p-6 rounded-lg shadow-2xl transform scale-100 transition-all ${bgColor}`}>
+                {/* Header/Icon */}
+                <div className="flex items-center space-x-4">
+                    {icon}
+                    <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+                </div>
+
+                {/* Message */}
+                <div className="mt-4 pl-14">
+                    <p className="text-gray-600">{message}</p>
+                </div>
+
+                {/* Footer/Actions */}
+                <div className="mt-6 flex justify-end space-x-3">
+                    {showCancelButton && (
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg 
+                                       hover:bg-gray-300 transition duration-150"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                    <button
+                        onClick={confirmAction}
+                        className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition duration-150 ${buttonColor}`}
+                    >
+                        {confirmText}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+// ------------------------------------------------------------------
+
+
+function Employee() {
+  const [employees, setEmployees] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  
+  // Custom Alert State
+  const [alert, setAlert] = useState({ 
+    isOpen: false, 
+    title: "", 
+    message: "", 
+    type: "", 
+    onConfirm: () => {}, 
+    itemId: null 
+  });
+
+
+  // Form fields
+  const [employee_code, setEmployeeCode] = useState("");
+  const [employee_name, setEmployeeName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [joining_date, setJoiningDate] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [salary_type, setSalaryType] = useState("");
+  const [base_salary, setBaseSalary] = useState("");
+  const [is_active, setIsActive] = useState(1);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/employees");
+      setEmployees(res.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      // Show error alert on fetch failure
+      setAlert({
+        isOpen: true,
+        title: "Connection Error",
+        message: "Failed to load employee data. Check your API connection.",
+        type: "error",
+        onConfirm: () => setAlert({ ...alert, isOpen: false }),
+        onClose: () => setAlert({ ...alert, isOpen: false }),
+      });
+    }
+  };
+
+  // Function to reset all form fields
+  const resetFormFields = () => {
+    setEmployeeCode("");
+    setEmployeeName("");
+    setPhone("");
+    setEmail("");
+    setAddress("");
+    setJoiningDate("");
+    setDesignation("");
+    setSalaryType("");
+    setBaseSalary("");
+    setIsActive(1);
+    setEditingId(null);
+  };
+
+  const openAddModal = () => {
+    resetFormFields();
+    setShowModal(true);
+  }
+
+  const closeAndResetModal = () => {
+    setShowModal(false);
+    resetFormFields();
+  }
+
+
+  const handleAddEmployee = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios.post("http://localhost:8000/api/employees", {
+        employee_code,
+        employee_name,
+        phone,
+        email,
+        address,
+        joining_date,
+        designation,
+        salary_type,
+        base_salary,
+        is_active: Number(is_active),
+      });
+
+      // 1. Close the form modal
+      closeAndResetModal();
+      
+      // 2. Show Success Alert (using CustomAlert)
+      setAlert({
+        isOpen: true,
+        title: "Success",
+        message: "Employee added successfully.",
+        type: "success",
+        onConfirm: () => {
+          setAlert({ ...alert, isOpen: false });
+          fetchEmployees(); // Re-fetch data after closing alert
+        },
+        onClose: () => {
+          setAlert({ ...alert, isOpen: false });
+          fetchEmployees(); // Re-fetch data
+        },
+      });
+      
+    } catch (error) {
+  let errorMessage = "Failed to add employee.";
+
+  if (error.response && error.response.status === 422) {
+    const errors = error.response.data.errors;
+    errorMessage = Object.values(errors).flat().join(" ");
+  }
+
+  setAlert({
+    isOpen: true,
+    title: "Duplicate Entry",
+    message: errorMessage,
+    type: "error",
+    onConfirm: () => setAlert({ ...alert, isOpen: false }),
+    onClose: () => setAlert({ ...alert, isOpen: false }),
+  });
+}
+
+  };
+  
+  const handleDeleteConfirmation = (id) => {
+    // Show Confirmation Alert
+    setAlert({
+      isOpen: true,
+      title: "Confirm Deletion",
+      message: "Are you sure you want to delete this employee? This action cannot be undone!",
+      type: "confirm",
+      itemId: id, // Store ID to be deleted
+      onConfirm: () => {
+        handleDelete(id);
+      },
+      onClose: () => setAlert({ ...alert, isOpen: false }),
+    });
+  };
+
+  const handleDelete = async (id) => {
+    // 1. Close the confirmation alert first
+    setAlert({ ...alert, isOpen: false });
+
+    try {
+      await axios.delete(`http://localhost:8000/api/employees/${id}`);
+      
+      // Show Success Alert
+      setAlert({
+        isOpen: true,
+        title: "Deleted!",
+        message: "Employee removed successfully.",
+        type: "success",
+        onConfirm: () => {
+          setAlert({ ...alert, isOpen: false });
+          fetchEmployees(); // Re-fetch data
+        },
+        onClose: () => {
+          setAlert({ ...alert, isOpen: false });
+          fetchEmployees(); // Re-fetch data
+        },
+      });
+
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      // Show Error Alert
+      setAlert({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete employee.",
+        type: "error",
+        onConfirm: () => setAlert({ ...alert, isOpen: false }),
+        onClose: () => setAlert({ ...alert, isOpen: false }),
+      });
+    }
+  };
+
+  const handleUpdateEmployee = async (e) => {
+    e.preventDefault();
+
+    try {
+      await axios.put(`http://localhost:8000/api/employees/${editingId}`, {
+        employee_code,
+        employee_name,
+        phone,
+        email,
+        address,
+        joining_date,
+        designation,
+        salary_type,
+        base_salary,
+        is_active: Number(is_active),
+      });
+
+      // 1. Close the form modal
+      closeAndResetModal();
+      
+      // 2. Show Success Alert
+      setAlert({
+        isOpen: true,
+        title: "Success",
+        message: "Employee updated successfully.",
+        type: "success",
+        onConfirm: () => {
+          setAlert({ ...alert, isOpen: false });
+          fetchEmployees(); // Re-fetch data
+        },
+        onClose: () => {
+          setAlert({ ...alert, isOpen: false });
+          fetchEmployees(); // Re-fetch data
+        },
+      });
+    } catch (error) {
+  let errorMessage = "Failed to update employee.";
+
+  if (error.response && error.response.status === 422) {
+    const errors = error.response.data.errors;
+    errorMessage = Object.values(errors).flat().join(" ");
+  }
+
+  setAlert({
+    isOpen: true,
+    title: "Duplicate Entry",
+    message: errorMessage,
+    type: "error",
+    onConfirm: () => setAlert({ ...alert, isOpen: false }),
+    onClose: () => setAlert({ ...alert, isOpen: false }),
+  });
+}
+
+  };
+
+
+  const handleEdit = (employee) => {
+    setEditingId(employee.id);
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    };
+
+    setEmployeeCode(employee.employee_code || "");
+    setEmployeeName(employee.employee_name || "");
+    setPhone(employee.phone || "");
+    setEmail(employee.email || "");
+    setAddress(employee.address || "");
+    setJoiningDate(formatDate(employee.joining_date) || "");
+    setDesignation(employee.designation || "");
+    setSalaryType(String(employee.salary_type) || "");
+    setBaseSalary(employee.base_salary || "");
+    setIsActive(employee.is_active);
+
+    setShowModal(true);
+  };
+
+
+  return (
+    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
+          <h1 className="text-3xl font-extrabold text-indigo-700">
+            <span className="text-gray-900">🏢</span> Employee Management
+          </h1>
+          <button
+            onClick={openAddModal}
+            className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-full 
+                       shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            <FaPlus size={16} />
+            <span className="font-semibold">Add New Employee</span>
+          </button>
+        </div>
+
+        {/* Employee Table - Same styling as before */}
+        <div className="overflow-x-auto rounded-xl shadow-2xl mt-8">
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr className="bg-indigo-600 text-white text-sm font-bold uppercase tracking-wider">
+                <th className="py-4 px-6 text-left rounded-tl-xl">Sr No.</th>
+                <th className="py-4 px-6 text-left">ID</th>
+                <th className="py-4 px-6 text-left">Code</th>
+                <th className="py-4 px-6 text-left">Name</th>
+                <th className="py-4 px-6 text-left hidden sm:table-cell">Phone</th>
+                <th className="py-4 px-6 text-left hidden md:table-cell">Email</th>
+                <th className="py-4 px-6 text-left hidden lg:table-cell">Designation</th>
+                <th className="py-4 px-6 text-left">Status</th>
+                <th className="py-4 px-6 text-center" colSpan="2">Actions</th>
+                <th className="py-4 px-6 text-center">Salary Details</th>
+              </tr>
+            </thead>
+
+            <tbody className="text-sm divide-y divide-gray-200">
+              {employees.length > 0 ? (
+                employees.map((emp, index) => (
+                  <tr
+                    key={emp.id}
+                    className="hover:bg-indigo-50 transition duration-150 ease-in-out"
+                  >
+                    <td className="py-3 px-6 text-gray-700">{index + 1}</td>
+                    <td className="py-3 px-6 text-gray-700">{emp.id}</td>
+                    <td className="py-3 px-6 font-semibold text-gray-800">{emp.employee_code}</td>
+                    <td className="py-3 px-6">{emp.employee_name}</td>
+                    <td className="py-3 px-6 hidden sm:table-cell">{emp.phone}</td>
+                    <td className="py-3 px-6 hidden md:table-cell text-blue-600 truncate max-w-[150px]">{emp.email}</td>
+                    <td className="py-3 px-6 hidden lg:table-cell">{emp.designation}</td>
+                    <td className="py-3 px-6">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          emp.is_active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {emp.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    
+                    <td className="py-3 px-3 text-center w-0">
+                      <button
+                        onClick={() => handleEdit(emp)}
+                        className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150"
+                        title="Edit"
+                      >
+                        <FaEdit size={16} />
+                      </button>
+                    </td>
+                    <td className="py-3 px-3 text-center w-0">
+                      <button
+                        onClick={() => handleDeleteConfirmation(emp.id)}
+                        className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150"
+                        title="Delete"
+                      >
+                        <FaTrash size={16} />
+                      </button>
+                    </td>
+                    <td className="py-3 px-3 text-center w-0"><button className=" bg-indigo-600 text-white px-5 py-2.5 rounded-full "> salary</button></td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="10" className="py-10 text-center text-gray-500 text-lg">
+                    No employees found. Please add one!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      {/* Add/Edit Employee Modal - Unchanged */}
+      {showModal && (
+        <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
+          {/* ... Modal content remains the same ... */}
+          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl transform transition-all duration-300 scale-100">
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <h3 className="text-2xl font-bold text-indigo-700">
+                {editingId ? "Edit Employee Details" : "Add New Employee"}
+              </h3>
+              <button
+                type="button"
+                onClick={closeAndResetModal}
+                className="text-gray-400 hover:text-red-500 transition duration-150 p-2 rounded-full hover:bg-red-50"
+                title="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={editingId ? handleUpdateEmployee : handleAddEmployee} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div>
+                  <label htmlFor="code" className="block text-sm font-semibold text-gray-700 mb-1">Employee Code</label>
+                  <input
+                    id="code" type="text" value={employee_code} onChange={(e) => setEmployeeCode(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="E.g., EMP001" required />
+                </div>
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-1">Employee Name</label>
+                  <input
+                    id="name" type="text" value={employee_name} onChange={(e) => setEmployeeName(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="Full Name" required />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
+                  <input
+                    id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="123-456-7890" required />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                  <input
+                    id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="name@company.com" required />
+                </div>
+                <div>
+                  <label htmlFor="designation" className="block text-sm font-semibold text-gray-700 mb-1">Designation</label>
+                  <input
+                    id="designation" type="text" value={designation} onChange={(e) => setDesignation(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="E.g., Software Engineer" required />
+                </div>
+                <div>
+                  <label htmlFor="joining_date" className="block text-sm font-semibold text-gray-700 mb-1">Joining Date</label>
+                  <input
+                    id="joining_date" type="date" value={joining_date} onChange={(e) => setJoiningDate(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    required />
+                </div>
+                <div>
+                  <label htmlFor="base_salary" className="block text-sm font-semibold text-gray-700 mb-1">Base Salary</label>
+                  <input
+                    id="base_salary" type="number" value={base_salary} onChange={(e) => setBaseSalary(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="e.g., 50000" required />
+                </div>
+                <div>
+                  <label htmlFor="salary_type" className="block text-sm font-semibold text-gray-700 mb-1">Salary Type</label>
+                  <select
+                    id="salary_type" value={salary_type} onChange={(e) => setSalaryType(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    required>
+                    <option value="" disabled>Select Type</option>
+                    <option value="0">Monthly</option>
+                    <option value="1">Daily</option>
+                  </select>
+                </div>
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3">
+                  <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+                  <input
+                    id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)}
+                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    placeholder="Street, City, Country" required />
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-700">Status:</label>
+                  <div
+                    onClick={() => setIsActive(is_active === 1 ? 0 : 1)}
+                    className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-all duration-300 ${
+                      is_active ? "bg-green-500" : "bg-gray-400"
+                    } shadow-inner`}
+                  >
+                    <div
+                      className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-all duration-300 ${
+                        is_active ? "translate-x-7" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                  <span className={`text-sm font-medium ${is_active ? "text-green-600" : "text-gray-600"}`}>
+                    {is_active ? "Active" : "Inactive"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-6 flex justify-end gap-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={closeAndResetModal}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 font-medium transform hover:scale-105"
+                >
+                  {editingId ? "Save Changes" : "Create Employee"}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* RENDER THE CUSTOM ALERT */}
+      <CustomAlert
+        isOpen={alert.isOpen}
+        title={alert.title}
+        message={alert.message}
+        type={alert.type}
+        onConfirm={alert.onConfirm}
+        onClose={alert.onClose}
+      />
+    </div>
+  );
+}
+
+export default Employee;

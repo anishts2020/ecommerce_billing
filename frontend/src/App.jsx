@@ -2,8 +2,10 @@ import { useState } from 'react'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import Employee from './Pages/Employee';
+import Customer from './Pages/Customer';
 
 function App() {
   return (
@@ -16,6 +18,24 @@ function App() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        {/* Employee Page Route */}
+        <Route
+          path="/employees"
+          element={
+            <PrivateRoute>
+              <Employee />
+            </PrivateRoute>
+          }
+        />
+         {/* customer */}
+         <Route
+          path="/customers"
+          element={
+            <PrivateRoute>
+              <Customer />
             </PrivateRoute>
           }
         />

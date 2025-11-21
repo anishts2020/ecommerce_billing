@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const u = localStorage.getItem("user");
     if (u) {
@@ -40,12 +41,25 @@ export default function Dashboard() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl shadow p-4">
-                <h2 className="font-semibold mb-2">Employee & Salary</h2>
-                <p className="text-sm text-slate-600">
-                  Manage employees, roles, salary payments.
-                </p>
-              </div>
+              <div
+  onClick={() => navigate("/employees")}
+  className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+>
+  <h2 className="font-semibold mb-2">Employee & Salary</h2>
+  <p className="text-sm text-slate-600">
+    Manage employees, roles, salary payments.
+  </p>
+</div>
+
+              <div
+  onClick={() => navigate("/customers")}
+  className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+>
+  <h2 className="font-semibold mb-2">Customer & Sales</h2>
+  <p className="text-sm text-slate-600">
+    Manage employees, roles, salary payments.
+  </p>
+</div>
             </>
           )}
 

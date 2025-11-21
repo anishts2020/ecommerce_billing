@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\CustomerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +17,8 @@ use App\Http\Controllers\Api\AuthController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::apiResource('customers', \App\Http\Controllers\Api\CustomerController::class);
+Route::apiResource('employees', EmployeeController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
 
