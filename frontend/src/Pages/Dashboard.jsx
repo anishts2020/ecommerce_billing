@@ -28,6 +28,7 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
+      <a href="/Materials">Materials </a>
 
       <main className="max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-4">
