@@ -7,10 +7,10 @@ function CreateUser() {
   const [isOpen, setIsOpen] = useState(false);
 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    mobile: "",
+    user_name: "",
+    user_email: "",
+    user_pass: "",
+    user_mobile: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -23,7 +23,6 @@ function CreateUser() {
     message: "",
   });
 
-  // 🔥 Reload state added
   const [reload, setReload] = useState(false);
 
   const showAlert = (type, title, message) => {
@@ -40,14 +39,14 @@ function CreateUser() {
     setErrors({});
 
     const newErrors = {};
-    if (!/^[A-Za-z\s]+$/.test(form.name)) {
-      newErrors.name = ["Name cannot contain numbers or special characters"];
+    if (!/^[A-Za-z\s]+$/.test(form.user_name)) {
+      newErrors.user_name = ["Name cannot contain numbers or special characters"];
     }
-    if (form.password.length < 8) {
-      newErrors.password = ["Password must be at least 8 characters"];
+    if (form.user_pass.length < 8) {
+      newErrors.user_pass = ["Password must be at least 8 characters"];
     }
-    if (!/^\d{10}$/.test(form.mobile)) {
-      newErrors.mobile = ["Mobile number must be exactly 10 digits"];
+    if (!/^\d{10}$/.test(form.user_mobile)) {
+      newErrors.user_mobile = ["Mobile number must be exactly 10 digits"];
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -56,15 +55,24 @@ function CreateUser() {
     }
 
     try {
-      await axios.post("http://localhost:8000/api/users", form);
+      await axios.post("http://localhost:8000/api/users", {
+        name: form.user_name,
+        email: form.user_email,
+        password: form.user_pass,
+        mobile: form.user_mobile,
+      });
 
       showAlert("success", "Success", "User created successfully!");
 
-      // 🔥 IMPORTANT: refresh UserList
       setReload(!reload);
 
-      // Reset form + close modal
-      setForm({ name: "", email: "", password: "", mobile: "" });
+      setForm({
+        user_name: "",
+        user_email: "",
+        user_pass: "",
+        user_mobile: "",
+      });
+
       setIsOpen(false);
     } catch (error) {
       if (error.response && error.response.status === 422) {
@@ -83,14 +91,19 @@ function CreateUser() {
           onClick={() => setIsOpen(true)}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg"
         >
-          Add User
+         + Add User
         </button>
       </div>
 
-      {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-8 relative">
+
+            {/* Fake hidden form prevents autofill */}
+            <form autoComplete="off" style={{ display: "none" }}>
+              <input type="text" name="fake_user" />
+              <input type="password" name="fake_pass" />
+            </form>
 
             {/* Close Button */}
             <button
@@ -102,19 +115,21 @@ function CreateUser() {
 
             <h1 className="text-2xl font-bold text-center mb-6">Create User</h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
 
               {/* Name */}
               <div>
                 <input
                   type="text"
-                  value={form.name}
+                  name="user_name"
+                  autoComplete="off"
+                  value={form.user_name}
                   className="border rounded-lg p-3 w-full"
                   placeholder="Enter Username"
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onChange={(e) => setForm({ ...form, user_name: e.target.value })}
                 />
-                {errors.name && (
-                  <span className="text-red-500 text-sm">{errors.name[0]}</span>
+                {errors.user_name && (
+                  <span className="text-red-500 text-sm">{errors.user_name[0]}</span>
                 )}
               </div>
 
@@ -122,10 +137,12 @@ function CreateUser() {
               <div>
                 <input
                   type="email"
-                  value={form.email}
+                  name="user_email"
+                  autoComplete="new-email"
+                  value={form.user_email}
                   className="border rounded-lg p-3 w-full"
                   placeholder="Enter Email"
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  onChange={(e) => setForm({ ...form, user_email: e.target.value })}
                 />
                 {errors.email && (
                   <span className="text-red-500 text-sm">{errors.email[0]}</span>
@@ -136,17 +153,15 @@ function CreateUser() {
               <div>
                 <input
                   type="password"
-                  value={form.password}
+                  name="user_pass"
+                  autoComplete="new-password"
+                  value={form.user_pass}
                   className="border rounded-lg p-3 w-full"
                   placeholder="Enter Password"
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, user_pass: e.target.value })}
                 />
-                {errors.password && (
-                  <span className="text-red-500 text-sm">
-                    {errors.password[0]}
-                  </span>
+                {errors.user_pass && (
+                  <span className="text-red-500 text-sm">{errors.user_pass[0]}</span>
                 )}
               </div>
 
@@ -154,18 +169,16 @@ function CreateUser() {
               <div>
                 <input
                   type="text"
-                  value={form.mobile}
+                  name="user_mobile"
+                  autoComplete="off"
+                  value={form.user_mobile}
                   className="border rounded-lg p-3 w-full"
                   placeholder="Enter Mobile Number"
                   maxLength={10}
-                  onChange={(e) =>
-                    setForm({ ...form, mobile: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, user_mobile: e.target.value })}
                 />
-                {errors.mobile && (
-                  <span className="text-red-500 text-sm">
-                    {errors.mobile[0]}
-                  </span>
+                {errors.user_mobile && (
+                  <span className="text-red-500 text-sm">{errors.user_mobile[0]}</span>
                 )}
               </div>
 
@@ -194,7 +207,7 @@ function CreateUser() {
         onClose={() => setAlert({ ...alert, open: false })}
       />
 
-      {/* User List (🔥 reload passed here) */}
+      {/* User List */}
       <UserList reload={reload} />
     </>
   );
