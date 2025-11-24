@@ -1,13 +1,10 @@
-import { useState } from 'react';
-import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./Pages/Dashboard";
+import Roles from "./Pages/Roles";
+import UserRoles from "./Pages/UserRoles";
 import PrivateRoute from "./components/PrivateRoute";
-import UserList from './Pages/UserList';
-import CreateUser from './Pages/CreateUser';
-
-
+import "./App.css";
 
 function App() {
   
@@ -15,7 +12,13 @@ function App() {
   return (
     <Router>
       <Routes>
+
+        {/* Public Route */}
         <Route path="/login" element={<Login />} />
+
+        <Route path="/createroles" element={<Roles />} />
+        <Route path="/createuserroles" element={<UserRoles />} />
+        {/* Protected Route */}
         <Route
           path="/dashboard"
           element={
@@ -28,10 +31,7 @@ function App() {
           }
         />
 
-        {/* Optional: separate page for users list */}
-        <Route path="/users" element={<UserList />} />
-
-        {/* default route */}
+        {/* Default route → Redirect to login */}
         <Route path="*" element={<Login />} />
                 <Route path="/CreateUser" element={<CreateUser/>} />
 
