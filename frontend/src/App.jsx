@@ -7,6 +7,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
 
 function App() {
+  
+
   return (
     <Router>
       <Routes>
@@ -21,13 +23,18 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <Dashboard
+                openCreateModal={() => setIsModalOpen(true)}
+              />
+              
             </PrivateRoute>
           }
         />
 
         {/* Default route → Redirect to login */}
         <Route path="*" element={<Login />} />
+                <Route path="/CreateUser" element={<CreateUser/>} />
+
       </Routes>
     </Router>
   );
