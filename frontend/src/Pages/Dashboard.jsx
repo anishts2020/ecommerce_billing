@@ -46,6 +46,7 @@ export default function Dashboard() {
           )}
         </ul>
       </nav>
+      <a href="/color-form">colors</a>
 
       <div className="min-h-screen bg-slate-50">
         <header className="bg-white shadow mb-4">

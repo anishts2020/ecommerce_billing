@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ProductSizeController;
-
-
-
+use App\Http\Controllers\Api\ColorController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,6 +26,9 @@ Route::get('/product-sizes', [ProductSizeController::class, 'index']);
 Route::post('/product-sizes', [ProductSizeController::class, 'store']);
 Route::put('/product-sizes/{id}', [ProductSizeController::class, 'update']);
 Route::delete('/product-sizes/{id}', [ProductSizeController::class, 'destroy']);
+Route::get('/colors', [ColorController::class, 'index']);
+Route::post('/colors', [ColorController::class, 'store']);
+
 
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

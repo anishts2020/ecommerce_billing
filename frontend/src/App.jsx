@@ -6,6 +6,7 @@ import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import Vendors from './Pages/Vendors';
 import ProductSizePage from './Pages/ProductSizePage';
+import Colors from './Pages/Colors';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="*" element={<Login />} />
         <Route path='/vendors' element={<Vendors/>}></Route>
         <Route path="/product-sizes" element={<ProductSizePage />} />
+        <Route path="/color-form" element={<Colors/>}></Route>
       </Routes>
     </Router>
   );

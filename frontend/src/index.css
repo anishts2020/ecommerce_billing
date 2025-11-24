@@ -18,3 +18,9 @@
   outline: none;
   box-shadow: 0 0 0 3px rgba(147,197,253,0.5);
 }
+@import "select2/dist/css/select2.min.css";
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
