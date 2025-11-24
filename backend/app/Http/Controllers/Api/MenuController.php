@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\colors;
-
-
-class ColorsController extends Controller
+class MenuController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +13,6 @@ class ColorsController extends Controller
     public function index()
     {
         //
-        return colors::where('is_active', 1)->get();
-
     }
 
     /**

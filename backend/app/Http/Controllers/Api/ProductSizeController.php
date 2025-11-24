@@ -15,6 +15,7 @@ class ProductSizeController extends Controller
      */
     public function index()
     {
+        //
         return Product_size::where('is_active', 1)->get();
 
     }
