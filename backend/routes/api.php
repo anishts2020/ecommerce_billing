@@ -5,6 +5,15 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
 
+use App\Http\Controllers\Api\ProductsController;
+
+use App\Http\Controllers\Api\ProductCategories;
+use App\Http\Controllers\Api\ProductTypes;
+use App\Http\Controllers\Api\ColorsController;
+use App\Http\Controllers\Api\ProductSizeController;
+use App\Http\Controllers\Api\VendorsController;
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,6 +26,28 @@ use App\Http\Controllers\Api\AuthController;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+
+
+
+Route::get('/products', [ProductsController::class, 'index']);
+
+Route::post('/products/store', [ProductsController::class, 'store']);
+Route::get('/products/{id}', [ProductsController::class, 'show']);
+Route::put('/products/{id}', [ProductsController::class, 'update']);
+Route::delete('/products/{id}', [ProductsController::class, 'destroy']);
+
+
+
+
+
+Route::get('/categories', [ProductCategories::class, 'index']);
+Route::get('/types', [ProductTypes::class, 'index']);
+Route::get('/colors', [ColorsController::class, 'index']);
+Route::get('/sizes', [ProductSizeController::class, 'index']);
+Route::get('/vendors', [VendorsController::class, 'index']);
+
+
+
 
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
