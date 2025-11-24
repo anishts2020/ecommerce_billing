@@ -7,6 +7,15 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductCategoriesController;
 use App\Http\Controllers\Api\MaterialsController;
 
+use App\Http\Controllers\Api\ProductsController;
+
+use App\Http\Controllers\Api\ProductCategories;
+use App\Http\Controllers\Api\ProductTypes;
+use App\Http\Controllers\Api\ColorsController;
+use App\Http\Controllers\Api\ProductSizeController;
+use App\Http\Controllers\Api\VendorsController;
+
+
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
@@ -58,6 +67,26 @@ Route::put('/product-sizes/{id}', [ProductSizeController::class, 'update']);
 Route::delete('/product-sizes/{id}', [ProductSizeController::class, 'destroy']);
 Route::get('/colors', [ColorController::class, 'index']);
 Route::post('/colors', [ColorController::class, 'store']);
+
+
+
+Route::get('/products', [ProductsController::class, 'index']);
+
+Route::post('/products/store', [ProductsController::class, 'store']);
+Route::get('/products/{id}', [ProductsController::class, 'show']);
+Route::put('/products/{id}', [ProductsController::class, 'update']);
+Route::delete('/products/{id}', [ProductsController::class, 'destroy']);
+
+
+
+
+
+Route::get('/categories', [ProductCategories::class, 'index']);
+Route::get('/types', [ProductTypes::class, 'index']);
+Route::get('/colors', [ColorsController::class, 'index']);
+Route::get('/sizes', [ProductSizeController::class, 'index']);
+Route::get('/vendors', [VendorsController::class, 'index']);
+
 
 
 

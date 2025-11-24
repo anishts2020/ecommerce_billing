@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { Link } from "react-router-dom"; // <-- import Link
 import toast from "react-hot-toast";
 
 export default function Dashboard() {
+  
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -15,6 +19,8 @@ export default function Dashboard() {
   const roles = user.roles || [];
   const isAdmin = roles.includes("ADMIN");
   const isCashier = roles.includes("CASHIER");
+
+
 
   return (
     <>
@@ -88,9 +94,27 @@ export default function Dashboard() {
             <>
               <div className="bg-white rounded-xl shadow p-4">
                 <h2 className="font-semibold mb-2">Product Management</h2>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-slate-600"> </p>
                   Add / edit categories, types, vendors, materials, products.
-                </p>
+                  
+                  <div className="mt-4 flex gap-4">
+                    <button
+                      onClick={() => navigate("/add-product")}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Add Product
+                    </button>
+
+                    <button
+                      onClick={() => navigate("/view-products")}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
+                      View Products
+                    </button>
+                  </div>
+
+
+                
               </div>
 
                 <div className="bg-white rounded-xl shadow p-4">

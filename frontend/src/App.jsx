@@ -1,3 +1,4 @@
+import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
@@ -16,6 +17,12 @@ import UserRoles from "./Pages/UserRoles";
 import PrivateRoute from "./components/PrivateRoute";
 import "./App.css";
 
+
+// Product pages
+import AddProduct from "./pages/AddProduct";
+import ViewProducts from "./pages/ViewProducts";
+
+
 function App() {
   
 
@@ -23,6 +30,10 @@ function App() {
     <Router> 
       <Routes>
 
+        {/* Public Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Routes */}
         {/* Public Route */}
         <Route path="/login" element={<Login />} />
 
@@ -49,6 +60,31 @@ function App() {
             }
 />
 
+        
+
+        <Route
+          path="/add-product"
+          element={
+            <PrivateRoute>
+              <AddProduct />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/view-products"
+          element={
+            <PrivateRoute>
+              <ViewProducts />
+            </PrivateRoute>
+          }
+        />
+       
+
+
+       
+
+        {/* Default route */}
         {/* Default route → Redirect to login */}
         <Route path="*" element={<Login />} />
         <Route path="ProductCategories" element={<ProductCategories />} />
