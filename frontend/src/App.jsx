@@ -1,67 +1,93 @@
-import './App.css'
+import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
-import Materials from './Pages/Materials';
-import Login from "./pages/Login";
-import Dashboard from "./Pages/Dashboard";
-import PrivateRoute from "./components/PrivateRoute";
+
+import Materials from "./Pages/Materials";
 import ProductCategories from "./Pages/ProductCategories";
-import PrivateRoute from "./components/PrivateRoute";
-import Vendors from './Pages/Vendors';
-import ProductSizePage from './Pages/ProductSizePage';
-import Colors from './Pages/Colors';
+import Vendors from "./Pages/Vendors";
+import ProductSizePage from "./Pages/ProductSizePage";
+import Colors from "./Pages/Colors";
 import Roles from "./Pages/Roles";
 import UserRoles from "./Pages/UserRoles";
-import PrivateRoute from "./components/PrivateRoute";
-import "./App.css";
-
 
 // Product pages
 import AddProduct from "./pages/AddProduct";
 import ViewProducts from "./pages/ViewProducts";
 
+// MISSING IMPORT FIXED
+import CreateUser from "./Pages/CreateUser";
 
 function App() {
-  
-
   return (
-    <Router> 
+    <Router>
       <Routes>
-
-        {/* Public Login */}
+        {/* Public */}
         <Route path="/login" element={<Login />} />
 
-        {/* Protected Routes */}
-        {/* Public Route */}
-        <Route path="/login" element={<Login />} />
-
+        {/* Admin Screens (unprotected routes FIRST) */}
         <Route path="/createroles" element={<Roles />} />
         <Route path="/createuserroles" element={<UserRoles />} />
-        {/* Protected Route */}
+        <Route path="/CreateUser" element={<CreateUser />} />
+
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard
-                openCreateModal={() => setIsModalOpen(true)}
-              />
-              
+              <Dashboard />
             </PrivateRoute>
           }
         />
-          <Route
-         path="/ProductCategories"
-         element={
+
+        <Route
+          path="/ProductCategories"
+          element={
             <PrivateRoute>
-                <ProductCategories />
+              <ProductCategories />
             </PrivateRoute>
-            }
-/>
+          }
+        />
 
-        
+        <Route
+          path="/Materials"
+          element={
+            <PrivateRoute>
+              <Materials />
+            </PrivateRoute>
+          }
+        />
 
+        <Route
+          path="/vendors"
+          element={
+            <PrivateRoute>
+              <Vendors />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/product-sizes"
+          element={
+            <PrivateRoute>
+              <ProductSizePage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/color-form"
+          element={
+            <PrivateRoute>
+              <Colors />
+            </PrivateRoute>
+          }
+        />
+
+        {/* products */}
         <Route
           path="/add-product"
           element={
@@ -79,21 +105,9 @@ function App() {
             </PrivateRoute>
           }
         />
-       
 
-
-       
-
-        {/* Default route */}
-        {/* Default route → Redirect to login */}
+        {/* Default */}
         <Route path="*" element={<Login />} />
-        <Route path="ProductCategories" element={<ProductCategories />} />
-           <Route path="/Materials" element={<Materials />} />
-        <Route path='/vendors' element={<Vendors/>}></Route>
-        <Route path="/product-sizes" element={<ProductSizePage />} />
-        <Route path="/color-form" element={<Colors/>}></Route>
-                <Route path="/CreateUser" element={<CreateUser/>} />
-
       </Routes>
     </Router>
   );

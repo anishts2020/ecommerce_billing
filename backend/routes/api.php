@@ -17,7 +17,6 @@ use App\Http\Controllers\Api\VendorsController;
 
 
 use App\Http\Controllers\Api\VendorController;
-use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
 /*
 |--------------------------------------------------------------------------
