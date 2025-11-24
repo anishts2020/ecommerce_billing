@@ -6,6 +6,8 @@ import Materials from './Pages/Materials';
 import Login from "./pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import ProductCategories from "./Pages/ProductCategories";
+import PrivateRoute from "./components/PrivateRoute";
 import Vendors from './Pages/Vendors';
 import ProductSizePage from './Pages/ProductSizePage';
 import Colors from './Pages/Colors';
@@ -38,9 +40,18 @@ function App() {
             </PrivateRoute>
           }
         />
+          <Route
+         path="/ProductCategories"
+         element={
+            <PrivateRoute>
+                <ProductCategories />
+            </PrivateRoute>
+            }
+/>
 
         {/* Default route → Redirect to login */}
         <Route path="*" element={<Login />} />
+        <Route path="ProductCategories" element={<ProductCategories />} />
            <Route path="/Materials" element={<Materials />} />
         <Route path='/vendors' element={<Vendors/>}></Route>
         <Route path="/product-sizes" element={<ProductSizePage />} />

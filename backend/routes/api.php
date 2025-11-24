@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProductCategoriesController;
 use App\Http\Controllers\Api\MaterialsController;
 
 use App\Http\Controllers\Api\VendorController;
@@ -60,6 +61,11 @@ Route::post('/colors', [ColorController::class, 'store']);
 
 
 
+
+Route::get('/product-categories', [ProductCategoriesController::class, 'index']);
+Route::post('/product-categories', [ProductCategoriesController::class, 'store']);
+Route::put('/product-categories/{id}', [ProductCategoriesController::class, 'update']);
+Route::delete('/product-categories/{id}', [ProductCategoriesController::class, 'destroy']);
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
@@ -67,6 +73,8 @@ Route::post('/colors', [ColorController::class, 'store']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+   
+
 
     // later: protected routes for products, billing, etc.
 });
