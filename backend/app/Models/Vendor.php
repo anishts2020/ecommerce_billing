@@ -5,16 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductSize extends Model
+class Vendor extends Model
 {
     use HasFactory;
-
-    protected $table = 'product_sizes';
-    protected $primaryKey = 'size_id';
-
     protected $fillable = [
-        'size_name',
-        'description',
-        'is_active',
+        'vendor_name',
+        'email',
+        'phone',
+        'address',
+        'city',
+        'state',
+        'pincode',
+        'gst_number',
     ];
 }

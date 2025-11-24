@@ -5,19 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\colors;
+use App\Models\Product_categories;
 
-
-class ColorsController extends Controller
+class ProductCategories extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-        return colors::where('is_active', 1)->get();
-
+        return Product_categories::where('is_active', 1)->get();
     }
 
     /**
