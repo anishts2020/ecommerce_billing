@@ -29,6 +29,16 @@ export default function Dashboard() {
         </div>
       </header>
 
+        <p className="text-center mt-4">
+          <a href="/createroles" className="auth-link">
+            Create Role
+          </a>
+        </p>
+        <p className="text-center mt-4">
+          <a href="/createuserroles" className="auth-link">
+            Create User Role
+          </a>
+        </p>
       <main className="max-w-6xl mx-auto px-4">
         <div className="grid md:grid-cols-3 gap-4">
           {isAdmin && (
