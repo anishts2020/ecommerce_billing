@@ -105,7 +105,12 @@ export default function Materials() {
     }
   };
 
-  const normalize = (arr) => (arr || []).map((m) => ({ ...m, id: m.id ?? m.material_id ?? null }));
+  const normalize = (arr) =>
+    (arr || []).map((m) => {
+      // ensure names are trimmed for consistent comparisons
+      const name = (m.material_name ?? "").toString().trim();
+      return { ...m, id: m.id ?? m.material_id ?? null, material_name: name, description: (m.description ?? "").toString().trim() };
+    });
 
   const fetchMaterials = async () => {
     try {
@@ -140,6 +145,13 @@ export default function Materials() {
     }
     setNameError("");
 
+    // duplicate check (case-insensitive)
+    const exists = materials.some((m) => (m.material_name || "").toLowerCase() === name.toLowerCase());
+    if (exists) {
+      setAlertState({ isOpen: true, title: "Already exists", message: "A material with that name already exists.", type: "error" });
+      return;
+    }
+
     try {
       await axios.post("http://127.0.0.1:8000/api/materials", {
         material_name: name,
@@ -150,7 +162,12 @@ export default function Materials() {
       setFormData({ material_name: "", description: "" });
       setAlertState({ isOpen: true, title: "Added", message: "Material added successfully.", type: "success" });
     } catch (err) {
-      setAlertState({ isOpen: true, title: "Add failed", message: err.response?.data?.message || err.message, type: "error" });
+      const backendMsg = err.response?.data?.message || err.response?.data?.error;
+      if (err.response?.status === 409 || /duplicate|unique/i.test(backendMsg || "")) {
+        setAlertState({ isOpen: true, title: "Already exists", message: backendMsg || "A material with that name already exists.", type: "error" });
+      } else {
+        setAlertState({ isOpen: true, title: "Add failed", message: backendMsg || err.message, type: "error" });
+      }
     }
   };
 
@@ -190,6 +207,16 @@ export default function Materials() {
     }
     setNameError("");
 
+    // duplicate check excluding current item (case-insensitive)
+    const exists = materials.some((m) => {
+      const mid = m.id ?? m.material_id;
+      return mid !== editData.id && (m.material_name || "").toLowerCase() === name.toLowerCase();
+    });
+    if (exists) {
+      setAlertState({ isOpen: true, title: "Already exists", message: "Another material with that name already exists.", type: "error" });
+      return;
+    }
+
     try {
       await axios.put(`http://127.0.0.1:8000/api/materials/${editData.id}`, {
         material_name: name,
@@ -199,7 +226,12 @@ export default function Materials() {
       setEditModal(false);
       setAlertState({ isOpen: true, title: "Updated", message: "Material updated successfully.", type: "success" });
     } catch (err) {
-      setAlertState({ isOpen: true, title: "Update failed", message: err.response?.data?.message || err.message, type: "error" });
+      const backendMsg = err.response?.data?.message || err.response?.data?.error;
+      if (err.response?.status === 409 || /duplicate|unique/i.test(backendMsg || "")) {
+        setAlertState({ isOpen: true, title: "Already exists", message: backendMsg || "Another material with that name already exists.", type: "error" });
+      } else {
+        setAlertState({ isOpen: true, title: "Update failed", message: backendMsg || err.message, type: "error" });
+      }
     }
   };
 
