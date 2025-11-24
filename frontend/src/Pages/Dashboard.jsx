@@ -57,6 +57,9 @@ export default function Dashboard() {
               ({roles.join(", ")})
             </div>
           </div>
+        </div>
+      </header>
+      <a href="/Materials">Materials </a>
         </header>
 
         <main className="max-w-6xl mx-auto px-4">

@@ -1,4 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./Pages/Login";
+import Dashboard from "./Pages/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
+import Materials from './Pages/Materials';
 import Login from "./pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
@@ -37,6 +41,7 @@ function App() {
 
         {/* Default route → Redirect to login */}
         <Route path="*" element={<Login />} />
+           <Route path="/Materials" element={<Materials />} />
         <Route path='/vendors' element={<Vendors/>}></Route>
         <Route path="/product-sizes" element={<ProductSizePage />} />
         <Route path="/color-form" element={<Colors/>}></Route>

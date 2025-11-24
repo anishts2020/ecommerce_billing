@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MaterialsController;
+
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
@@ -41,6 +43,10 @@ Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/materials', [MaterialsController::class, 'index']);
+Route::post('/materials', [MaterialsController::class, 'store']);
+Route::put('/materials/{id}', [MaterialsController::class, 'update']);
+Route::delete('/materials/{id}', [MaterialsController::class, 'destroy']);
 Route::get('/vendors', [VendorController::class, 'index']);   // Fetch all vendors
 Route::post('/vendors', [VendorController::class, 'store']);
 Route::put('/vendors/{id}', [VendorController::class, 'update']);
