@@ -105,7 +105,31 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/colors"
+          element={
+            <PrivateRoute>
+              <Colors />
+            </PrivateRoute>
+          }
+        />
+ <Route
+          path="/CreateUser"
+          element={
+            <PrivateRoute>
+              <CreateUser />
+            </PrivateRoute>
+          }
+        />
 
+         <Route
+          path="/ProductCategories"
+          element={
+            <PrivateRoute>
+              <ProductCategories />
+            </PrivateRoute>
+          }
+        />
         {/* Default */}
         <Route path="*" element={<Login />} />
       </Routes>

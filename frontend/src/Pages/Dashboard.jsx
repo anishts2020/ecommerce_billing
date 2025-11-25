@@ -31,7 +31,7 @@ export default function Dashboard() {
           {isAdmin && (
             <li>
               <Link to="/vendors" className="hover:underline">
-                Create User
+               Vendors
               </Link>
             </li>
           )}
@@ -43,7 +43,34 @@ export default function Dashboard() {
               </Link>
             </li>
           )}
-
+           {isAdmin && (
+            <li>
+              <Link to="/CreateUser" className="hover:underline">
+                Create User
+              </Link>
+            </li>
+          )}
+    {isAdmin && (
+            <li>
+              <Link to="/colors" className="hover:underline">
+                Colors
+              </Link>
+            </li>
+          )}
+           {isAdmin && (
+            <li>
+              <Link to="/Materials" className="hover:underline">
+               Materials
+              </Link>
+            </li>
+          )}
+             {isAdmin && (
+            <li>
+              <Link to="/ProductCategories" className="hover:underline">
+               ProductCategories
+              </Link>
+            </li>
+          )}
           <li>
             <Link to="/login" className="hover:underline">
               Logout
@@ -65,9 +92,9 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <a href="/Materials" className="ml-4 text-blue-600 underline">
+        {/* <a href="/Materials" className="ml-4 text-blue-600 underline">
           Materials
-        </a>
+        </a> */}
 
         {/* MAIN CONTENT */}
         <main className="max-w-6xl mx-auto px-4 mt-4">
