@@ -69,6 +69,13 @@ export default function Dashboard() {
           Materials
         </a>
 
+        <div>
+        <a href="/ProductCategories ">Product Categories</a>
+      </div>
+      <div>
+        <a href="/color-form ">Colors</a>
+      </div>
+
         {/* MAIN CONTENT */}
         <main className="max-w-6xl mx-auto px-4 mt-4">
           <div className="grid md:grid-cols-3 gap-4">
