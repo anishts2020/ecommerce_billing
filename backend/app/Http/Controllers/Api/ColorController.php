@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 class ColorController extends Controller
 {
     public function index() {
-        return response()->json(["colors" => Color::all()]);
+        // return response()->json(["colors" => Color::all()]);
+        return Color::all(); // ✅ correct
+
     }
 
     public function store(Request $request) {

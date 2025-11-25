@@ -32,7 +32,7 @@ class Products extends Model
 
     public function size()
     {
-        return $this->belongsTo(ProductSize::class, 'size_id', 'product_size_id');
+        return $this->belongsTo(ProductSize::class, 'size_id', 'size_id');
     }
 
     public function vendor()

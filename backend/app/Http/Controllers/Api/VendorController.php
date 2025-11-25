@@ -30,32 +30,33 @@ class VendorController extends Controller
 
         return Vendor::create($request->all());
     }
+
+    // UPDATE VENDOR
     public function update(Request $request, $id)
     {
         $request->validate([
             'vendor_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:vendors,email,' . $id,
-            'phone' => 'required|digits:10|unique:vendors,phone,' . $id,
+            'email' => 'required|email|unique:vendors,email,' . $id . ',vendor_id',
+            'phone' => 'required|digits:10|unique:vendors,phone,' . $id . ',vendor_id',
             'address' => 'required',
             'city' => 'required',
             'state' => 'required',
             'pincode' => 'required|numeric',
-            'gst_number' => 'required|string|size:15|unique:vendors,gst_number,' . $id,
+            'gst_number' => 'required|string|size:15|unique:vendors,gst_number,' . $id . ',vendor_id',
         ]);
 
-        $vendor = Vendor::findOrFail($id);
+        $vendor = Vendor::where('vendor_id', $id)->firstOrFail();
         $vendor->update($request->all());
 
         return response()->json(['message' => 'Vendor updated successfully']);
     }
 
+    // DELETE VENDOR
     public function destroy($id)
     {
-        $vendor = Vendor::findOrFail($id);
-
+        $vendor = Vendor::where('vendor_id', $id)->firstOrFail();
         $vendor->delete();
 
         return response()->json(['message' => 'Vendor deleted successfully']);
     }
-
 }
