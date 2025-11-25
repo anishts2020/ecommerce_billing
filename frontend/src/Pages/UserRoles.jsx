@@ -11,7 +11,6 @@ function UserRoles() {
   const [editingId, setEditingId] = useState(null);
 
   const [formModalOpen, setFormModalOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
 
   // ALERT MODAL CONTROL
   const [alert, setAlert] = useState({
@@ -68,7 +67,15 @@ function UserRoles() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.user_id) {
+      openAlert("error", "Validation Failed", "Please select a User");
+      return;
+    }
 
+    if (!formData.role_id) {
+      openAlert("error", "Validation Failed", "Please select a Role");
+      return;
+    }
     // Duplicate validation popup
     if (isDuplicateEntry()) {
       openAlert(
@@ -101,25 +108,25 @@ function UserRoles() {
   };
 
   const handleDelete = (id) => {
-    setDeleteId(id);
     openAlert(
       "delete-confirm",
       "Are you sure?",
       "This user role will be permanently deleted?",
-      confirmDelete
+      () => confirmDelete(id)
     );
   };
 
-  const confirmDelete = async () => {
+
+  const confirmDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/user-role/${deleteId}`);
+      await axios.delete(`http://localhost:8000/api/user-role/${id}`);
       openAlert("success", "Deleted", "Record deleted successfully");
-      setDeleteId(null);
       fetchAll();
     } catch (err) {
       openAlert("error", "Failed", "Failed to delete record");
     }
   };
+
 
   return (
     <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
