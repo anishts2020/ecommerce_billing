@@ -4,15 +4,30 @@ import Select from "react-select";
 import colorsJson from "../data/colors.json";
 
 export default function Colors() {
-  const [colors, setColors] = useState([]);
+  const [colors, setColors] = useState([]); // always start as array
   const [selectedColor, setSelectedColor] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchColors = async () => {
+    setLoading(true);
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/colors");
-      setColors(res.data.colors);
+      console.log("colors API response:", res.data);
+
+      // safer: try multiple common shapes, fallback to empty array
+      const serverColors =
+        (res.data && res.data.colors) ?? // { colors: [...] }
+        (res.data && res.data.data) ??   // { data: [...] }
+        res.data ??                      // raw array or object
+        [];
+
+      // ensure it's an array
+      setColors(Array.isArray(serverColors) ? serverColors : []);
     } catch (err) {
       console.error("Failed to fetch colors", err);
+      setColors([]); // on error, keep it an array
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -20,11 +35,14 @@ export default function Colors() {
     fetchColors();
   }, []);
 
-  const options = colorsJson.map((c) => ({
-    label: `${c.name} (${c.hex})`,
-    value: c.name,
-    code: c.hex,
-  }));
+  // make sure colorsJson is defined and an array before mapping
+  const options = Array.isArray(colorsJson)
+    ? colorsJson.map((c) => ({
+        label: `${c.name} (${c.hex})`,
+        value: c.name,
+        code: c.hex,
+      }))
+    : [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,16 +99,25 @@ export default function Colors() {
             </tr>
           </thead>
           <tbody>
-            {colors.map((c) => (
-              <tr key={c.id} className="border-b text-center hover:bg-gray-100">
-                <td>{c.color_name}</td>
-                <td>{c.color_code}</td>
-                <td>{c.is_active ? "Yes" : "No"}</td>
-                <td>
-                  <div className="w-6 h-6 mx-auto rounded" style={{ backgroundColor: c.color_code }}></div>
+            {/* guard here too */}
+            {Array.isArray(colors) && colors.length > 0 ? (
+              colors.map((c) => (
+                <tr key={c.id ?? c.color_code ?? Math.random()} className="border-b text-center hover:bg-gray-100">
+                  <td>{c.color_name}</td>
+                  <td>{c.color_code}</td>
+                  <td>{c.is_active ? "Yes" : "No"}</td>
+                  <td>
+                    <div className="w-6 h-6 mx-auto rounded" style={{ backgroundColor: c.color_code }}></div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-4 text-center">
+                  {loading ? "Loading colors..." : "No colors found."}
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

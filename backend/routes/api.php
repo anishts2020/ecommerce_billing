@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\ProductCategories;
 use App\Http\Controllers\Api\ProductTypes;
 use App\Http\Controllers\Api\ColorsController;
 use App\Http\Controllers\Api\ProductSizeController;
-use App\Http\Controllers\Api\VendorsController;
+
 
 
 use App\Http\Controllers\Api\VendorController;
@@ -84,7 +84,7 @@ Route::get('/categories', [ProductCategories::class, 'index']);
 Route::get('/types', [ProductTypes::class, 'index']);
 Route::get('/colors', [ColorsController::class, 'index']);
 Route::get('/sizes', [ProductSizeController::class, 'index']);
-Route::get('/vendors', [VendorsController::class, 'index']);
+
 
 
 

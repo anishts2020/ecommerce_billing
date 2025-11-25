@@ -114,7 +114,6 @@ export default function Vendors() {
 
   const [editData, setEditData] = useState({ ...formData, id: "" });
 
-  // --- Custom Alert State ---
   const [alertState, setAlertState] = useState({
     isOpen: false,
     title: "",
@@ -123,14 +122,14 @@ export default function Vendors() {
     actionToRun: null,
   });
 
-  const closeAlert = () => setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
+  const closeAlert = () =>
+    setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
 
   const handleAlertConfirm = () => {
     if (alertState.type === "confirm" && alertState.actionToRun) {
       alertState.actionToRun();
-    } else {
-      closeAlert();
     }
+    closeAlert();
   };
 
   // --- Fetch Vendors ---
@@ -139,24 +138,56 @@ export default function Vendors() {
       const res = await axios.get("http://127.0.0.1:8000/api/vendors");
       setVendors(res.data);
     } catch (err) {
-      setAlertState({ isOpen: true, title: "Error", message: "Failed to fetch vendors", type: "error" });
+      setAlertState({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to fetch vendors",
+        type: "error",
+        actionToRun: null,
+      });
     }
   };
 
-  useEffect(() => fetchVendors(), []);
+  useEffect(() => {
+    const loadVendors = async () => {
+      await fetchVendors();
+    };
+    loadVendors();
+  }, []);
 
   // --- Add Vendor ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post("http://127.0.0.1:8000/api/vendors", formData);
-      setAlertState({ isOpen: true, title: "Success", message: "Vendor added successfully!", type: "success" });
+      setAlertState({
+        isOpen: true,
+        title: "Success",
+        message: "Vendor added successfully!",
+        type: "success",
+        actionToRun: null,
+      });
       fetchVendors();
-      setFormData({ vendor_name: "", email: "", phone: "", address: "", state: "", city: "", pincode: "", gst_number: "" });
+      setFormData({
+        vendor_name: "",
+        email: "",
+        phone: "",
+        address: "",
+        state: "",
+        city: "",
+        pincode: "",
+        gst_number: "",
+      });
     } catch (error) {
-      if (error.response && error.response.status === 422) {
+      if (error.response?.status === 422) {
         const messages = Object.values(error.response.data.errors).flat();
-        setAlertState({ isOpen: true, title: "Validation Error", message: messages.join(", "), type: "error" });
+        setAlertState({
+          isOpen: true,
+          title: "Validation Error",
+          message: messages.join(", "),
+          type: "error",
+          actionToRun: null,
+        });
       }
     }
   };
@@ -172,32 +203,54 @@ export default function Vendors() {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/vendors/${id}`);
           fetchVendors();
-          setAlertState({ isOpen: true, title: "Deleted", message: "Vendor deleted successfully!", type: "success" });
+          setAlertState({
+            isOpen: true,
+            title: "Deleted",
+            message: "Vendor deleted successfully!",
+            type: "success",
+            actionToRun: null,
+          });
         } catch {
-          setAlertState({ isOpen: true, title: "Error", message: "Could not delete vendor", type: "error" });
+          setAlertState({
+            isOpen: true,
+            title: "Error",
+            message: "Could not delete vendor",
+            type: "error",
+            actionToRun: null,
+          });
         }
       },
     });
   };
 
-  // --- Open Edit Modal ---
   const openEdit = (v) => {
     setEditData(v);
     setEditModal(true);
   };
 
-  // --- Update Vendor ---
   const updateVendor = async (e) => {
     e.preventDefault();
     try {
       await axios.put(`http://127.0.0.1:8000/api/vendors/${editData.id}`, editData);
-      setAlertState({ isOpen: true, title: "Success", message: "Vendor updated successfully!", type: "success" });
+      setAlertState({
+        isOpen: true,
+        title: "Success",
+        message: "Vendor updated successfully!",
+        type: "success",
+        actionToRun: null,
+      });
       setEditModal(false);
       fetchVendors();
     } catch (error) {
-      if (error.response && error.response.status === 422) {
+      if (error.response?.status === 422) {
         const messages = Object.values(error.response.data.errors).flat();
-        setAlertState({ isOpen: true, title: "Validation Error", message: messages.join(", "), type: "error" });
+        setAlertState({
+          isOpen: true,
+          title: "Validation Error",
+          message: messages.join(", "),
+          type: "error",
+          actionToRun: null,
+        });
       }
     }
   };
@@ -207,8 +260,20 @@ export default function Vendors() {
       <h2 className="text-3xl font-bold mb-6">Vendor Management</h2>
 
       {/* ADD VENDOR FORM */}
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow mb-8">
-        {["vendor_name", "email", "phone", "address", "state", "city", "pincode", "gst_number"].map((field) => (
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow mb-8"
+      >
+        {[
+          "vendor_name",
+          "email",
+          "phone",
+          "address",
+          "state",
+          "city",
+          "pincode",
+          "gst_number",
+        ].map((field) => (
           <input
             key={field}
             type={field === "email" ? "email" : "text"}
@@ -219,7 +284,11 @@ export default function Vendors() {
             required
           />
         ))}
-        <button type="submit" className="col-span-1 md:col-span-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+
+        <button
+          type="submit"
+          className="col-span-1 md:col-span-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
           Add Vendor
         </button>
       </form>
@@ -229,9 +298,24 @@ export default function Vendors() {
         <table className="w-full">
           <thead>
             <tr className="bg-blue-600 text-white">
-              {["Name","Email","Phone","Address","State","City","Pincode","GST","Actions"].map((th) => <th key={th} className="p-2">{th}</th>)}
+              {[
+                "Name",
+                "Email",
+                "Phone",
+                "Address",
+                "State",
+                "City",
+                "Pincode",
+                "GST",
+                "Actions",
+              ].map((th) => (
+                <th key={th} className="p-2">
+                  {th}
+                </th>
+              ))}
             </tr>
           </thead>
+
           <tbody>
             {vendors.map((v) => (
               <tr key={v.id} className="border-b text-center hover:bg-gray-100">
@@ -244,8 +328,18 @@ export default function Vendors() {
                 <td className="p-2">{v.pincode}</td>
                 <td className="p-2">{v.gst_number}</td>
                 <td className="p-2 flex justify-center gap-2">
-                  <button onClick={() => openEdit(v)} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"><EditIcon className="w-4 h-4" /></button>
-                  <button onClick={() => handleDelete(v.id)} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"><TrashIcon className="w-4 h-4" /></button>
+                  <button
+                    onClick={() => openEdit(v)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                  >
+                    <EditIcon className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(v.id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -259,12 +353,40 @@ export default function Vendors() {
           <div className="bg-white p-6 rounded shadow-lg w-96">
             <h3 className="text-xl font-bold mb-4">Edit Vendor</h3>
             <form onSubmit={updateVendor} className="space-y-3">
-              {["vendor_name","email","phone","address","state","city","pincode","gst_number"].map((field) => (
-                <input key={field} type={field==="email"?"email":"text"} value={editData[field]} onChange={(e)=>setEditData({...editData,[field]:e.target.value})} className="border rounded px-3 py-2 w-full"/>
+              {[
+                "vendor_name",
+                "email",
+                "phone",
+                "address",
+                "state",
+                "city",
+                "pincode",
+                "gst_number",
+              ].map((field) => (
+                <input
+                  key={field}
+                  type={field === "email" ? "email" : "text"}
+                  value={editData[field]}
+                  onChange={(e) =>
+                    setEditData({ ...editData, [field]: e.target.value })
+                  }
+                  className="border rounded px-3 py-2 w-full"
+                />
               ))}
               <div className="flex justify-between mt-4">
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
-                <button onClick={()=>setEditModal(false)} type="button" className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setEditModal(false)}
+                  type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -283,4 +405,3 @@ export default function Vendors() {
     </div>
   );
 }
-                                                                                    

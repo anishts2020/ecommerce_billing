@@ -17,7 +17,7 @@ class Products extends Model
 
     public function category()
     {
-        return $this->belongsTo(Product_categories::class, 'category_id', 'product_category_id');
+        return $this->belongsTo(ProductCategory::class, 'category_id', 'product_category_id');
     }
 
     public function type()
@@ -27,16 +27,16 @@ class Products extends Model
 
     public function color()
     {
-        return $this->belongsTo(colors::class, 'color_id', 'color_id');
+        return $this->belongsTo(Color::class, 'color_id', 'color_id');
     }
 
     public function size()
     {
-        return $this->belongsTo(Product_size::class, 'size_id', 'product_size_id');
+        return $this->belongsTo(ProductSize::class, 'size_id', 'product_size_id');
     }
 
     public function vendor()
     {
-        return $this->belongsTo(Vendors::class, 'vendor_id', 'vendor_id');
+        return $this->belongsTo(Vendor::class, 'vendor_id', 'vendor_id');
     }
 }
