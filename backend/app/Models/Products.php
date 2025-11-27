@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Products extends Model
 {
     use HasFactory;
+  
+
+  protected $primaryKey = 'product_id'; 
+
+
      protected $table = 'products'; // your actual table name
 
     protected $primaryKey = 'product_id';
@@ -17,6 +22,7 @@ class Products extends Model
         'selling_price',   ];
        
 
+}
     protected $primaryKey = 'product_id';
 
     protected $fillable = [

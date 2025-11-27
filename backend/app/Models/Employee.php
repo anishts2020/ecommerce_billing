@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     use HasFactory;
+    protected $table = 'employee';
+
+    public function salaryPayments()
+    {
+       return $this->hasMany(SalaryPayment::class, 'employee_id');
+    }
+
     protected $fillable = [
         'employee_code',
         'employee_name',

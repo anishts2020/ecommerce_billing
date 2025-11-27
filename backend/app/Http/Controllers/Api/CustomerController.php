@@ -42,6 +42,24 @@ class CustomerController extends Controller
         return Customer::findOrFail($id);
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+       $customer = Customer::findOrFail($id);
+        $customer->update($request->all());
+        return $customer;
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+       return Customer::destroy($id);
+    }
+
     public function checkByPhone($phone)
 {
     $customer = Customer::where('phone', $phone)->first();
@@ -57,6 +75,12 @@ class CustomerController extends Controller
         'exists' => false
     ]);
 }
+}
+
+
+
+
+
 
 public function checkPhone($phone)
 {
