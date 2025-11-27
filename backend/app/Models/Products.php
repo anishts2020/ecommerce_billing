@@ -13,10 +13,47 @@ class Products extends Model
   protected $primaryKey = 'product_id'; 
 
 
+     protected $table = 'products'; // your actual table name
+
+    protected $primaryKey = 'product_id';
   protected $fillable =  ['product_code',
     'product_name',
       'unit_of_measure',
         'selling_price',   ];
        
 
+}
+    protected $primaryKey = 'product_id';
+
+    protected $fillable = [
+        'product_code','sku','product_name','product_description',
+        'category_id','type_id','color_id','size_id','vendor_id',
+        'unit_of_measure','quantity_on_hand','min_stock_level',
+        'cost_price','selling_price','tax_percent','is_published','is_active'
+    ];
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_id', 'product_category_id');
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(Product_types::class, 'type_id', 'product_type_id');
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(Color::class, 'color_id', 'color_id');
+    }
+
+    public function size()
+    {
+        return $this->belongsTo(ProductSize::class, 'size_id', 'size_id');
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class, 'vendor_id', 'vendor_id');
+    }
 }

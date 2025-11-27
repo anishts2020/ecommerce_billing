@@ -15,4 +15,19 @@ class Employee extends Model
        return $this->hasMany(SalaryPayment::class, 'employee_id');
     }
 
+    protected $fillable = [
+        'employee_code',
+        'employee_name',
+        'phone',
+        'email',
+        'address',
+        'joining_date',
+        'designation',
+        'salary_type',
+        'base_salary',
+        'is_active',
+    ];
+    protected $casts = [
+        'is_active' => 'integer',  // ← add this
+    ];
 }

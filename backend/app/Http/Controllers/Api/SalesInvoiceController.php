@@ -19,6 +19,7 @@ class SalesInvoiceController extends Controller
 
     /**
      * Store invoice + items
+     * Store a new invoice with items.
      */
     public function store(Request $request)
     {
@@ -80,6 +81,46 @@ class SalesInvoiceController extends Controller
 
 
 
+            'invoice_no' => 'required',
+            'invoice_date' => 'required',
+            'customer_id' => 'required',
+            'grand_total' => 'required',
+            'discount' => 'required',
+            'tax' => 'required',
+            'net_total' => 'required',
+            'payment_mode' => 'required',
+            'items' => 'required|array',
+        ]);
+
+        // Create invoice
+        $invoice = SalesInvoice::create([
+            'invoice_no' => $request->invoice_no,
+            'invoice_date' => $request->invoice_date,
+            'customer_id' => $request->customer_id,
+            'cashier_id' => $request->cashier_id ?? null,
+            'grand_total' => $request->grand_total,
+            'discount' => $request->discount,
+            'tax' => $request->tax,
+            'net_total' => $request->net_total,
+            'payment_mode' => $request->payment_mode,
+            'status' => 'Completed',
+   'remarks' => $request->remarks ?? '',
+
+        ]);
+
+        // Insert items based on your NEW table structure
+        foreach ($request->items as $item) {
+            SalesInvoiceItem::create([
+                'sales_invoice_id' => $invoice->sales_invoice_id,
+                'product_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+                'discount_amount' => $item['discount_amount'],
+                'tax_percent' => $item['tax_percent'],
+                'grand_total' => $item['grand_total'],
+            ]);
+        }
+
         return response()->json([
             'message' => 'Invoice saved successfully',
             'invoice' => $invoice
@@ -88,6 +129,7 @@ class SalesInvoiceController extends Controller
 
     /**
      * Return single invoice + mapped items
+     * Show one invoice by ID.
      */
     public function show($id)
     {
@@ -152,6 +194,11 @@ class SalesInvoiceController extends Controller
 
     /**
      * Delete invoice
+        return $invoice;
+    }
+
+    /**
+     * Delete an invoice.
      */
     public function destroy($id)
     {

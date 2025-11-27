@@ -1,1 +1,25 @@
 @import "tailwindcss";
+@keyframes fadeIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+ 
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+.input {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(147,197,253,0.5);
+}
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
