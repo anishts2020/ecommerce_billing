@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import Header from "../components/Header";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <Header />
       {/* Top Navigation */}
       <nav>
         <ul className="flex space-x-4 bg-gray-800 p-4 text-white">
