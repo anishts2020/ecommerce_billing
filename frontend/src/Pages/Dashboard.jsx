@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import {useNavigate} from "react-router-dom";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const u = localStorage.getItem("user");
     if (u) setUser(JSON.parse(u));
@@ -133,6 +134,66 @@ export default function Dashboard() {
                   </p>
                 </div>
 
+              <div
+  onClick={() => navigate("/employees")}
+  className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+>
+  <h2 className="font-semibold mb-2">Employee & Salary</h2>
+  <p className="text-sm text-slate-600">
+    Manage employees, roles, salary payments.
+  </p>
+</div>
+<div className="bg-white rounded-xl shadow p-4 hover:shadow-lg transition">
+
+  <h2 className="font-semibold mb-2">Sales Invoice</h2>
+  <p className="text-sm text-slate-600 mb-4">
+    Bills
+  </p>
+
+  <div className="flex gap-3">
+    {/* Invoice List Button */}
+    <button
+      onClick={() => navigate("/salesinvoice_list")}
+      className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition"
+    >
+      Invoice List
+    </button>
+
+    {/* Add Invoice Button */}
+    <button
+      onClick={() => navigate("/sales-invoice")}
+      className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition"
+    >
+      Add Invoice
+    </button>
+  </div>
+
+</div>
+
+
+              <div
+  onClick={() => navigate("/customers")}
+  className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+>
+  <h2 className="font-semibold mb-2">Customer & Sales</h2>
+  <p className="text-sm text-slate-600">
+    Manage employees, roles, salary payments.
+  </p>
+</div>
+            </>
+          )}
+
+          {isCashier && (
+            <div className="bg-white rounded-xl shadow p-4">
+              <h2 className="font-semibold mb-2">Billing</h2>
+              <p className="text-sm text-slate-600">
+                Create new bills and manage daily sales.
+              </p>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
                 <div className="bg-white rounded-xl shadow p-4">
                   <h2 className="font-semibold mb-2">User & Role Settings</h2>
                   <p className="text-sm text-slate-600 mb-2">
