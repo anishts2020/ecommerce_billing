@@ -6,6 +6,11 @@ import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import EmployeeDetails from "./Pages/EmployeeDetails";
 import SalaryDetails from './Pages/SalaryDetails';
+import Customer from './Pages/Customer';
+import CustomerDetailsForm from './Pages/CustomerDetailsForm';
+import SalesInvoice from './Pages/SalesInvoice';
+import SalesinvoiceList from './Pages/SalesinvoiceList';
+import SalesInvoiceItems from './Pages/SalesInvoiceItems';
 
 function App() {
   return (
@@ -35,9 +40,20 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/customers" element={
+          <PrivateRoute>
+            <Customer/>
+          </PrivateRoute>
+        }
+        />
 
         {/* default route */}
         <Route path="*" element={<Login />} />
+        <Route path="/customer-form" element={<CustomerDetailsForm />} />
+        <Route path="/sales-invoice" element={<SalesInvoice/>} />
+        <Route path='/sales-voiceList' element={<SalesinvoiceList/>}/>
+        <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems/>} />
+
       </Routes>
     </Router>
   );

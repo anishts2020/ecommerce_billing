@@ -56,6 +56,44 @@ export default function Dashboard() {
                   Manage employees, roles, salary payments.
                 </p>
               </div>
+              <div
+                onClick={() => navigate("/customers")}
+                className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+              >
+                <h2 className="font-semibold mb-2">Customer & Sales</h2>
+                <p className="text-sm text-slate-600">
+                  Manage employees, roles, salary payments.
+                </p>
+              </div>
+
+              <div
+                onClick={() => navigate("/customer-form")}
+                className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+              >
+                <h2 className="font-semibold mb-2">Customer & Sales</h2>
+                <p className="text-sm text-slate-600">
+                  Manage employees, roles, salary payments.
+                </p>
+              </div>
+
+              <div
+                onClick={() => navigate("/sales-invoice")}
+                className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+              >
+                <h2 className="font-semibold mb-2">sales invoice</h2>
+                <p className="text-sm text-slate-600">
+                  bills
+                </p>
+              </div>
+              <div
+                onClick={() => navigate("/sales-voiceList")}
+                className="bg-white rounded-xl shadow p-4 cursor-pointer hover:shadow-lg transition"
+              >
+                <h2 className="font-semibold mb-2">sales invoice</h2>
+                <p className="text-sm text-slate-600">
+                  bills
+                </p>
+              </div>
             </>
           )}
 
