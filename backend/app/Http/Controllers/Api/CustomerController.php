@@ -42,6 +42,37 @@ class CustomerController extends Controller
         return Customer::findOrFail($id);
     }
 
+    public function checkByPhone($phone)
+{
+    $customer = Customer::where('phone', $phone)->first();
+
+    if ($customer) {
+        return response()->json([
+            'exists' => true,
+            'data' => $customer
+        ]);
+    }
+
+    return response()->json([
+        'exists' => false
+    ]);
+}
+
+public function checkPhone($phone)
+{
+    $customer = Customer::where('phone', $phone)->first();
+
+    if ($customer) {
+        return response()->json([
+            'exists' => true,
+            'data' => $customer
+        ]);
+    } else {
+        return response()->json([
+            'exists' => false
+        ]);
+    }
+}
     /**
      * Update the specified resource in storage.
      */

@@ -106,6 +106,7 @@ function Customer() {
   const [customers, setCustomers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const emptyForm = {
     customer_name: "",
@@ -271,6 +272,13 @@ function Customer() {
           <h1 className="text-3xl font-extrabold text-indigo-700">
             👥 Customer Management
           </h1>
+          <input
+    type="text"
+    placeholder="Search by name..."
+    className="w-full md:w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-300 outline-none"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
 
           {/* ADD CUSTOMER BUTTON */}
           <button
@@ -300,8 +308,15 @@ function Customer() {
             </thead>
             <tbody className="text-sm divide-y divide-gray-200">
               {customers.length > 0 ? (
-                customers.map((cust) => (
+                
+  customers
+    .filter(cust =>
+      cust.customer_name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    )
+    .map((cust, index) => (
+                
                   <tr key={cust.id} className="hover:bg-indigo-50 transition duration-150 ease-in-out">
+                    
                     <td className="py-3 px-6 text-gray-700">{cust.id}</td>
                     <td className="py-3 px-6 font-semibold text-gray-800">{cust.customer_name}</td>
                     <td className="py-3 px-6 hidden sm:table-cell">{cust.phone}</td>

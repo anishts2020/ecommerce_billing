@@ -103,7 +103,7 @@ function Employee() {
   const [employees, setEmployees] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
+  const [searchTerm, setSearchTerm] = useState("");
   // Custom Alert State
   const [alert, setAlert] = useState({ 
     isOpen: false, 
@@ -371,6 +371,13 @@ function Employee() {
           <h1 className="text-3xl font-extrabold text-indigo-700">
             <span className="text-gray-900">🏢</span> Employee Management
           </h1>
+          <input
+    type="text"
+    placeholder="Search by name..."
+    className="w-full md:w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-300 outline-none"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
           <button
             onClick={openAddModal}
             className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-full 
@@ -400,8 +407,12 @@ function Employee() {
             </thead>
 
             <tbody className="text-sm divide-y divide-gray-200">
-              {employees.length > 0 ? (
-                employees.map((emp, index) => (
+             {employees.length > 0 ? (
+  employees
+    .filter(emp =>
+      emp.employee_name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    )
+    .map((emp, index) => (
                   <tr
                     key={emp.id}
                     className="hover:bg-indigo-50 transition duration-150 ease-in-out"
