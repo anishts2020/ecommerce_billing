@@ -8,12 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     use HasFactory;
-    protected $table = 'employee';
+    protected $table = 'employees';
 
-    public function salaryPayments()
-    {
-       return $this->hasMany(SalaryPayment::class, 'employee_id');
-    }
+    
 
     protected $fillable = [
         'employee_code',
@@ -30,4 +27,8 @@ class Employee extends Model
     protected $casts = [
         'is_active' => 'integer',  // ← add this
     ];
+    public function salaryPayments()
+    {
+       return $this->hasMany(SalaryPayment::class, 'employee_id');
+    }
 }

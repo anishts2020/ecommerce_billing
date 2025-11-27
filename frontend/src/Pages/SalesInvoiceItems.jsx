@@ -97,7 +97,7 @@ function SalesInvoiceItems() {
                             </tr>
                         </thead>
 
-                        <tbody className="bg-white divide-y divide-gray-200">
+                       <tbody className="bg-white divide-y divide-gray-200">
                             {items.map((item, index) => (
                                 <tr
                                     key={item.sales_invoice_item_id}

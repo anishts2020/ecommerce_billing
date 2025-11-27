@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Products;
 
 class SalesInvoiceItem extends Model
 {
     use HasFactory;
 
     protected $primaryKey = 'sales_invoice_item_id';
-       protected $primaryKey = 'sales_invoice_item_id';
 
     protected $fillable = [
         'sales_invoice_id',
@@ -21,17 +19,11 @@ class SalesInvoiceItem extends Model
         'discount_amount',
         'tax_percent',
         'grand_total',
-        'grand_total'
     ];
 
     public function product()
     {
         return $this->belongsTo(Products::class, 'product_id');
-    }
-}
-
-       return $this->belongsTo(Products::class, 'product_id');
-
     }
 
     public function invoice()

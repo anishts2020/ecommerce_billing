@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 // Removed: import Swal from "sweetalert2"; // No longer needed
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
@@ -130,7 +131,7 @@ function Employee() {
   useEffect(() => {
     fetchEmployees();
   }, []);
-
+   const navigate = useNavigate();
   const fetchEmployees = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/employees");
@@ -454,7 +455,14 @@ function Employee() {
                         <FaTrash size={16} />
                       </button>
                     </td>
-                    <td className="py-3 px-3 text-center w-0"><button className=" bg-indigo-600 text-white px-5 py-2.5 rounded-full "> salary</button></td>
+                   <td className="py-3 px-3 text-center w-0">
+  <button
+    onClick={() => navigate(`/salary/${emp.id}`)}
+    className="bg-indigo-600 text-white px-5 py-2.5 rounded-full hover:bg-indigo-700 transition"
+  >
+    Salary
+  </button>
+</td>
                   </tr>
                 ))
               ) : (
