@@ -111,6 +111,7 @@ const AddProduct = () => {
     product_description: "",
     category_id: "",
     type_id: "",
+    material_id: "",
     color_id: "",
     size_id: "",
     vendor_id: "",
@@ -132,6 +133,7 @@ const AddProduct = () => {
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [vendors, setVendors] = useState([]);
+  const [materials, setMaterials] = useState([]);
 
   useEffect(() => {
   axios.get("http://localhost:8000/api/categories").then((res) =>
@@ -149,6 +151,9 @@ const AddProduct = () => {
   axios.get("http://localhost:8000/api/sizes").then((res) =>
     setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])
   );
+  axios.get("http://localhost:8000/api/materials").then((res) =>
+  setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])
+);
 
   axios.get("http://localhost:8000/api/vendors").then((res) =>
     setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])
@@ -300,6 +305,18 @@ const AddProduct = () => {
             </option>
           ))}
         </select>
+        <select
+  className="border p-2 rounded"
+  onChange={(e) => setFormData({ ...formData, material_id: e.target.value })}
+>
+  <option value="">Select Material</option>
+  {materials.map((m) => (
+    <option key={m.material_id} value={m.material_id}>
+      {m.material_name}
+    </option>
+  ))}
+</select>
+
 
         {/* COLOR PICKER */}
         <div className="col-span-2">
