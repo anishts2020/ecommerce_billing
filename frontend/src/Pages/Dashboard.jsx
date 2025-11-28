@@ -123,6 +123,12 @@ export default function Dashboard() {
                     >
                       View Products
                     </button>
+                    <button
+                      onClick={() => navigate("/inventory-transactions")}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
+                      Inventory Transactions
+                    </button>
                   </div>
                 </div>
 
@@ -139,13 +145,20 @@ export default function Dashboard() {
                     Manage roles & permissions.
                   </p>
 
-                  <div className="flex flex-col gap-2">
-                    <a href="/createroles" className="text-blue-600 underline">
+                  <div className="mt-4 flex gap-4">
+                    <button
+                      onClick={() => navigate("/createroles")}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
                       Create Role
-                    </a>
-                    <a href="/createuserroles" className="text-blue-600 underline">
+                    </button>
+
+                    <button
+                      onClick={() => navigate("/createuserroles")}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
                       Create User Role
-                    </a>
+                    </button>
                   </div>
                 </div>
               </>
