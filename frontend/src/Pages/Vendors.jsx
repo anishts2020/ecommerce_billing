@@ -86,6 +86,10 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
 // MAIN COMPONENT
 export default function Vendors() {
   const [vendors, setVendors] = useState([]);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [perPage] = useState(10);
 
   const [formData, setFormData] = useState({
     vendor_name: "",
@@ -99,83 +103,36 @@ export default function Vendors() {
   });
 
   const [editModal, setEditModal] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [alertState, setAlertState] = useState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
 
-  const [editData, setEditData] = useState({
-    vendor_name: "",
-    email: "",
-    phone: "",
-    address: "",
-    state: "",
-    city: "",
-    pincode: "",
-    gst_number: "",
-    vendor_id: "",
-  });
+  const closeAlert = () => setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
+  const handleAlertConfirm = () => { if (alertState.type === "confirm" && alertState.actionToRun) alertState.actionToRun(); closeAlert(); };
 
-  const [alertState, setAlertState] = useState({
-    isOpen: false,
-    title: "",
-    message: "",
-    type: "success",
-    actionToRun: null,
-  });
-
-  const closeAlert = () =>
-    setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
-
-  const handleAlertConfirm = () => {
-    if (alertState.type === "confirm" && alertState.actionToRun) alertState.actionToRun();
-    closeAlert();
-  };
-
-  const fetchVendors = async () => {
+  const fetchVendors = async (page = 1, searchTerm = "") => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/vendors");
-      setVendors(res.data);
+      const res = await axios.get("http://127.0.0.1:8000/api/vendors", { params: { page, search: searchTerm, per_page: perPage } });
+      setVendors(res.data.data);
+      setCurrentPage(res.data.current_page);
+      setLastPage(res.data.last_page);
     } catch {
-      setAlertState({
-        isOpen: true,
-        title: "Error",
-        message: "Failed to fetch vendors",
-        type: "error",
-      });
+      setAlertState({ isOpen: true, title: "Error", message: "Failed to fetch vendors", type: "error" });
     }
   };
 
-  useEffect(() => {
-    fetchVendors();
-  }, []);
+  useEffect(() => { fetchVendors(currentPage, search); }, [currentPage, search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post("http://127.0.0.1:8000/api/vendors", formData);
-      setAlertState({
-        isOpen: true,
-        title: "Success",
-        message: "Vendor added successfully!",
-        type: "success",
-      });
+      setAlertState({ isOpen: true, title: "Success", message: "Vendor added successfully!", type: "success" });
+      setFormData({ vendor_name: "", email: "", phone: "", address: "", state: "", city: "", pincode: "", gst_number: "" });
       fetchVendors();
-      setFormData({
-        vendor_name: "",
-        email: "",
-        phone: "",
-        address: "",
-        state: "",
-        city: "",
-        pincode: "",
-        gst_number: "",
-      });
     } catch (error) {
       if (error.response?.status === 422) {
         const messages = Object.values(error.response.data.errors).flat();
-        setAlertState({
-          isOpen: true,
-          title: "Validation Error",
-          message: messages.join(", "),
-          type: "error",
-        });
+        setAlertState({ isOpen: true, title: "Validation Error", message: messages.join(", "), type: "error" });
       }
     }
   };
@@ -190,50 +147,26 @@ export default function Vendors() {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/vendors/${vendor_id}`);
           fetchVendors();
-          setAlertState({
-            isOpen: true,
-            title: "Deleted",
-            message: "Vendor deleted successfully!",
-            type: "success",
-          });
+          setAlertState({ isOpen: true, title: "Deleted", message: "Vendor deleted successfully!", type: "success" });
         } catch {
-          setAlertState({
-            isOpen: true,
-            title: "Error",
-            message: "Could not delete vendor",
-            type: "error",
-          });
+          setAlertState({ isOpen: true, title: "Error", message: "Could not delete vendor", type: "error" });
         }
       },
     });
   };
 
-  const openEdit = (v) => {
-    setEditData(v);
-    setEditModal(true);
-  };
-
+  const openEdit = (v) => { setEditData(v); setEditModal(true); };
   const updateVendor = async (e) => {
     e.preventDefault();
     try {
       await axios.put(`http://127.0.0.1:8000/api/vendors/${editData.vendor_id}`, editData);
-      setAlertState({
-        isOpen: true,
-        title: "Success",
-        message: "Vendor updated successfully!",
-        type: "success",
-      });
+      setAlertState({ isOpen: true, title: "Success", message: "Vendor updated successfully!", type: "success" });
       setEditModal(false);
       fetchVendors();
     } catch (error) {
       if (error.response?.status === 422) {
         const messages = Object.values(error.response.data.errors).flat();
-        setAlertState({
-          isOpen: true,
-          title: "Validation Error",
-          message: messages.join(", "),
-          type: "error",
-        });
+        setAlertState({ isOpen: true, title: "Validation Error", message: messages.join(", "), type: "error" });
       }
     }
   };
@@ -243,46 +176,42 @@ export default function Vendors() {
       <h2 className="text-3xl font-bold mb-6">Vendor Management</h2>
 
       {/* ADD VENDOR FORM */}
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow mb-8">
-        {[
-          "vendor_name",
-          "email",
-          "phone",
-          "address",
-          "state",
-          "city",
-          "pincode",
-          "gst_number",
-        ].map((field) => (
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow mb-4">
+        {["vendor_name","email","phone","address","state","city","pincode","gst_number"].map((field) => (
           <input
             key={field}
             type={field === "email" ? "email" : "text"}
-            placeholder={field.replace("_", " ").toUpperCase()}
+            placeholder={field.replace("_"," ").toUpperCase()}
             value={formData[field]}
             onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
             className="border rounded px-3 py-2"
             required
           />
         ))}
-
-        <button type="submit" className="col-span-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-          Add Vendor
-        </button>
+        <button type="submit" className="col-span-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Add Vendor</button>
       </form>
+
+      {/* SEARCH */}
+      <div className="mb-4 flex justify-end">
+        <input
+          type="text"
+          placeholder="Search vendors..."
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+          className="border rounded px-3 py-2 w-1/3"
+        />
+      </div>
 
       {/* VENDORS TABLE */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="bg-blue-600 text-white">
-              {["Name", "Email", "Phone", "Address", "State", "City", "Pincode", "GST", "Actions"].map((th) => (
-                <th key={th} className="p-2">
-                  {th}
-                </th>
+              {["Name","Email","Phone","Address","State","City","Pincode","GST","Actions"].map((th) => (
+                <th key={th} className="p-2">{th}</th>
               ))}
             </tr>
           </thead>
-
           <tbody>
             {vendors.map((v) => (
               <tr key={v.vendor_id} className="border-b text-center hover:bg-gray-100">
@@ -295,17 +224,22 @@ export default function Vendors() {
                 <td className="p-2">{v.pincode}</td>
                 <td className="p-2">{v.gst_number}</td>
                 <td className="p-2 flex justify-center gap-2">
-                  <button onClick={() => openEdit(v)} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-                    <EditIcon className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDelete(v.vendor_id)} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
+                  <button onClick={() => openEdit(v)} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"><EditIcon className="w-4 h-4" /></button>
+                  <button onClick={() => handleDelete(v.vendor_id)} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"><TrashIcon className="w-4 h-4" /></button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* PAGINATION */}
+      <div className="flex justify-center mt-4 gap-2">
+        <button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Prev</button>
+        {Array.from({ length: lastPage }, (_, i) => i + 1).map(page => (
+          <button key={page} onClick={() => setCurrentPage(page)} className={`px-3 py-1 rounded ${currentPage === page ? "bg-blue-600 text-white" : "bg-gray-200"}`}>{page}</button>
+        ))}
+        <button disabled={currentPage === lastPage} onClick={() => setCurrentPage(prev => prev + 1)} className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50">Next</button>
       </div>
 
       {/* EDIT MODAL */}
@@ -314,16 +248,7 @@ export default function Vendors() {
           <div className="bg-white p-6 rounded shadow-lg w-96">
             <h3 className="text-xl font-bold mb-4">Edit Vendor</h3>
             <form onSubmit={updateVendor} className="space-y-3">
-              {[
-                "vendor_name",
-                "email",
-                "phone",
-                "address",
-                "state",
-                "city",
-                "pincode",
-                "gst_number",
-              ].map((field) => (
+              {["vendor_name","email","phone","address","state","city","pincode","gst_number"].map((field) => (
                 <input
                   key={field}
                   type={field === "email" ? "email" : "text"}
@@ -333,12 +258,8 @@ export default function Vendors() {
                 />
               ))}
               <div className="flex justify-between mt-4">
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                  Update
-                </button>
-                <button type="button" onClick={() => setEditModal(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                  Cancel
-                </button>
+                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
+                <button type="button" onClick={() => setEditModal(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
               </div>
             </form>
           </div>
@@ -346,14 +267,7 @@ export default function Vendors() {
       )}
 
       {/* GLOBAL ALERT */}
-      <CustomAlert
-        isOpen={alertState.isOpen}
-        title={alertState.title}
-        message={alertState.message}
-        type={alertState.type}
-        onConfirm={handleAlertConfirm}
-        onClose={closeAlert}
-      />
+      <CustomAlert isOpen={alertState.isOpen} title={alertState.title} message={alertState.message} type={alertState.type} onConfirm={handleAlertConfirm} onClose={closeAlert} />
     </div>
   );
 }

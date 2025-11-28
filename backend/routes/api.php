@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ColorController;
 
+
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserRoleController;
 use App\Http\Controllers\Api\UserController;
@@ -93,6 +94,8 @@ Route::get('/sizes', [ProductSizeController::class, 'index']);
 // ORIGINAL
 Route::get('/colors', [ColorController::class, 'index']);
 Route::post('/colors', [ColorController::class, 'store']);
+Route::put('/colors/{id}', [ColorController::class, 'update']);
+Route::delete('/colors/{id}', [ColorController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
