@@ -191,7 +191,7 @@ function SalaryDetails() {
     // Fetch employee details
     useEffect(() => {
         // Mocking API call
-        axios.get(`http://127.0.0.1:8000/api/employee/${id}`)
+        axios.get(`http://127.0.0.1:8000/api/employees/${id}`)
             .then(res => setEmployee(res.data.data))
             .catch(err => console.error("Could not fetch employee details:", err));
     }, [id]);
@@ -371,8 +371,9 @@ function SalaryDetails() {
                 {/* HEADER */}
                 <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center p-6">
                     <h2 className="text-2xl sm:text-2xl font-extrabold text-gray-800">
-                        Salary History for <span>{employee?.emp_name || `Employee ${id}`}</span>
-                    </h2>
+    Salary History for <span>{employee?.emp_name || `Employee ${id}`}</span>
+</h2>
+
                     <button
                         onClick={() => {
                             handleCloseForm(); // Reset form for fresh "Add"

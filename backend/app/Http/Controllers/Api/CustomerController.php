@@ -75,7 +75,7 @@ class CustomerController extends Controller
         'exists' => false
     ]);
 }
-}
+
 
 
 
@@ -100,18 +100,19 @@ public function checkPhone($phone)
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-       $customer = Customer::findOrFail($id);
-        $customer->update($request->all());
-        return $customer;
-    }
+    // public function update(Request $request, string $id)
+    // {
+    //    $customer = Customer::findOrFail($id);
+    //     $customer->update($request->all());
+    //     return $customer;
+    // }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-       return Customer::destroy($id);
-    }
+    // public function destroy(string $id)
+    // {
+    //    return Customer::destroy($id);
+    // }
 }
+

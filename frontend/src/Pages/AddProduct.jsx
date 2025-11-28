@@ -270,76 +270,89 @@ const AddProduct = () => {
           ))}
         </select>
 
-        {/* Color Picker */}
-        <div className="col-span-2">
-          <label className="block mb-2 font-semibold text-gray-800 text-sm">
-            Select Color
-          </label>
+       {/* Color Picker - Searchable Dropdown */}
+    <div className="col-span-2">
+      <label className="block mb-2 font-semibold text-gray-800 text-sm">
+        Select Color
+      </label>
 
-          <div className="grid grid-cols-5 gap-2 bg-white p-3 rounded-xl shadow-inner border border-gray-300">
+      <div className="relative">
+        {/* SEARCH BOX */}
+        <input
+          type="text"
+          placeholder="Search color..."
+          className="w-full border p-2 rounded"
+          value={formData.searchColor || ""}
+          onChange={(e) =>
+            setFormData({ ...formData, searchColor: e.target.value })
+          }
+          onFocus={() => setFormData({ ...formData, showColorDropdown: true })}
+        />
 
-            {paginatedColors.map((color, index) => (
-              <div
-                key={`${color.color_id}-${index}`}
-                onClick={() => setFormData({ ...formData, color_id: color.color_id })}
-                className={`
-                  group relative w-8 h-8 rounded-md cursor-pointer border 
-                  hover:scale-110 transition-all duration-150 hover:shadow-md
-                  ${
-                    formData.color_id === color.color_id
-                      ? "border-black shadow-lg"
-                      : "border-gray-300"
-                  }
-                `}
-                style={{ backgroundColor: color.color_code }}
-              >
-                <span className="absolute -top-6 left-1/2 -translate-x-1/2 px-2 py-[2px]
-                  text-[9px] rounded-md shadow bg-gray-800 text-white opacity-0
-                  group-hover:opacity-100 transition duration-150 pointer-events-none">
-                  {color.color_name}
-                </span>
+        {/* DROPDOWN LIST */}
+        {formData.showColorDropdown && (
+          <div className="absolute z-20 bg-white border rounded w-full max-h-56 overflow-y-auto shadow">
+            {colors
+              .filter((c) =>
+                c.color_name
+                  .toLowerCase()
+                  .includes((formData.searchColor || "").toLowerCase())
+              )
+              .map((color) => (
+                <div
+                  key={color.color_id}
+                  className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      color_id: color.color_id,
+                      searchColor: color.color_name,
+                      showColorDropdown: false,
+                    });
+                  }}
+                >
+                  {/* Color Swatch */}
+                  <span
+                    className="w-5 h-5 rounded border"
+                    style={{ backgroundColor: color.color_code }}
+                  ></span>
 
-                {formData.color_id === color.color_id && (
-                  <span className="absolute bottom-[2px] right-[2px] bg-white rounded-full p-[1px] text-[10px] text-green-600 font-bold shadow">
-                    ✔
-                  </span>
-                )}
-              </div>
-            ))}
+                  {/* Color Name */}
+                  <span className="text-sm">{color.color_name}</span>
+                </div>
+              ))}
 
+            {/* No Results */}
+            {colors.filter((c) =>
+              c.color_name
+                .toLowerCase()
+                .includes((formData.searchColor || "").toLowerCase())
+            ).length === 0 && (
+              <div className="p-2 text-gray-500 text-sm">No colors found</div>
+            )}
           </div>
+        )}
+      </div>
 
-          {/* Pagination */}
-          <button
-            type="button"
-            disabled={colorPage === 0}
-            onClick={() => setColorPage((prev) => prev - 1)}
-            className={`px-2 py-1 text-xs rounded-md font-semibold
-              ${
-                colorPage === 0
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gray-700 text-white hover:bg-gray-900"
-              }
-            `}
-          >
-            ◀ Prev
-          </button>
+      {/* Selected Color Preview */}
+      {formData.color_id && (
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-sm text-gray-700">Selected:</span>
+          <span
+            className="w-6 h-6 rounded border shadow"
+            style={{
+              backgroundColor:
+                colors.find((c) => c.color_id === formData.color_id)?.color_code ||
+                "#fff",
+            }}
+          ></span>
 
-          <button
-            type="button"
-            disabled={colorPage >= Math.ceil(colors.length / COLORS_PER_PAGE) - 1}
-            onClick={() => setColorPage((prev) => prev + 1)}
-            className={`px-2 py-1 text-xs rounded-md font-semibold
-              ${
-                colorPage >= Math.ceil(colors.length / COLORS_PER_PAGE) - 1
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-800"
-              }
-            `}
-          >
-            Next ▶
-          </button>
+          <span className="text-sm text-gray-600">
+            {colors.find((c) => c.color_id === formData.color_id)?.color_name}
+          </span>
         </div>
+      )}
+    </div>
 
         {/* Unit of Measure */}
         <input type="text" placeholder="Unit of Measure" className="border p-2 rounded"

@@ -2,255 +2,98 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
-// --- START: Reusable Icon Components ---
+//
+// ------------------------------------------------------------
+// SVG ICONS (CLEAN - ONE TIME ONLY)
+// ------------------------------------------------------------
 const CheckCircleIcon = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-);
-const XCircleIcon = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-);
-const AlertTriangleIcon = (props) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-    </svg>
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
+
 const XCircleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
+
 const AlertTriangleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
   </svg>
 );
-// --- END: Reusable Icon Components ---
 
-// ------------------------------------------------------------------
-// CustomAlert Component (FIXED LOGIC)
-// ------------------------------------------------------------------
+//
+// ------------------------------------------------------------
+// CUSTOM ALERT COMPONENT (FIXED AND CLEAN)
+// ------------------------------------------------------------
 const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    let icon, bgColor, buttonColor, confirmText, showCancelButton = false;
+  let icon, buttonColor, confirmText, showCancel = false;
 
-    
-    // Determine the style and text based on the alert type
-    switch (type) {
-        case 'confirm':
-            icon = <AlertTriangleIcon className="w-10 h-10 text-amber-500" />;
-            bgColor = 'bg-white rounded-2xl shadow-xl';
-            buttonColor = 'bg-red-600 hover:bg-red-700';
-            confirmText = 'Yes, Proceed';
-            showCancelButton = true;
-            break;
-        case 'success':
-            icon = <CheckCircleIcon className="w-10 h-10 text-green-500" />;
-            bgColor = 'bg-white rounded-xl shadow-lg';
-            buttonColor = 'bg-green-600 hover:bg-green-700';
-            confirmText = 'Close';
-            break;
-        case 'error':
-            icon = <XCircleIcon className="w-10 h-10 text-red-500" />;
-            bgColor = 'bg-white rounded-xl shadow-lg';
-            buttonColor = 'bg-red-600 hover:bg-red-700';
-            confirmText = 'Close';
-            break;
-        default:
-        default: 
-            icon = <AlertTriangleIcon className="w-10 h-10 text-blue-500" />;
-            bgColor = 'bg-white rounded-xl shadow-lg';
-            buttonColor = 'bg-blue-600 hover:bg-blue-700';
-            confirmText = 'OK';
-    }
+  switch (type) {
+    case "confirm":
+      icon = <AlertTriangleIcon className="w-12 h-12 text-yellow-500" />;
+      buttonColor = "bg-red-600 hover:bg-red-700";
+      confirmText = "Yes, Continue";
+      showCancel = true;
+      break;
 
-    // The primary button action is ALWAYS onConfirm.
-    const primaryAction = onConfirm;
+    case "success":
+      icon = <CheckCircleIcon className="w-12 h-12 text-green-500" />;
+      buttonColor = "bg-green-600 hover:bg-green-700";
+      confirmText = "Close";
+      break;
 
-    return (
-        <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
-            <div className={`w - full max-w-sm p-6 ${bgColor}`}>
-            {/* Header/Icon */}
-            <div className="flex justify-center mb-4">
-                {icon}
-            </div>
+    case "error":
+      icon = <XCircleIcon className="w-12 h-12 text-red-500" />;
+      buttonColor = "bg-red-600 hover:bg-red-700";
+      confirmText = "Close";
+      break;
 
-            {/* Content */}
-            <div className="text-center">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-6">
-                    {message}
-                </p>
-            </div>
+    default:
+      icon = <AlertTriangleIcon className="w-12 h-12 text-blue-500" />;
+      buttonColor = "bg-blue-600 hover:bg-blue-700";
+      confirmText = "OK";
+  }
 
-            {/* Footer/Actions */}
-            <div className="flex justify-center space-x-3">
-                {showCancelButton && (
-                    <button
-                        onClick={onClose} // Cancel button calls onClose
-                        className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg 
-                                       hover:bg-gray-300 transition duration-150"
-                    >
-                        Cancel
-                    </button>
-                )}
-                <button
-                    onClick={primaryAction} // Primary button calls onConfirm
-                    className={`px - 6 py-2 text-sm font-bold text-white rounded-lg transition duration-150 ${buttonColor}`}
-                    >
-                {confirmText}
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
+        <div className="mb-4 flex justify-center">{icon}</div>
+
+        <h3 className="text-xl font-bold mb-2">{title}</h3>
+        <p className="text-gray-600 mb-6">{message}</p>
+
+        <div className="flex justify-center gap-3">
+          {showCancel && (
+            <button
+              onClick={onClose}
+              className="px-5 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Cancel
             </button>
+          )}
+
+          <button
+            onClick={onConfirm}
+            className={`px-5 py-2 text-white rounded-lg ${buttonColor}`}
+          >
+            {confirmText}
+          </button>
         </div>
-            </div >
-        </div >
-    const primaryAction = onConfirm; 
-
-    return (
-        <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
-            <div className={`w-full max-w-sm p-6 ${bgColor}`}>
-                {/* Header/Icon */}
-                <div className="flex justify-center mb-4">
-                    {icon}
-                </div>
-
-                {/* Content */}
-                <div className="text-center">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-6">
-                        {message}
-                    </p>
-                </div>
-
-                {/* Footer/Actions */}
-                <div className="flex justify-center space-x-3">
-                    {showCancelButton && (
-                        <button
-                            onClick={onClose} // Cancel button calls onClose
-                            className="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg 
-                                       hover:bg-gray-300 transition duration-150"
-                        >
-                            Cancel
-                        </button>
-                    )}
-                    <button
-                        onClick={primaryAction} // Primary button calls onConfirm
-                        className={`px-6 py-2 text-sm font-bold text-white rounded-lg transition duration-150 ${buttonColor}`}
-                    >
-                        {confirmText}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+      </div>
+    </div>
+  );
 };
-// ------------------------------------------------------------------
 
-
+//
+// ------------------------------------------------------------
+// CUSTOMER COMPONENT
+// ------------------------------------------------------------
 function Customer() {
-    const [customers, setCustomers] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [editingId, setEditingId] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-
-    const emptyForm = {
-        customer_name: "",
-        phone: "",
-        email: "",
-        address: "",
-        city: "",
-        state: "",
-        pincode: "",
-        gst_number: "",
-    };
-    const [formData, setFormData] = useState(emptyForm);
-
-    // Custom Alert State
-    const [alert, setAlert] = useState({
-        isOpen: false,
-        title: "",
-        message: "",
-        type: "",
-        // Default onConfirm and onClose are set to just close the alert
-        onConfirm: () => setAlert(prev => ({ ...prev, isOpen: false })),
-        onClose: () => setAlert(prev => ({ ...prev, isOpen: false }))
-    });
-
-
-    useEffect(() => {
-        fetchCustomers();
-    }, []);
-
-    // Function that closes the alert AND fetches customers (used for success cases)
-    const handleRefetchAndClose = () => {
-        setAlert(prev => ({ ...prev, isOpen: false }));
-        fetchCustomers();
-    };
-
-    const fetchCustomers = async () => {
-        try {
-            const response = await axios.get("http://localhost:8000/api/customers");
-            setCustomers(response.data);
-        } catch (error) {
-            console.error("Error fetching customers:", error);
-            setAlert({
-                isOpen: true,
-                title: "Connection Error",
-                message: "Failed to load customer data.",
-                type: "error",
-                onConfirm: () => setAlert(prev => ({ ...prev, isOpen: false })), // Simple close for error
-                onClose: () => setAlert(prev => ({ ...prev, isOpen: false })),
-            });
-        }
-    };
-
-    const openAddModal = () => {
-        setFormData(emptyForm);
-        setEditingId(null);
-        setShowModal(true);
-    };
-
-    const openEditModal = (cust) => {
-        setEditingId(cust.id);
-        setFormData({
-            customer_name: cust.customer_name || "",
-            phone: cust.phone || "",
-            email: cust.email || "",
-            address: cust.address || "",
-            city: cust.city || "",
-            state: cust.state || "",
-            pincode: cust.pincode || "",
-            gst_number: cust.gst_number || "",
-        });
-        setShowModal(true);
-    };
-
-    const closeAndResetModal = () => {
-        setShowModal(false);
-        setEditingId(null);
-        setFormData(emptyForm);
-    };
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSave = async (e) => {
-        e.preventDefault();
-        const isEditing = editingId !== null;
-        const url = isEditing
-            ? `http ://localhost:8000/api/customers/${editingId}`
-              : "http://localhost:8000/api/customers";
   const [customers, setCustomers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -266,43 +109,34 @@ function Customer() {
     pincode: "",
     gst_number: "",
   };
+
   const [formData, setFormData] = useState(emptyForm);
 
-  // Custom Alert State
-  const [alert, setAlert] = useState({ 
-    isOpen: false, 
-    title: "", 
-    message: "", 
-    type: "", 
-    // Default onConfirm and onClose are set to just close the alert
-    onConfirm: () => setAlert(prev => ({ ...prev, isOpen: false })), 
-    onClose: () => setAlert(prev => ({ ...prev, isOpen: false }))
+  const [alert, setAlert] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "",
+    onConfirm: () => setAlert(a => ({ ...a, isOpen: false })),
+    onClose: () => setAlert(a => ({ ...a, isOpen: false })),
   });
 
-
+  // Load customers
   useEffect(() => {
     fetchCustomers();
   }, []);
 
-  // Function that closes the alert AND fetches customers (used for success cases)
-  const handleRefetchAndClose = () => {
-    setAlert(prev => ({ ...prev, isOpen: false }));
-    fetchCustomers();
-  };
-
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/customers");
-      setCustomers(response.data);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
+      const res = await axios.get("http://localhost:8000/api/customers");
+      setCustomers(res.data);
+    } catch (err) {
       setAlert({
         isOpen: true,
-        title: "Connection Error",
-        message: "Failed to load customer data.",
+        title: "Error",
+        message: "Could not load customers.",
         type: "error",
-        onConfirm: () => setAlert(prev => ({ ...prev, isOpen: false })), // Simple close for error
-        onClose: () => setAlert(prev => ({ ...prev, isOpen: false })),
+        onConfirm: () => setAlert(a => ({ ...a, isOpen: false })),
       });
     }
   };
@@ -312,607 +146,290 @@ function Customer() {
     setEditingId(null);
     setShowModal(true);
   };
-  
-  const openEditModal = (cust) => {
-    setEditingId(cust.id);
-    setFormData({
-        customer_name: cust.customer_name || "",
-        phone: cust.phone || "",
-        email: cust.email || "",
-        address: cust.address || "",
-        city: cust.city || "",
-        state: cust.state || "",
-        pincode: cust.pincode || "",
-        gst_number: cust.gst_number || "",
-    });
+
+  const openEditModal = (c) => {
+    setEditingId(c.id);
+    setFormData(c);
     setShowModal(true);
   };
 
-  const closeAndResetModal = () => {
+  const closeModal = () => {
     setShowModal(false);
     setEditingId(null);
     setFormData(emptyForm);
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const handleSave = async (e) => {
     e.preventDefault();
-    const isEditing = editingId !== null;
-    const url = isEditing 
-        ? `http://localhost:8000/api/customers/${editingId}`
-        : "http://localhost:8000/api/customers";
-    const method = isEditing ? axios.put : axios.post;
-    const action = isEditing ? "Updated" : "Added";
+
+    const url = editingId
+      ? `http://localhost:8000/api/customers/${editingId}`
+      : "http://localhost:8000/api/customers";
 
     try {
-        await method(url, formData);
+      editingId
+        ? await axios.put(url, formData)
+        : await axios.post(url, formData);
 
-        closeAndResetModal();
-
-        setAlert({
-            isOpen: true,
-            title: "Success!",
-            message: `Customer ${ action } Successfully.`,
-            type: "success",
-            onConfirm: handleRefetchAndClose, // The primary action runs the combined function
-            onClose: handleRefetchAndClose, // Although not strictly needed here, it handles possible custom close implementations
-      });
-} catch (error) {
-    console.error(`Error ${ action.toLowerCase() } customer:`, error);
-    setAlert({
-        isOpen: true,
-        title: "Error",
-        message: `Failed to ${ isEditing? "Update": "Add" } Customer.`,
-      await method(url, formData);
-      
-      closeAndResetModal();
+      closeModal();
 
       setAlert({
         isOpen: true,
-        title: "Success!",
-        message: `Customer ${action} Successfully.`,
+        title: "Success",
+        message: `Customer ${editingId ? "updated" : "added"} successfully!`,
         type: "success",
-        onConfirm: handleRefetchAndClose, // The primary action runs the combined function
-        onClose: handleRefetchAndClose, // Although not strictly needed here, it handles possible custom close implementations
+        onConfirm: () => {
+          setAlert(a => ({ ...a, isOpen: false }));
+          fetchCustomers();
+        },
       });
     } catch (error) {
-      console.error(`Error ${action.toLowerCase()} customer:`, error);
       setAlert({
         isOpen: true,
         title: "Error",
-        message: `Failed to ${isEditing ? "Update" : "Add"} Customer.`,
+        message: `Failed to save customer.`,
         type: "error",
-        onConfirm: () => setAlert(prev => ({ ...prev, isOpen: false })),
-        onClose: () => setAlert(prev => ({ ...prev, isOpen: false })),
       });
     }
   };
 
-const handleDeleteConfirmation = (id) => {
-    setAlert({
-        isOpen: true,
-        title: "Confirm Deletion",
-        message: "Are you sure you want to delete this customer? This cannot be undone.",
-        type: "confirm",
-        onConfirm: () => handleDelete(id), // The primary action runs the delete
-        onClose: () => setAlert(prev => ({ ...prev, isOpen: false })), // Cancel action just closes
-    });
-};
-
-const handleDelete = async (id) => {
-  
-  const handleDeleteConfirmation = (id) => {
+  const confirmDelete = (id) => {
     setAlert({
       isOpen: true,
-      title: "Confirm Deletion",
-      message: "Are you sure you want to delete this customer? This cannot be undone.",
+      title: "Delete Customer?",
+      message: "This action cannot be undone.",
       type: "confirm",
-      onConfirm: () => handleDelete(id), // The primary action runs the delete
-      onClose: () => setAlert(prev => ({ ...prev, isOpen: false })), // Cancel action just closes
+      onConfirm: () => handleDelete(id),
+      onClose: () => setAlert(a => ({ ...a, isOpen: false })),
     });
   };
 
   const handleDelete = async (id) => {
-    setAlert(prev => ({ ...prev, isOpen: false })); // Close confirmation alert
+    setAlert(a => ({ ...a, isOpen: false }));
 
     try {
-        await axios.delete(`http://localhost:8000/api/customers/${id}`);
-            setAlert({
-                isOpen: true,
-                title: "Deleted!",
-                message: "Customer deleted successfully.",
-                type: "success",
-                onConfirm: handleRefetchAndClose, // The primary action runs the combined function
-                onClose: handleRefetchAndClose,
-            });
-        setAlert({
-            isOpen: true,
-            title: "Deleted!",
-            message: "Customer deleted successfully.",
-            type: "success",
-            onConfirm: handleRefetchAndClose, // The primary action runs the combined function
-            onClose: handleRefetchAndClose, 
-        });
-    } catch (error) {
-        console.error("Error deleting customer:", error);
-        setAlert({
-            isOpen: true,
-            title: "Error",
-            message: "Failed to delete customer.",
-            type: "error",
-            onConfirm: () => setAlert(prev => ({ ...prev, isOpen: false })),
-            onClose: () => setAlert(prev => ({ ...prev, isOpen: false })),
-        });
+      await axios.delete(`http://localhost:8000/api/customers/${id}`);
+
+      setAlert({
+        isOpen: true,
+        title: "Deleted",
+        message: "Customer removed successfully.",
+        type: "success",
+        onConfirm: () => {
+          setAlert(a => ({ ...a, isOpen: false }));
+          fetchCustomers();
+        },
+      });
+    } catch (err) {
+      setAlert({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete customer.",
+        type: "error",
+      });
     }
-};
-
-
-return (
-    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto">
-
-            {/* Header Section */}
-            <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
-                <h1 className="text-3xl font-extrabold text-indigo-700">
-                    👥 Customer Management
-                </h1>
-                <input
-                    type="text"
-                    placeholder="Search by name..."
-                    className="w-full md:w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-300 outline-none"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-
-                {/* ADD CUSTOMER BUTTON */}
-                <button
-                    onClick={openAddModal}
-                    className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-full 
-                        shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105"
-                >
-                    <FaPlus size={16} />
-                    <span className="font-semibold">Add Customer</span>
-                </button>
-            </div>
-
-            {/* --- Customer Table --- */}
-            <div className="overflow-x-auto rounded-xl shadow-2xl mt-8">
-                <table className="min-w-full bg-white">
-                    <thead>
-                        <tr className="bg-indigo-600 text-white text-sm font-bold uppercase tracking-wider">
-                            <th className="py-4 px-6 text-left rounded-tl-xl">ID</th>
-                            <th className="py-4 px-6 text-left">Name</th>
-                            <th className="py-4 px-6 text-left hidden sm:table-cell">Phone</th>
-                            <th className="py-4 px-6 text-left hidden md:table-cell">Email</th>
-                            <th className="py-4 px-6 text-left hidden lg:table-cell">City</th>
-                            <th className="py-4 px-6 text-center">Edit</th>
-                            <th className="py-4 px-6 text-center ">Delete</th>
-
-                        </tr>
-                    </thead>
-                    <tbody className="text-sm divide-y divide-gray-200">
-                        {customers.length > 0 ? (
-
-                            customers
-                                .filter(cust =>
-                                    cust.customer_name.toLowerCase().startsWith(searchTerm.toLowerCase())
-                                )
-                                .map((cust, index) => (
-
-                                    <tr key={cust.id} className="hover:bg-indigo-50 transition duration-150 ease-in-out">
-
-                                        <td className="py-3 px-6 text-gray-700">{cust.id}</td>
-                                        <td className="py-3 px-6 font-semibold text-gray-800">{cust.customer_name}</td>
-                                        <td className="py-3 px-6 hidden sm:table-cell">{cust.phone}</td>
-                                        <td className="py-3 px-6 hidden md:table-cell text-blue-600 truncate max-w-[150px]">{cust.email}</td>
-                                        <td className="py-3 px-6 hidden lg:table-cell">{cust.city}</td>
-
-                                        <td className="py-3 px-3 text-center w-0">
-                                            <button
-                                                onClick={() => openEditModal(cust)}
-                                                className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150"
-                                                title="Edit"
-                                            >
-                                                <FaEdit size={16} />
-                                            </button>
-                                        </td>
-                                        <td className="py-3 px-3 text-center w-0">
-                                            <button
-                                                onClick={() => handleDeleteConfirmation(cust.id)}
-                                                className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150"
-                                                title="Delete"
-                                            >
-                                                <FaTrash size={16} />
-                                            </button>
-                                        </td>
-
-                                    </tr>
-                                ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7" className="py-10 text-center text-gray-500 text-lg">
-                                    No customers found. Click 'Add Customer' to begin.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-
-
-        {/* --- ADD/EDIT CUSTOMER MODAL (Attractive Tailwind styling) --- */}
-        {showModal && (
-            <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
-
-                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-2xl transform transition-all duration-300 scale-100">
-                    <div className="flex justify-between items-center mb-6 border-b pb-4">
-                        <h3 className="text-2xl font-bold text-indigo-700">
-                            {editingId ? "Edit Customer Details" : "Add New Customer"}
-                        </h3>
-                        <button
-                            type="button"
-                            onClick={closeAndResetModal}
-                            className="text-gray-400 hover:text-red-500 transition duration-150 p-2 rounded-full hover:bg-red-50"
-                            title="Close"
-                        >
-                            <FaTimes size={20} />
-                        </button>
-                    </div>
-
-                    <form onSubmit={handleSave} className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                            {/* Customer Name */}
-                            <div>
-                                <label htmlFor="customer_name" className="block text-sm font-semibold text-gray-700 mb-1">Customer Name</label>
-                                <input
-                                    id="customer_name" type="text" name="customer_name" placeholder="Full Name"
-                                    value={formData.customer_name} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* Phone */}
-                            <div>
-                                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
-                                <input
-                                    id="phone" type="text" name="phone" placeholder="123-456-7890"
-                                    value={formData.phone} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* Email */}
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                                <input
-                                    id="email" type="email" name="email" placeholder="name@company.com"
-                                    value={formData.email} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* GST Number */}
-                            <div>
-                                <label htmlFor="gst_number" className="block text-sm font-semibold text-gray-700 mb-1">GST Number</label>
-                                <input
-                                    id="gst_number" type="text" name="gst_number" placeholder="Optional"
-                                    value={formData.gst_number} onChange={handleChange}
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* Address */}
-                            <div className="sm:col-span-2">
-                                <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
-                                <input
-                                    id="address" type="text" name="address" placeholder="Street Address"
-                                    value={formData.address} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* City */}
-                            <div>
-                                <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-1">City</label>
-                                <input
-                                    id="city" type="text" name="city" placeholder="City"
-                                    value={formData.city} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* State */}
-                            <div>
-                                <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-1">State</label>
-                                <input
-                                    id="state" type="text" name="state" placeholder="State/Province"
-                                    value={formData.state} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                            {/* Pincode */}
-                            <div className="sm:col-span-2">
-                                <label htmlFor="pincode" className="block text-sm font-semibold text-gray-700 mb-1">Pincode/Zip</label>
-                                <input
-                                    id="pincode" type="text" name="pincode" placeholder="Pincode"
-                                    value={formData.pincode} onChange={handleChange} required
-                                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                                />
-                            </div>
-
-                        </div>
-
-                        <div className="pt-4 flex justify-end gap-4 border-t border-gray-200">
-                            <button
-                                type="button"
-                                onClick={closeAndResetModal}
-                                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200 font-medium"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 font-medium transform hover:scale-105"
-                            >
-                                {editingId ? "Save Changes" : "Save Customer"}
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        )}
-
-        {/* RENDER THE CUSTOM ALERT */}
-        <CustomAlert
-            isOpen={alert.isOpen}
-            title={alert.title}
-            message={alert.message}
-            type={alert.type}
-            onConfirm={alert.onConfirm}
-            onClose={alert.onClose}
-        />
-    </div>
-);
   };
-
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-lg mb-6">
           <h1 className="text-3xl font-extrabold text-indigo-700">
             👥 Customer Management
           </h1>
-          <input
-    type="text"
-    placeholder="Search by name..."
-    className="w-full md:w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-300 outline-none"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
 
-          {/* ADD CUSTOMER BUTTON */}
+          <input
+            type="text"
+            placeholder="Search customer..."
+            className="w-60 px-3 py-2 border rounded-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
           <button
             onClick={openAddModal}
-            className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-full 
-                        shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105"
+            className="bg-indigo-600 text-white px-5 py-2 rounded-full flex items-center gap-2 hover:bg-indigo-700"
           >
-            <FaPlus size={16} />
-            <span className="font-semibold">Add Customer</span>
+            <FaPlus /> Add Customer
           </button>
         </div>
-        
-        {/* --- Customer Table --- */}
-        <div className="overflow-x-auto rounded-xl shadow-2xl mt-8">
-          <table className="min-w-full bg-white">
+
+        {/* CUSTOMER TABLE */}
+        <div className="overflow-x-auto shadow-xl rounded-xl">
+          <table className="w-full bg-white">
             <thead>
-              <tr className="bg-indigo-600 text-white text-sm font-bold uppercase tracking-wider">
-                <th className="py-4 px-6 text-left rounded-tl-xl">ID</th>
-                <th className="py-4 px-6 text-left">Name</th>
-                <th className="py-4 px-6 text-left hidden sm:table-cell">Phone</th>
-                <th className="py-4 px-6 text-left hidden md:table-cell">Email</th>
-                <th className="py-4 px-6 text-left hidden lg:table-cell">City</th>
-                <th className="py-4 px-6 text-center">Edit</th>
-                <th className="py-4 px-6 text-center ">Delete</th>
-                
+              <tr className="bg-indigo-600 text-white text-sm">
+                <th className="p-3 text-left">ID</th>
+                <th className="p-3 text-left">Name</th>
+                <th className="p-3 text-left">Phone</th>
+                <th className="p-3 text-left">Email</th>
+                <th className="p-3 text-left">City</th>
+                <th className="p-3 text-center">Edit</th>
+                <th className="p-3 text-center">Delete</th>
               </tr>
             </thead>
-            <tbody className="text-sm divide-y divide-gray-200">
-              {customers.length > 0 ? (
-                
-  customers
-    .filter(cust =>
-      cust.customer_name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    )
-    .map((cust, index) => (
-                
-                  <tr key={cust.id} className="hover:bg-indigo-50 transition duration-150 ease-in-out">
-                    
-                    <td className="py-3 px-6 text-gray-700">{cust.id}</td>
-                    <td className="py-3 px-6 font-semibold text-gray-800">{cust.customer_name}</td>
-                    <td className="py-3 px-6 hidden sm:table-cell">{cust.phone}</td>
-                    <td className="py-3 px-6 hidden md:table-cell text-blue-600 truncate max-w-[150px]">{cust.email}</td>
-                    <td className="py-3 px-6 hidden lg:table-cell">{cust.city}</td>
 
-                    <td className="py-3 px-3 text-center w-0">
+            <tbody>
+              {customers
+                .filter(c => c.customer_name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .map(c => (
+                  <tr key={c.id} className="border-b hover:bg-indigo-50">
+                    <td className="p-3">{c.id}</td>
+                    <td className="p-3 font-semibold">{c.customer_name}</td>
+                    <td className="p-3">{c.phone}</td>
+                    <td className="p-3">{c.email}</td>
+                    <td className="p-3">{c.city}</td>
+                    <td className="p-3 text-center">
                       <button
-                        onClick={() => openEditModal(cust)}
-                        className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150"
-                        title="Edit"
+                        onClick={() => openEditModal(c)}
+                        className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full"
                       >
-                        <FaEdit size={16} />
+                        <FaEdit />
                       </button>
                     </td>
-                    <td className="py-3 px-3 text-center w-0">
+                    <td className="p-3 text-center">
                       <button
-                        onClick={() => handleDeleteConfirmation(cust.id)}
-                        className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150"
-                        title="Delete"
+                        onClick={() => confirmDelete(c.id)}
+                        className="text-red-600 hover:bg-red-100 p-2 rounded-full"
                       >
-                        <FaTrash size={16} />
+                        <FaTrash />
                       </button>
                     </td>
-                   
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="py-10 text-center text-gray-500 text-lg">
-                    No customers found. Click 'Add Customer' to begin.
-                  </td>
-                </tr>
-              )}
+                ))}
             </tbody>
           </table>
         </div>
-        
-      </div>
 
+        {/* CUSTOMER FORM MODAL */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl">
 
-      {/* --- ADD/EDIT CUSTOMER MODAL (Attractive Tailwind styling) --- */}
-      {showModal && (
-        <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
+              <div className="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 className="text-xl font-bold text-indigo-700">
+                  {editingId ? "Edit Customer" : "Add Customer"}
+                </h2>
+                <button onClick={closeModal} className="text-gray-500 hover:text-red-500">
+                  <FaTimes size={20} />
+                </button>
+              </div>
 
-          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-2xl transform transition-all duration-300 scale-100">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-              <h3 className="text-2xl font-bold text-indigo-700">
-                {editingId ? "Edit Customer Details" : "Add New Customer"}
-              </h3>
-              <button
-                type="button"
-                onClick={closeAndResetModal}
-                className="text-gray-400 hover:text-red-500 transition duration-150 p-2 rounded-full hover:bg-red-50"
-                title="Close"
-              >
-                <FaTimes size={20} />
-              </button>
+              <form onSubmit={handleSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  name="customer_name"
+                  placeholder="Name"
+                  value={formData.customer_name}
+                  onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
+                  className="p-3 border rounded-lg"
+                  required
+                />
+
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="Phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="p-3 border rounded-lg"
+                  required
+                />
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="p-3 border rounded-lg"
+                  required
+                />
+
+                <input
+                  type="text"
+                  name="gst_number"
+                  placeholder="GST Number"
+                  value={formData.gst_number}
+                  onChange={(e) => setFormData({ ...formData, gst_number: e.target.value })}
+                  className="p-3 border rounded-lg"
+                />
+
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="p-3 border rounded-lg sm:col-span-2"
+                  required
+                />
+
+                <input
+                  type="text"
+                  name="city"
+                  placeholder="City"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className="p-3 border rounded-lg"
+                  required
+                />
+
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className="p-3 border rounded-lg"
+                  required
+                />
+
+                <input
+                  type="text"
+                  name="pincode"
+                  placeholder="Pincode"
+                  value={formData.pincode}
+                  onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                  className="p-3 border rounded-lg sm:col-span-2"
+                  required
+                />
+
+                <div className="sm:col-span-2 flex justify-end gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="px-6 py-2 border rounded-lg"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  >
+                    {editingId ? "Update" : "Save"}
+                  </button>
+                </div>
+              </form>
+
             </div>
-            
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
-                {/* Customer Name */}
-                <div>
-                  <label htmlFor="customer_name" className="block text-sm font-semibold text-gray-700 mb-1">Customer Name</label>
-                  <input
-                    id="customer_name" type="text" name="customer_name" placeholder="Full Name" 
-                    value={formData.customer_name} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-                {/* Phone */}
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
-                  <input
-                    id="phone" type="text" name="phone" placeholder="123-456-7890" 
-                    value={formData.phone} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-                {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                  <input
-                    id="email" type="email" name="email" placeholder="name@company.com" 
-                    value={formData.email} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-                {/* GST Number */}
-                <div>
-                  <label htmlFor="gst_number" className="block text-sm font-semibold text-gray-700 mb-1">GST Number</label>
-                  <input
-                    id="gst_number" type="text" name="gst_number" placeholder="Optional" 
-                    value={formData.gst_number} onChange={handleChange}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-                {/* Address */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
-                  <input
-                    id="address" type="text" name="address" placeholder="Street Address" 
-                    value={formData.address} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-                {/* City */}
-                <div>
-                  <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-1">City</label>
-                  <input
-                    id="city" type="text" name="city" placeholder="City" 
-                    value={formData.city} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-
-                {/* State */}
-                <div>
-                  <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-1">State</label>
-                  <input
-                    id="state" type="text" name="state" placeholder="State/Province" 
-                    value={formData.state} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-                {/* Pincode */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="pincode" className="block text-sm font-semibold text-gray-700 mb-1">Pincode/Zip</label>
-                  <input
-                    id="pincode" type="text" name="pincode" placeholder="Pincode" 
-                    value={formData.pincode} onChange={handleChange} required
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                  />
-                </div>
-                
-              </div>
-              
-              <div className="pt-4 flex justify-end gap-4 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={closeAndResetModal}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200 font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 font-medium transform hover:scale-105"
-                >
-                  {editingId ? "Save Changes" : "Save Customer"}
-                </button>
-              </div>
-
-            </form>
           </div>
-        </div>
-      )}
-      
-      {/* RENDER THE CUSTOM ALERT */}
-      <CustomAlert
-        isOpen={alert.isOpen}
-        title={alert.title}
-        message={alert.message}
-        type={alert.type}
-        onConfirm={alert.onConfirm}
-        onClose={alert.onClose}
-      />
+        )}
+
+        {/* ALERT */}
+        <CustomAlert
+          isOpen={alert.isOpen}
+          title={alert.title}
+          message={alert.message}
+          type={alert.type}
+          onConfirm={alert.onConfirm}
+          onClose={alert.onClose}
+        />
+
+      </div>
     </div>
   );
 }

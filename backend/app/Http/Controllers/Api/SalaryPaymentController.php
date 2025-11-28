@@ -34,7 +34,8 @@ class SalaryPaymentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id'   => 'required|exists:employee,id',
+            'employee_id' => 'required|exists:employees,id',
+
             'salary_month'  => 'required|integer|min:1|max:12',
             'salary_year'   => 'required|integer|min:2000|max:2100',
             'gross_salary'  => 'required|numeric|min:0',
