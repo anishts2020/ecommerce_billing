@@ -192,7 +192,7 @@ function SalaryDetails() {
     useEffect(() => {
         // Mocking API call
         axios.get(`http://127.0.0.1:8000/api/employees/${id}`)
-            .then(res => setEmployee(res.data.data))
+            .then(res => setEmployee(res.data))
             .catch(err => console.error("Could not fetch employee details:", err));
     }, [id]);
 
@@ -370,9 +370,17 @@ function SalaryDetails() {
 
                 {/* HEADER */}
                 <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center p-6">
-                    <h2 className="text-2xl sm:text-2xl font-extrabold text-gray-800">
-    Salary History for <span>{employee?.emp_name || `Employee ${id}`}</span>
-</h2>
+                   <h2 className="text-2xl font-bold flex items-center">
+                <span className="mr-3 text-indigo-600">🧾</span>
+                Salary History (ID: {id})
+                {employee?.employee_name && (
+    <span className="ml-3 text-gray-600 text-lg">
+        — Employee: <span className="font-semibold">{employee.employee_name}</span>
+    </span>
+)}
+
+               
+            </h2>
 
                     <button
                         onClick={() => {

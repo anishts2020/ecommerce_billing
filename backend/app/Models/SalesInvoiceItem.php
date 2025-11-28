@@ -31,3 +31,4 @@ class SalesInvoiceItem extends Model
         return $this->belongsTo(SalesInvoice::class, 'sales_invoice_id');
     }
 }
+ 
