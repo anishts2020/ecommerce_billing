@@ -71,6 +71,15 @@ export default function Dashboard() {
               </Link>
             </li>
           )}
+
+        
+              {isAdmin && (
+            <li>
+              <Link to="/PurchaseInvoiceItem" className="hover:underline">
+               PurchaseInvoice
+              </Link>
+            </li>
+          )}
           <li>
             <Link to="/login" className="hover:underline">
               Logout
