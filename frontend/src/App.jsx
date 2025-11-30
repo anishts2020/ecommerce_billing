@@ -1,245 +1,107 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./Pages/Login";
-import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import Layout from "./components/Layout";
 
-import SalaryDetails from './Pages/SalaryDetails';
-import Customer from './Pages/Customer';
-import CustomerDetailsForm from './Pages/CustomerDetailsForm';
+/* AUTH */
+import Login from "./Pages/Login";
 
-import SalesinvoiceList from './Pages/SalesinvoiceList';
-import SalesInvoiceItems from './Pages/SalesInvoiceItems';
+/* DASHBOARD */
+import Dashboard from "./Pages/Dashboard";
 
+/* EMPLOYEES */
+import Employee from "./Pages/Employee";
+import SalaryDetails from "./Pages/SalaryDetails";
 
+/* CUSTOMERS */
+import Customer from "./Pages/Customer";
+import CustomerDetailsForm from "./Pages/CustomerDetailsForm";
 
+/* SALES */
+import Salesinvoice from "./Pages/Salesinvoice";
+import SalesinvoiceList from "./Pages/SalesinvoiceList";
+import SalesInvoiceItems from "./Pages/SalesInvoiceItems";
 
-
-import Employee from './Pages/Employee';
-
-import Salesinvoice from './Pages/Salesinvoice';
-
-
-
+/* PRODUCTS */
 import Materials from "./Pages/Materials";
 import ProductCategories from "./Pages/ProductCategories";
 import Vendors from "./Pages/Vendors";
 import ProductSizePage from "./Pages/ProductSizePage";
 import Colors from "./Pages/Colors";
+import AddProduct from "./Pages/AddProduct";
+import ViewProducts from "./Pages/ViewProducts";
+
+/* USERS & ROLES */
 import Roles from "./Pages/Roles";
 import UserRoles from "./Pages/UserRoles";
-import PurchaseInvoice from "./Pages/PurchaseInvoice";
-// Product pages
-import AddProduct from "./pages/AddProduct";
-import ViewProducts from "./pages/ViewProducts";
+import CreateUser from "./Pages/CreateUser";
+
+/* PURCHASE */
 import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItem";
 
-// MISSING IMPORT FIXED
-import CreateUser from "./Pages/CreateUser";
-import InventoryTransactions from "./Pages/InventoryTransaction"
+/* INVENTORY */
+import InventoryTransactions from "./Pages/InventoryTransaction";
 
-function App() {
+
+export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Public */}
+
+        {/* PUBLIC ROUTES */}
         <Route path="/login" element={<Login />} />
 
-        {/* Admin Screens (unprotected routes FIRST) */}
-        <Route path="/createroles" element={<Roles />} />
-        <Route path="/createuserroles" element={<UserRoles />} />
-        <Route path="/CreateUser" element={<CreateUser />} />
+        {/* PROTECTED LAYOUT ROUTES */}
+        <Route
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        {/* <Route path="/employees" element={
-            <PrivateRoute>
-              <EmployeeDetails />
-            </PrivateRoute>
-          }
-        /> */}
-        <Route
-          path="/salary/:id"
-          element={
-            <PrivateRoute>
-              <SalaryDetails />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/customers" element={
-          <PrivateRoute>
-            <Customer/>
-          </PrivateRoute>
-        }
-        
-        />
-        <Route
-          path="/employees"
-          element={
-            <PrivateRoute>
-              <Employee />
-            </PrivateRoute>
-          }
-        />
+          {/* DASHBOARD */}
+          <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route
-          path="/salesinvoice_list"
-          element={
-            <PrivateRoute>
-              <SalesinvoiceList />
-            </PrivateRoute>
-          }
-        />
-         {/* customer */}
-         <Route
-          path="/customers"
-          element={
-            <PrivateRoute>
-              <Customer />
-            </PrivateRoute>
-          }
-        />
-         {/* <Route
-          path="/customer-form"
-          element={
-            <PrivateRoute>
-              <CustomerDetailsForm />
-            </PrivateRoute>
-          }
-        /> */}
-        <Route
-  path="/sales-invoice"
-  element={
-    <PrivateRoute>
-      <Salesinvoice />
-    </PrivateRoute>
-  }
-/>
+          {/* EMPLOYEES */}
+          <Route path="/employees" element={<Employee />} />
+          <Route path="/salary/:id" element={<SalaryDetails />} />
 
-        <Route
-          path="/ProductCategories"
-          element={
-            <PrivateRoute>
-              <ProductCategories />
-            </PrivateRoute>
-          }
-        />
+          {/* CUSTOMERS */}
+          <Route path="/customers" element={<Customer />} />
+          <Route path="/customer-form" element={<CustomerDetailsForm />} />
 
-        <Route
-          path="/Materials"
-          element={
-            <PrivateRoute>
-              <Materials />
-            </PrivateRoute>
-          }
-        />
+          {/* SALES */}
+          <Route path="/sales-invoice" element={<Salesinvoice />} />
+          <Route path="/salesinvoice_list" element={<SalesinvoiceList />} />
+          <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems />} />
 
-        <Route
-          path="/vendors"
-          element={
-            <PrivateRoute>
-              <Vendors />
-            </PrivateRoute>
-          }
-        />
+          {/* PRODUCT MANAGEMENT */}
+          <Route path="/product-categories" element={<ProductCategories />} />
+          <Route path="/materials" element={<Materials />} />
+          <Route path="/vendors" element={<Vendors />} />
+          <Route path="/product-sizes" element={<ProductSizePage />} />
+          <Route path="/colors" element={<Colors />} />
 
-        <Route
-          path="/product-sizes"
-          element={
-            <PrivateRoute>
-              <ProductSizePage />
-            </PrivateRoute>
-          }
-        />
+          <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/view-products" element={<ViewProducts />} />
 
-        <Route
-          path="/color-form"
-          element={
-            <PrivateRoute>
-              <Colors />
-            </PrivateRoute>
-          }
-        />
+          {/* USERS & ROLES */}
+          <Route path="/createroles" element={<Roles />} />
+          <Route path="/createuserroles" element={<UserRoles />} />
+          <Route path="/createuser" element={<CreateUser />} />
 
-        {/* products */}
-        <Route
-          path="/add-product"
-          element={
-            <PrivateRoute>
-              <AddProduct />
-            </PrivateRoute>
-          }
-        />
+          {/* PURCHASE */}
+          <Route path="/purchase-invoice-items" element={<PurchaseInvoiceItems />} />
 
-        <Route
-          path="/view-products"
-          element={
-            <PrivateRoute>
-              <ViewProducts />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/colors"
-          element={
-            <PrivateRoute>
-              <Colors />
-            </PrivateRoute>
-          }
-        />
- <Route
-          path="/CreateUser"
-          element={
-            <PrivateRoute>
-              <CreateUser />
-            </PrivateRoute>
-          }
-        />
+          {/* INVENTORY */}
+          <Route path="/inventory-transactions" element={<InventoryTransactions />} />
 
-         <Route
-          path="/ProductCategories"
-          element={
-            <PrivateRoute>
-              <ProductCategories />
-            </PrivateRoute>
-          }
-        />
+        </Route>
 
-           <Route
-          path="/PurchaseInvoice"
-          element={
-            <PrivateRoute>
-              <PurchaseInvoice />
-            </PrivateRoute>
-          }
-        />
-               <Route
-          path="/PurchaseInvoiceItem"
-          element={
-            <PrivateRoute>
-              <PurchaseInvoiceItems />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/inventory-transactions" element={<InventoryTransactions />} />
-
-        {/* Default */}
+        {/* DEFAULT */}
         <Route path="*" element={<Login />} />
-        <Route path="/customer-form" element={<CustomerDetailsForm />} />
-        <Route path="/sales-invoice" element={<Salesinvoice/>} />
-        <Route path='/sales-voiceList' element={<SalesinvoiceList/>}/>
-        <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems/>} />
-
       </Routes>
     </Router>
   );
 }
-
-export default App;
