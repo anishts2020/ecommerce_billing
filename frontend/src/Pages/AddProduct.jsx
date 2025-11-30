@@ -136,31 +136,32 @@ const AddProduct = () => {
   const [materials, setMaterials] = useState([]);
 
   useEffect(() => {
-  axios.get("http://localhost:8000/api/categories").then((res) =>
-    setCategories(Array.isArray(res.data) ? res.data : res.data.data || [])
-  );
+    axios.get("http://localhost:8000/api/categories").then((res) =>
+      setCategories(Array.isArray(res.data) ? res.data : res.data.data || [])
+    );
 
-  axios.get("http://localhost:8000/api/types").then((res) =>
-    setTypes(Array.isArray(res.data) ? res.data : res.data.data || [])
-  );
+    axios.get("http://localhost:8000/api/types").then((res) =>
+      setTypes(Array.isArray(res.data) ? res.data : res.data.data || [])
+    );
 
-  axios.get("http://localhost:8000/api/colors").then((res) =>
-    setColors(Array.isArray(res.data) ? res.data : res.data.data || [])
-  );
+    axios.get("http://localhost:8000/api/colors").then((res) =>
+      setColors(Array.isArray(res.data) ? res.data : res.data.data || [])
+    );
 
-  axios.get("http://localhost:8000/api/sizes").then((res) =>
-    setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])
-  );
-  axios.get("http://localhost:8000/api/materials").then((res) =>
-  setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])
-);
+    axios.get("http://localhost:8000/api/sizes").then((res) =>
+      setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])
+    );
 
-  axios.get("http://localhost:8000/api/vendors").then((res) =>
-    setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])
-  );
-}, []);
+    axios.get("http://localhost:8000/api/materials").then((res) =>
+      setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])
+    );
 
-  /* ---- Close color dropdown on outside click ---- */
+    axios.get("http://localhost:8000/api/vendors").then((res) =>
+      setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])
+    );
+  }, []);
+
+  /* Close dropdown on outside click */
   useEffect(() => {
     const closeDropdown = () => {
       setFormData((prev) => ({ ...prev, showColorDropdown: false }));
@@ -170,9 +171,6 @@ const AddProduct = () => {
     return () => window.removeEventListener("click", closeDropdown);
   }, []);
 
-  /* ----------------------------------------------------------
-     SUBMIT FORM
-  ---------------------------------------------------------- */
   const resetForm = () => {
     setFormData({
       product_code: "",
@@ -181,6 +179,7 @@ const AddProduct = () => {
       product_description: "",
       category_id: "",
       type_id: "",
+      material_id: "",
       color_id: "",
       size_id: "",
       vendor_id: "",
@@ -249,14 +248,13 @@ const AddProduct = () => {
           placeholder="Description"
           className="border p-2 rounded col-span-2"
           value={formData.product_description}
-          onChange={(e) =>
-            setFormData({ ...formData, product_description: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, product_description: e.target.value })}
         />
 
         {/* Category */}
         <select
           className="border p-2 rounded"
+          value={formData.category_id}
           onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
         >
           <option value="">Select Category</option>
@@ -270,6 +268,7 @@ const AddProduct = () => {
         {/* Type */}
         <select
           className="border p-2 rounded"
+          value={formData.type_id}
           onChange={(e) => setFormData({ ...formData, type_id: e.target.value })}
         >
           <option value="">Select Type</option>
@@ -283,11 +282,12 @@ const AddProduct = () => {
         {/* Size */}
         <select
           className="border p-2 rounded"
+          value={formData.size_id}
           onChange={(e) => setFormData({ ...formData, size_id: e.target.value })}
         >
           <option value="">Select Size</option>
-          {sizes.map((size, index) => (
-            <option key={`${index}-${size.size_name}`} value={size.size_id}>
+          {sizes.map((size) => (
+            <option key={size.size_id} value={size.size_id}>
               {size.size_name}
             </option>
           ))}
@@ -296,6 +296,7 @@ const AddProduct = () => {
         {/* Vendor */}
         <select
           className="border p-2 rounded"
+          value={formData.vendor_id}
           onChange={(e) => setFormData({ ...formData, vendor_id: e.target.value })}
         >
           <option value="">Select Vendor</option>
@@ -305,18 +306,20 @@ const AddProduct = () => {
             </option>
           ))}
         </select>
-        <select
-  className="border p-2 rounded"
-  onChange={(e) => setFormData({ ...formData, material_id: e.target.value })}
->
-  <option value="">Select Material</option>
-  {materials.map((m) => (
-    <option key={m.material_id} value={m.material_id}>
-      {m.material_name}
-    </option>
-  ))}
-</select>
 
+        {/* Material */}
+        <select
+          className="border p-2 rounded"
+          value={formData.material_id}
+          onChange={(e) => setFormData({ ...formData, material_id: e.target.value })}
+        >
+          <option value="">Select Material</option>
+          {materials.map((m) => (
+            <option key={m.material_id} value={m.material_id}>
+              {m.material_name}
+            </option>
+          ))}
+        </select>
 
         {/* COLOR PICKER */}
         <div className="col-span-2">
@@ -374,70 +377,8 @@ const AddProduct = () => {
                   <div className="p-2 text-gray-500 text-sm">No colors found</div>
                 )}
               </div>
-
-       {/* Color Picker - Searchable Dropdown */}
-    <div className="col-span-2">
-      <label className="block mb-2 font-semibold text-gray-800 text-sm">
-        Select Color
-      </label>
-
-      <div className="relative">
-        {/* SEARCH BOX */}
-        <input
-          type="text"
-          placeholder="Search color..."
-          className="w-full border p-2 rounded"
-          value={formData.searchColor || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, searchColor: e.target.value })
-          }
-          onFocus={() => setFormData({ ...formData, showColorDropdown: true })}
-        />
-
-        {/* DROPDOWN LIST */}
-        {formData.showColorDropdown && (
-          <div className="absolute z-20 bg-white border rounded w-full max-h-56 overflow-y-auto shadow">
-            {colors
-              .filter((c) =>
-                c.color_name
-                  .toLowerCase()
-                  .includes((formData.searchColor || "").toLowerCase())
-              )
-              .map((color) => (
-                <div
-                  key={color.color_id}
-                  className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100"
-                  onClick={() => {
-                    setFormData({
-                      ...formData,
-                      color_id: color.color_id,
-                      searchColor: color.color_name,
-                      showColorDropdown: false,
-                    });
-                  }}
-                >
-                  {/* Color Swatch */}
-                  <span
-                    className="w-5 h-5 rounded border"
-                    style={{ backgroundColor: color.color_code }}
-                  ></span>
-
-                  {/* Color Name */}
-                  <span className="text-sm">{color.color_name}</span>
-                </div>
-              ))}
-
-            {/* No Results */}
-            {colors.filter((c) =>
-              c.color_name
-                .toLowerCase()
-                .includes((formData.searchColor || "").toLowerCase())
-            ).length === 0 && (
-              <div className="p-2 text-gray-500 text-sm">No colors found</div>
             )}
           </div>
-        )}
-      </div>
 
           {/* Selected Color Preview */}
           {formData.color_id && (
@@ -450,31 +391,12 @@ const AddProduct = () => {
                     colors.find((c) => c.color_id === formData.color_id)?.color_code || "#fff",
                 }}
               ></span>
-
               <span className="text-sm text-gray-600">
                 {colors.find((c) => c.color_id === formData.color_id)?.color_name}
               </span>
             </div>
           )}
-      {/* Selected Color Preview */}
-      {formData.color_id && (
-        <div className="mt-2 flex items-center gap-2">
-          <span className="text-sm text-gray-700">Selected:</span>
-          <span
-            className="w-6 h-6 rounded border shadow"
-            style={{
-              backgroundColor:
-                colors.find((c) => c.color_id === formData.color_id)?.color_code ||
-                "#fff",
-            }}
-          ></span>
-
-          <span className="text-sm text-gray-600">
-            {colors.find((c) => c.color_id === formData.color_id)?.color_name}
-          </span>
         </div>
-      )}
-    </div>
 
         {/* Unit of Measure */}
         <input
