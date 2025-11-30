@@ -45,23 +45,30 @@ class EmployeeController extends Controller
 
     // 🟢 Update employee
     public function update(Request $request, $id)
-    {
-        $request->validate([
+{
+    $request->validate([
+        'employee_code' => 'required|unique:employees,employee_code,' . $id,
         'employee_name' => 'required|string',
-        'email' => 'required|email|unique:employees,email,' . $id,
         'phone' => 'required|unique:employees,phone,' . $id,
-        'salaryType' => 'required|string',
-        'salary' => 'required|numeric'
+        'email' => 'required|email|unique:employees,email,' . $id,
+        'address' => 'nullable|string',
+        'joining_date' => 'required|date',
+        'designation' => 'required|string',
+        'salary_type' => 'required|integer',
+        'base_salary' => 'required|numeric',
+        'is_active' => 'required|boolean',
     ]);
-        $employee = Employee::findOrFail($id);
 
-        $employee->update($request->all());
+    $employee = Employee::findOrFail($id);
 
-        return response()->json([
-            'message' => 'Employee updated successfully',
-            'employee' => $employee
-        ]);
-    }
+    $employee->update($request->all());
+
+    return response()->json([
+        'message' => 'Employee updated successfully',
+        'employee' => $employee
+    ]);
+}
+
 
     // 🟢 Delete employee
     public function destroy($id)

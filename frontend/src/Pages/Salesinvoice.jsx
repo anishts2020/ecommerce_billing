@@ -349,12 +349,13 @@ const closeModal = () => {
   });
 };
 const updateQuantity = (index, qty) => {
+  const finalQty=Math.max(0, qty); // minimum 1
   setItems((prev) =>
     prev.map((item, i) =>
       i === index
         ? {
             ...item,
-            quantity: qty,
+            quantity: finalQty,
             total: qty * item.price,
           }
         : item
@@ -423,6 +424,7 @@ const updateQuantity = (index, qty) => {
                     <td className="py-3 px-6">
                       <input
                         type="number"
+                        min="0"
                         value={item.quantity}
                         onChange={(e) =>
                           updateQuantity(index, Number(e.target.value))
