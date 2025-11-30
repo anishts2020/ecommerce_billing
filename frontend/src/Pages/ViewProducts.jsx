@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Barcode from "react-barcode";
 
-// SVG Icons
+// ===== SVG ICONS =====
 const AlertTriangleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -21,7 +21,7 @@ const CheckCircleIcon = (props) => (
   </svg>
 );
 
-// Custom Alert Component
+// ===== CUSTOM ALERT =====
 const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   if (!isOpen) return null;
 
@@ -56,21 +56,16 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
           <h2 className="text-xl font-bold">{title}</h2>
           <p className="text-gray-600">{message}</p>
         </div>
-
         <div className="mt-6 flex justify-center gap-4">
-          {type === "confirm" && (
-            <button onClick={onClose} className="px-4 py-2 border rounded-lg">Cancel</button>
-          )}
-
-          <button onClick={onConfirm} className={`px-4 py-2 text-white rounded-lg ${buttonColor}`}>
-            {confirmText}
-          </button>
+          {type === "confirm" && <button onClick={onClose} className="px-4 py-2 border rounded-lg">Cancel</button>}
+          <button onClick={onConfirm} className={`px-4 py-2 text-white rounded-lg ${buttonColor}`}>{confirmText}</button>
         </div>
       </div>
     </div>
   );
 };
 
+// ===== VIEW PRODUCTS COMPONENT =====
 const ViewProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -78,6 +73,7 @@ const ViewProducts = () => {
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [vendors, setVendors] = useState([]);
+  const [materials, setMaterials] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const [editData, setEditData] = useState({});
@@ -92,7 +88,6 @@ const ViewProducts = () => {
   });
 
   const closeAlert = () => setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
-
   const handleAlertConfirm = () => {
     if (alertState.type === "confirm" && alertState.actionToRun) {
       alertState.actionToRun();
@@ -100,11 +95,11 @@ const ViewProducts = () => {
     closeAlert();
   };
 
-  // Fetch all products
+  // FETCH DATA
   const fetchProducts = () => {
     axios
       .get("http://localhost:8000/api/products")
-      .then((res) => setProducts(res.data))
+      .then((res) => setProducts(Array.isArray(res.data) ? res.data : []))
       .catch(() =>
         setAlertState({
           isOpen: true,
@@ -116,71 +111,92 @@ const ViewProducts = () => {
   };
 
   const fetchCategories = () => {
-    axios.get("http://localhost:8000/api/categories").then((res) => setCategories(res.data));
+    axios.get("http://localhost:8000/api/categories")
+      .then((res) => setCategories(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setCategories([]));
+  };
+
+  const fetchTypes = () => {
+    axios.get("http://localhost:8000/api/types")
+      .then((res) => setTypes(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setTypes([]));
+  };
+
+  const fetchColors = () => {
+    axios.get("http://localhost:8000/api/colors")
+      .then((res) => setColors(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setColors([]));
+  };
+
+  const fetchSizes = () => {
+    axios.get("http://localhost:8000/api/sizes")
+      .then((res) => setSizes(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setSizes([]));
+  };
+
+  const fetchVendors = () => {
+    axios.get("http://localhost:8000/api/vendors")
+      .then((res) => setVendors(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setVendors([]));
+  };
+
+  const fetchMaterials = () => {
+    axios.get("http://localhost:8000/api/materials")
+      .then((res) => setMaterials(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setMaterials([]));
   };
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-
-    axios.get("http://localhost:8000/api/types").then((res) => setTypes(res.data));
-    axios.get("http://localhost:8000/api/colors").then((res) => setColors(res.data));
-    axios.get("http://localhost:8000/api/sizes").then((res) => setSizes(res.data));
-    axios.get("http://localhost:8000/api/vendors").then((res) => setVendors(res.data));
+    fetchTypes();
+    fetchColors();
+    fetchSizes();
+    fetchVendors();
+    fetchMaterials();
   }, []);
 
-  // Open modal with selected product
+  // Create lookup object for materials
+  const materialLookup = Object.fromEntries(materials.map((m) => [m.material_id, m.material_name]));
+
+  // ===== EDIT PRODUCT =====
   const handleEdit = (p) => {
     setEditData({
-      product_id: p.product_id,
-      product_code: p.product_code,
-      sku: p.sku,
-      product_name: p.product_name,
-      product_description: p.product_description,
-      category_id: p.category?.product_category_id || p.category_id,
-      type_id: p.type?.product_type_id || p.type_id,
-      color_id: p.color?.color_id || p.color_id,
-      size_id: p.size?.size_id || p.size_id,
-      vendor_id: p.vendor?.vendor_id || p.vendor_id,
-      unit_of_measure: p.unit_of_measure,
-      quantity_on_hand: p.quantity_on_hand,
-      min_stock_level: p.min_stock_level,
-      cost_price: p.cost_price,
-      selling_price: p.selling_price,
-      tax_percent: p.tax_percent
+      product_id: p.product_id?.toString() || "",
+      product_code: p.product_code || "",
+      sku: p.sku || "",
+      product_name: p.product_name || "",
+      product_description: p.product_description || "",
+      category_id: (p.category?.product_category_id || p.category_id || "").toString(),
+      type_id: (p.type?.product_type_id || p.type_id || "").toString(),
+      color_id: (p.color?.color_id || p.color_id || "").toString(),
+      size_id: (p.size?.size_id || p.size_id || "").toString(),
+      vendor_id: (p.vendor?.vendor_id || p.vendor_id || "").toString(),
+      material_id: (p.material_id || "").toString(),
+      unit_of_measure: p.unit_of_measure || "",
+      quantity_on_hand: p.quantity_on_hand || "",
+      min_stock_level: p.min_stock_level || "",
+      cost_price: p.cost_price || "",
+      selling_price: p.selling_price || "",
+      tax_percent: p.tax_percent || "",
     });
-    
-
     setShowModal(true);
   };
 
-  // Update product
+  // ===== UPDATE PRODUCT =====
   const handleUpdate = async (e) => {
     e.preventDefault();
-
     try {
       await axios.put(`http://localhost:8000/api/products/${editData.product_id}`, editData);
-
-      setAlertState({
-        isOpen: true,
-        type: "success",
-        title: "Updated!",
-        message: "Product updated successfully",
-      });
-
+      setAlertState({ isOpen: true, type: "success", title: "Updated!", message: "Product updated successfully" });
       fetchProducts();
       setShowModal(false);
     } catch (error) {
-      setAlertState({
-        isOpen: true,
-        type: "error",
-        title: "Update Failed",
-        message: error.response?.data?.message || "Something went wrong",
-      });
+      setAlertState({ isOpen: true, type: "error", title: "Update Failed", message: error.response?.data?.message || "Something went wrong" });
     }
   };
 
-  // Delete product
+  // ===== DELETE PRODUCT =====
   const handleDelete = (id) => {
     setAlertState({
       isOpen: true,
@@ -190,22 +206,10 @@ const ViewProducts = () => {
       actionToRun: async () => {
         try {
           await axios.delete(`http://localhost:8000/api/products/${id}`);
-
-          setAlertState({
-            isOpen: true,
-            type: "success",
-            title: "Deleted!",
-            message: "Product deleted successfully.",
-          });
-
+          setAlertState({ isOpen: true, type: "success", title: "Deleted!", message: "Product deleted successfully." });
           fetchProducts();
         } catch {
-          setAlertState({
-            isOpen: true,
-            type: "error",
-            title: "Error!",
-            message: "Failed to delete product.",
-          });
+          setAlertState({ isOpen: true, type: "error", title: "Error!", message: "Failed to delete product." });
         }
       },
     });
@@ -228,6 +232,7 @@ const ViewProducts = () => {
               <th className="border p-2">Color</th>
               <th className="border p-2">Size</th>
               <th className="border p-2">Vendor</th>
+              <th className="border p-2">Material</th>
               <th className="border p-2">UOM</th>
               <th className="border p-2">Qty</th>
               <th className="border p-2">Min Stock</th>
@@ -238,7 +243,6 @@ const ViewProducts = () => {
               <th className="border p-2">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {products.map((p) => (
               <tr key={p.product_id}>
@@ -246,31 +250,24 @@ const ViewProducts = () => {
                 <td className="border p-2">{p.sku}</td>
                 <td className="border p-2">{p.product_name}</td>
                 <td className="border p-2">{p.product_description}</td>
-
                 <td className="border p-2">{p.category?.product_category_name || "-"}</td>
                 <td className="border p-2">{p.type?.product_type_name || "-"}</td>
                 <td className="border p-2">{p.color?.color_name || "-"}</td>
                 <td className="border p-2">{p.size?.size_name || "-"}</td>
                 <td className="border p-2">{p.vendor?.vendor_name || "-"}</td>
-
+                <td className="border p-2">{materialLookup[p.material_id] || "-"}</td>
                 <td className="border p-2">{p.unit_of_measure}</td>
                 <td className="border p-2">{p.quantity_on_hand}</td>
                 <td className="border p-2">{p.min_stock_level}</td>
                 <td className="border p-2">{p.cost_price}</td>
                 <td className="border p-2">{p.selling_price}</td>
                 <td className="border p-2">{p.tax_percent}</td>
-
                 <td className="border p-2">
-                  <Barcode value={p.product_id} height={40} width={1.5} fontSize={12} />
+                  <Barcode value={p.product_id.toString()} height={40} width={1.5} fontSize={12} />
                 </td>
-
                 <td className="border p-2">
-                  <button onClick={() => handleEdit(p)} className="px-3 py-1 bg-yellow-500 text-white mr-2 rounded">
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(p.product_id)} className="px-3 py-1 bg-red-600 text-white rounded">
-                    Delete
-                  </button>
+                  <button onClick={() => handleEdit(p)} className="px-3 py-1 bg-yellow-500 text-white mr-2 rounded">Edit</button>
+                  <button onClick={() => handleDelete(p.product_id)} className="px-3 py-1 bg-red-600 text-white rounded">Delete</button>
                 </td>
               </tr>
             ))}
@@ -282,7 +279,6 @@ const ViewProducts = () => {
       {showModal && (
         <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
           <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-            
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h3 className="text-2xl font-bold text-indigo-700">Edit Product</h3>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50">✕</button>
@@ -290,7 +286,6 @@ const ViewProducts = () => {
 
             <form onSubmit={handleUpdate} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
                 {[
                   { key: "product_code", label: "Product Code" },
                   { key: "sku", label: "SKU" },
@@ -318,13 +313,15 @@ const ViewProducts = () => {
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
                   <select
-                    value={editData.category_id}
+                    value={editData.category_id || ""}
                     onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}
                     className="block w-full p-3 border rounded-lg shadow-inner"
                   >
                     <option value="">Select Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.product_category_id} value={cat.product_category_id}>{cat.product_category_name}</option>
+                    {categories.map((c) => (
+                      <option key={c.product_category_id} value={c.product_category_id.toString()}>
+                        {c.product_category_name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -333,13 +330,15 @@ const ViewProducts = () => {
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Type</label>
                   <select
-                    value={editData.type_id}
+                    value={editData.type_id || ""}
                     onChange={(e) => setEditData({ ...editData, type_id: e.target.value })}
                     className="block w-full p-3 border rounded-lg shadow-inner"
                   >
                     <option value="">Select Type</option>
                     {types.map((t) => (
-                      <option key={t.product_type_id} value={t.product_type_id}>{t.product_type_name}</option>
+                      <option key={t.product_type_id} value={t.product_type_id.toString()}>
+                        {t.product_type_name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -348,46 +347,57 @@ const ViewProducts = () => {
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Color</label>
                   <select
-                    value={editData.color_id}
+                    value={editData.color_id || ""}
                     onChange={(e) => setEditData({ ...editData, color_id: e.target.value })}
                     className="block w-full p-3 border rounded-lg shadow-inner"
                   >
                     <option value="">Select Color</option>
                     {colors.map((c) => (
-                      <option key={c.color_id} value={c.color_id}>{c.color_name}</option>
+                      <option key={c.color_id} value={c.color_id.toString()}>{c.color_name}</option>
                     ))}
                   </select>
                 </div>
-
                 {/* SIZE */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Size</label>
                   <select
                     value={editData.size_id || ""}
-                    onChange={(e) => setEditData({ ...editData, size_id: parseInt(e.target.value) })}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
+                    onChange={(e) => setEditData({ ...editData, size_id: e.target.value })}
+                    className="block w-full p-3 border rounded-lg shadow-inner"
                   >
                     <option value="">Select Size</option>
                     {sizes.map((s) => (
-                      <option key={s.size_id} value={s.size_id}>
-                        {s.size_name}
-                      </option>
+                      <option key={s.size_id} value={s.size_id.toString()}>{s.size_name}</option>
                     ))}
                   </select>
                 </div>
-
 
                 {/* VENDOR */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Vendor</label>
                   <select
-                    value={editData.vendor_id}
+                    value={editData.vendor_id || ""}
                     onChange={(e) => setEditData({ ...editData, vendor_id: e.target.value })}
                     className="block w-full p-3 border rounded-lg shadow-inner"
                   >
                     <option value="">Select Vendor</option>
                     {vendors.map((v) => (
-                      <option key={v.vendor_id} value={v.vendor_id}>{v.vendor_name}</option>
+                      <option key={v.vendor_id} value={v.vendor_id.toString()}>{v.vendor_name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* MATERIAL */}
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Material</label>
+                  <select
+                    value={editData.material_id || ""}
+                    onChange={(e) => setEditData({ ...editData, material_id: e.target.value })}
+                    className="block w-full p-3 border rounded-lg shadow-inner"
+                  >
+                    <option value="">Select Material</option>
+                    {materials.map((m) => (
+                      <option key={m.material_id} value={m.material_id.toString()}>{m.material_name}</option>
                     ))}
                   </select>
                 </div>

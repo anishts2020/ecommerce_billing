@@ -17,9 +17,6 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\ProductCategoriesController;
 use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
-
-use App\Http\Controllers\Api\ProductCategories;
-use App\Http\Controllers\Api\ProductTypes;
 use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ColorController;
@@ -32,6 +29,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\ColorController;
 
+use App\Http\Controllers\Api\ProductTypes;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserRoleController;
 use App\Http\Controllers\Api\UserController;
@@ -100,28 +98,31 @@ Route::delete('/salary-payments/{id}', [SalaryPaymentController::class,'destroy'
 
 /*
 |--------------------------------------------------------------------------
-| AUTH
+| AUTH ROUTES
 |--------------------------------------------------------------------------
 */
-
 Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
 
 /*
 |--------------------------------------------------------------------------
-| MATERIALS
+| CUSTOMERS
 |--------------------------------------------------------------------------
 */
+Route::apiResource('customers', CustomerController::class);
+Route::get('/customer/check-phone/{phone}', [CustomerController::class, 'checkPhone']);
 
-Route::get('/materials', [MaterialsController::class, 'index']);
-Route::post('/materials', [MaterialsController::class, 'store']);
-Route::put('/materials/{id}', [MaterialsController::class, 'update']);
-Route::delete('/materials/{id}', [MaterialsController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
-| VENDORS
+| EMPLOYEES
 |--------------------------------------------------------------------------
 */
+Route::apiResource('employees', EmployeeController::class);
 
 Route::get('/vendors', [VendorController::class, 'index']);
 Route::post('/vendors', [VendorController::class, 'store']);
@@ -160,29 +161,55 @@ Route::get('/categories', [ProductCategoriesController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------
-| PRODUCT SIZES
+| SALARY PAYMENTS
 |--------------------------------------------------------------------------
 */
+Route::get('/salary-payments/{employee_id}', [SalaryPaymentController::class, 'getByEmployee']);
+Route::post('/salary-payments', [SalaryPaymentController::class, 'store']);
+Route::put('/salary-payments/{id}', [SalaryPaymentController::class,'update']);
+Route::delete('/salary-payments/{id}', [SalaryPaymentController::class,'destroy']);
 
-// Keep your original for safety
+
+/*
+|--------------------------------------------------------------------------
+| SALES INVOICE
+|--------------------------------------------------------------------------
+*/
+Route::apiResource('sales-invoices', SalesInvoiceController::class);
+Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getItems']);
+
+
+/*
+|--------------------------------------------------------------------------
+| PRODUCT BARCODE
+|--------------------------------------------------------------------------
+*/
+Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 Route::get('/product-sizes', [ProductSizeController::class, 'index']);
+Route::post('/product-sizes', [ProductSizeController::class, 'store']);
+Route::put('/product-sizes/{id}', [ProductSizeController::class, 'update']);
+Route::delete('/product-sizes/{id}', [ProductSizeController::class, 'destroy']);
 
-// ADD THIS FOR REACT:
-Route::get('/sizes', [ProductSizeController::class, 'index']);
+Route::get('/sizes', [ProductSizeController::class, 'index']); // alias
+
 
 /*
 |--------------------------------------------------------------------------
-| COLORS
+| PRODUCT CATEGORIES
 |--------------------------------------------------------------------------
 */
+Route::get('/product-categories', [ProductCategoriesController::class, 'index']);
+Route::post('/product-categories', [ProductCategoriesController::class, 'store']);
+Route::put('/product-categories/{id}', [ProductCategoriesController::class, 'update']);
+Route::delete('/product-categories/{id}', [ProductCategoriesController::class, 'destroy']);
 
-// ORIGINAL
-Route::get('/colors', [ColorController::class, 'index']);
-Route::post('/colors', [ColorController::class, 'store']);
+// simple alias for React
+Route::get('/categories', [ProductCategoriesController::class, 'index']);
+
 
 /*
 |--------------------------------------------------------------------------
-| PRODUCT TYPES
+| PRODUCT SIZES
 |--------------------------------------------------------------------------
 */
 Route::get('/product-sizes', [ProductSizeController::class, 'index']);
@@ -192,32 +219,9 @@ Route::delete('/product-sizes/{id}', [ProductSizeController::class, 'destroy']);
 
 Route::get('/sizes', [ProductSizeController::class, 'index']); // alias
 
-Route::get('/types', [ProductTypes::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------
-| PRODUCT CATEGORIES
-|--------------------------------------------------------------------------
-*/
-
-// ORIGINAL
-Route::get('/product-categories', [ProductCategoriesController::class, 'index']);
-Route::post('/product-categories', [ProductCategoriesController::class, 'store']);
-Route::put('/product-categories/{id}', [ProductCategoriesController::class, 'update']);
-Route::delete('/product-categories/{id}', [ProductCategoriesController::class, 'destroy']);
-
-// ADD THIS FOR REACT:
-Route::get('/categories', [ProductCategoriesController::class, 'index']);
-
-/*
-|--------------------------------------------------------------------------
-| PRODUCTS
-|--------------------------------------------------------------------------
-
-*/
-
-
-
 | PRODUCTS
 |--------------------------------------------------------------------------
 */
@@ -258,19 +262,36 @@ Route::post('/vendors', [VendorController::class, 'store']);
 Route::put('/vendors/{id}', [VendorController::class, 'update']);
 Route::delete('/vendors/{id}', [VendorController::class, 'destroy']);
 
-Route::get('/product-sizes', [ProductSizeController::class, 'index']);
-Route::post('/product-sizes', [ProductSizeController::class, 'store']);
-Route::put('/product-sizes/{id}', [ProductSizeController::class, 'update']);
-Route::delete('/product-sizes/{id}', [ProductSizeController::class, 'destroy']);
-
-// Duplicate optional alias
-Route::get('/sizes', [ProductSizeController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------
-| PROTECTED ROUTES
+| PRODUCT TYPES
 |--------------------------------------------------------------------------
 */
+Route::get('/types', [ProductTypes::class, 'index']);
+
+
+/*
+|--------------------------------------------------------------------------
+| USERS & ROLES
+|--------------------------------------------------------------------------
+*/
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/{id}', [UserController::class, 'show']);
+Route::post('/users', [UserController::class, 'store']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+Route::get('/user-role', [UserRoleController::class, 'index']);
+Route::get('/user-role/{id}', [UserRoleController::class, 'show']);
+Route::post('/user-role', [UserRoleController::class, 'store']);
+Route::put('/user-role/{id}', [UserRoleController::class, 'update']);
+Route::delete('/user-role/{id}', [UserRoleController::class, 'destroy']);
+
+Route::get('/roles', [RoleController::class, 'index']);
+Route::post('/roles', [RoleController::class, 'store']);
+Route::put('/roles/{id}', [RoleController::class, 'update']);
+Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
