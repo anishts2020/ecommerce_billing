@@ -69,20 +69,42 @@ class ProductsController extends Controller
      * UPDATE product
      */
     public function update(Request $request, $id)
-    {
-        $product = Products::find($id);
+{
+    $product = Products::find($id);
 
-        if (!$product) {
-            return response(["message" => "Product not found"], 404);
-        }
-
-        $product->update($request->all());
-
-        return response([
-            "message" => "Product updated successfully",
-            "data" => $product
-        ], 200);
+    if (!$product) {
+        return response(["message" => "Product not found"], 404);
     }
+
+    // Allow only fields that exist in the table
+    $validated = $request->only([
+        'product_code',
+        'sku',
+        'product_name',
+        'product_description',
+        'category_id',
+        'type_id',
+        'color_id',
+        'size_id',
+        'vendor_id',
+        'unit_of_measure',
+        'quantity_on_hand',
+        'min_stock_level',
+        'cost_price',
+        'selling_price',
+        'tax_percent',
+        'is_published',
+        'is_active'
+    ]);
+
+    $product->update($validated);
+
+    return response([
+        "message" => "Product updated successfully",
+        "data" => $product
+    ], 200);
+}
+
 
     /**
      * DELETE product

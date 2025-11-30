@@ -1,9 +1,25 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+
+import SalaryDetails from './Pages/SalaryDetails';
+import Customer from './Pages/Customer';
+import CustomerDetailsForm from './Pages/CustomerDetailsForm';
+
+import SalesinvoiceList from './Pages/SalesinvoiceList';
+import SalesInvoiceItems from './Pages/SalesInvoiceItems';
+
+
+
+
+
+import Employee from './Pages/Employee';
+
+import Salesinvoice from './Pages/Salesinvoice';
+
+
 
 import Materials from "./Pages/Materials";
 import ProductCategories from "./Pages/ProductCategories";
@@ -42,6 +58,69 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* <Route path="/employees" element={
+            <PrivateRoute>
+              <EmployeeDetails />
+            </PrivateRoute>
+          }
+        /> */}
+        <Route
+          path="/salary/:id"
+          element={
+            <PrivateRoute>
+              <SalaryDetails />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/customers" element={
+          <PrivateRoute>
+            <Customer/>
+          </PrivateRoute>
+        }
+        
+        />
+        <Route
+          path="/employees"
+          element={
+            <PrivateRoute>
+              <Employee />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/salesinvoice_list"
+          element={
+            <PrivateRoute>
+              <SalesinvoiceList />
+            </PrivateRoute>
+          }
+        />
+         {/* customer */}
+         <Route
+          path="/customers"
+          element={
+            <PrivateRoute>
+              <Customer />
+            </PrivateRoute>
+          }
+        />
+         {/* <Route
+          path="/customer-form"
+          element={
+            <PrivateRoute>
+              <CustomerDetailsForm />
+            </PrivateRoute>
+          }
+        /> */}
+        <Route
+  path="/sales-invoice"
+  element={
+    <PrivateRoute>
+      <Salesinvoice />
+    </PrivateRoute>
+  }
+/>
 
         <Route
           path="/ProductCategories"
@@ -136,6 +215,11 @@ function App() {
 
         {/* Default */}
         <Route path="*" element={<Login />} />
+        <Route path="/customer-form" element={<CustomerDetailsForm />} />
+        <Route path="/sales-invoice" element={<Salesinvoice/>} />
+        <Route path='/sales-voiceList' element={<SalesinvoiceList/>}/>
+        <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems/>} />
+
       </Routes>
     </Router>
   );

@@ -4,12 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-
-
-
-
-        //
 use App\Models\ProductSize;
 
 class ProductSizeController extends Controller
@@ -60,6 +54,6 @@ class ProductSizeController extends Controller
 
         return response()->json([
             'message' => 'Product size deleted successfully'
-        ], 204);
+        ], 200);
     }
 }

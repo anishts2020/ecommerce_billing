@@ -107,6 +107,7 @@ export default function ProductSizePage() {
     try {
       const response = await axios.get("http://localhost:8000/api/product-sizes");
       setSizes(response.data);
+
     } catch (error) {
       console.error("Error fetching product sizes:", error);
     }
