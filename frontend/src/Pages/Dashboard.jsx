@@ -36,6 +36,50 @@ export default function Dashboard() {
             </>
           )}
 
+          {isAdmin && (
+            <li>
+              <Link to="/product-sizes" className="hover:underline">
+                Product Sizes
+              </Link>
+            </li>
+          )}
+           {isAdmin && (
+            <li>
+              <Link to="/CreateUser" className="hover:underline">
+                Create User
+              </Link>
+            </li>
+          )}
+    {isAdmin && (
+            <li>
+              <Link to="/colors" className="hover:underline">
+                Colors
+              </Link>
+            </li>
+          )}
+           {isAdmin && (
+            <li>
+              <Link to="/Materials" className="hover:underline">
+               Materials
+              </Link>
+            </li>
+          )}
+             {isAdmin && (
+            <li>
+              <Link to="/ProductCategories" className="hover:underline">
+               ProductCategories
+              </Link>
+            </li>
+          )}
+
+        
+              {isAdmin && (
+            <li>
+              <Link to="/PurchaseInvoiceItem" className="hover:underline">
+               PurchaseInvoice
+              </Link>
+            </li>
+          )}
           <li>
             <Link to="/login" className="hover:underline">Logout</Link>
           </li>
