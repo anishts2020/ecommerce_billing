@@ -35,6 +35,7 @@ import ViewProducts from "./pages/ViewProducts";
 
 // MISSING IMPORT FIXED
 import CreateUser from "./Pages/CreateUser";
+import InventoryTransactions from "./Pages/InventoryTransaction"
 
 function App() {
   return (
@@ -209,6 +210,9 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+
         {/* Default */}
         <Route path="*" element={<Login />} />
         <Route path="/customer-form" element={<CustomerDetailsForm />} />

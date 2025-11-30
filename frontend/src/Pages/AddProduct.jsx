@@ -374,8 +374,70 @@ const AddProduct = () => {
                   <div className="p-2 text-gray-500 text-sm">No colors found</div>
                 )}
               </div>
+
+       {/* Color Picker - Searchable Dropdown */}
+    <div className="col-span-2">
+      <label className="block mb-2 font-semibold text-gray-800 text-sm">
+        Select Color
+      </label>
+
+      <div className="relative">
+        {/* SEARCH BOX */}
+        <input
+          type="text"
+          placeholder="Search color..."
+          className="w-full border p-2 rounded"
+          value={formData.searchColor || ""}
+          onChange={(e) =>
+            setFormData({ ...formData, searchColor: e.target.value })
+          }
+          onFocus={() => setFormData({ ...formData, showColorDropdown: true })}
+        />
+
+        {/* DROPDOWN LIST */}
+        {formData.showColorDropdown && (
+          <div className="absolute z-20 bg-white border rounded w-full max-h-56 overflow-y-auto shadow">
+            {colors
+              .filter((c) =>
+                c.color_name
+                  .toLowerCase()
+                  .includes((formData.searchColor || "").toLowerCase())
+              )
+              .map((color) => (
+                <div
+                  key={color.color_id}
+                  className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      color_id: color.color_id,
+                      searchColor: color.color_name,
+                      showColorDropdown: false,
+                    });
+                  }}
+                >
+                  {/* Color Swatch */}
+                  <span
+                    className="w-5 h-5 rounded border"
+                    style={{ backgroundColor: color.color_code }}
+                  ></span>
+
+                  {/* Color Name */}
+                  <span className="text-sm">{color.color_name}</span>
+                </div>
+              ))}
+
+            {/* No Results */}
+            {colors.filter((c) =>
+              c.color_name
+                .toLowerCase()
+                .includes((formData.searchColor || "").toLowerCase())
+            ).length === 0 && (
+              <div className="p-2 text-gray-500 text-sm">No colors found</div>
             )}
           </div>
+        )}
+      </div>
 
           {/* Selected Color Preview */}
           {formData.color_id && (
@@ -394,7 +456,25 @@ const AddProduct = () => {
               </span>
             </div>
           )}
+      {/* Selected Color Preview */}
+      {formData.color_id && (
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-sm text-gray-700">Selected:</span>
+          <span
+            className="w-6 h-6 rounded border shadow"
+            style={{
+              backgroundColor:
+                colors.find((c) => c.color_id === formData.color_id)?.color_code ||
+                "#fff",
+            }}
+          ></span>
+
+          <span className="text-sm text-gray-600">
+            {colors.find((c) => c.color_id === formData.color_id)?.color_name}
+          </span>
         </div>
+      )}
+    </div>
 
         {/* Unit of Measure */}
         <input
