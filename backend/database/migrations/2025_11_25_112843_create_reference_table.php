@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('colors', function (Blueprint $table) {
-            $table->id('color_id');
-             $table->string('color_name');
-             $table->string('color_code');
-             $table->tinyInteger('is_active')->default(1);
+        Schema::create('reference', function (Blueprint $table) {
+            $table->id();
+            $table->string('reference_table');
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('colors');
+        Schema::dropIfExists('reference');
     }
 };

@@ -9,10 +9,25 @@ use Illuminate\Http\Request;
 class VendorController extends Controller
 {
     // GET ALL VENDORS
-    public function index()
-    {
-        return Vendor::all();
+    public function index(Request $request)
+{
+    $query = \App\Models\Vendor::query();
+
+    // SEARCH
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where('vendor_name', 'like', "%$search%")
+              ->orWhere('email', 'like', "%$search%")
+              ->orWhere('phone', 'like', "%$search%");
     }
+
+    // PAGINATION
+    $perPage = $request->get('per_page', 10);
+    $vendors = $query->orderBy('vendor_name', 'asc')->paginate($perPage);
+
+    return response()->json($vendors);
+}
+
 
     // STORE VENDOR
     public function store(Request $request)

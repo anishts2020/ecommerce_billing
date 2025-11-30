@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 /* ----------------------------------------------------------
-   SVG ICONS (same as Vendors)
+   SVG ICONS
 ---------------------------------------------------------- */
 const AlertTriangleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,7 +24,7 @@ const CheckCircleIcon = (props) => (
 );
 
 /* ----------------------------------------------------------
-   Custom Alert Component (supports 2-button success)
+   CUSTOM ALERT
 ---------------------------------------------------------- */
 const CustomAlert = ({ isOpen, title, message, type, onClose, onView, onAddMore }) => {
   if (!isOpen) return null;
@@ -34,19 +34,19 @@ const CustomAlert = ({ isOpen, title, message, type, onClose, onView, onAddMore 
   switch (type) {
     case "success":
       icon = <CheckCircleIcon className="w-10 h-10 text-green-500" />;
-      bgColor = "bg-green-50 border-green-500";
+      bgColor = "bg-green-50 border-green-600";
       buttonColor = "bg-green-600 hover:bg-green-700";
       break;
 
     case "error":
       icon = <XCircleIcon className="w-10 h-10 text-red-500" />;
-      bgColor = "bg-red-50 border-red-500";
+      bgColor = "bg-red-50 border-red-600";
       buttonColor = "bg-red-600 hover:bg-red-700";
       break;
 
     default:
       icon = <AlertTriangleIcon className="w-10 h-10 text-yellow-500" />;
-      bgColor = "bg-yellow-50 border-yellow-500";
+      bgColor = "bg-yellow-50 border-yellow-600";
       buttonColor = "bg-yellow-600 hover:bg-yellow-700";
   }
 
@@ -62,7 +62,6 @@ const CustomAlert = ({ isOpen, title, message, type, onClose, onView, onAddMore 
           <p className="text-gray-600">{message}</p>
         </div>
 
-        {/* TWO BUTTONS ONLY FOR SUCCESS ALERT */}
         {type === "success" ? (
           <div className="mt-6 flex justify-center gap-4">
             <button onClick={onView} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -103,7 +102,7 @@ const AddProduct = () => {
   const closeAlert = () => setAlert({ ...alert, isOpen: false });
 
   /* ----------------------------------------------------------
-     FORM + DATA STATES
+     FORM STATE
   ---------------------------------------------------------- */
   const [formData, setFormData] = useState({
     product_code: "",
@@ -112,6 +111,7 @@ const AddProduct = () => {
     product_description: "",
     category_id: "",
     type_id: "",
+    material_id: "",
     color_id: "",
     size_id: "",
     vendor_id: "",
@@ -121,31 +121,53 @@ const AddProduct = () => {
     cost_price: "",
     selling_price: "",
     tax_percent: "",
+    searchColor: "",
+    showColorDropdown: false,
   });
 
+  /* ----------------------------------------------------------
+     FETCH DATA
+  ---------------------------------------------------------- */
   const [categories, setCategories] = useState([]);
   const [types, setTypes] = useState([]);
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [vendors, setVendors] = useState([]);
+  const [materials, setMaterials] = useState([]);
 
-  const [colorPage, setColorPage] = useState(0);
-  const COLORS_PER_PAGE = 50;
-
-  const paginatedColors = colors.slice(
-    colorPage * COLORS_PER_PAGE,
-    (colorPage + 1) * COLORS_PER_PAGE
+  useEffect(() => {
+  axios.get("http://localhost:8000/api/categories").then((res) =>
+    setCategories(Array.isArray(res.data) ? res.data : res.data.data || [])
   );
 
-  /* ----------------------------------------------------------
-     FETCH DATA
-  ---------------------------------------------------------- */
+  axios.get("http://localhost:8000/api/types").then((res) =>
+    setTypes(Array.isArray(res.data) ? res.data : res.data.data || [])
+  );
+
+  axios.get("http://localhost:8000/api/colors").then((res) =>
+    setColors(Array.isArray(res.data) ? res.data : res.data.data || [])
+  );
+
+  axios.get("http://localhost:8000/api/sizes").then((res) =>
+    setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])
+  );
+  axios.get("http://localhost:8000/api/materials").then((res) =>
+  setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])
+);
+
+  axios.get("http://localhost:8000/api/vendors").then((res) =>
+    setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])
+  );
+}, []);
+
+  /* ---- Close color dropdown on outside click ---- */
   useEffect(() => {
-    axios.get("http://localhost:8000/api/categories").then((res) => setCategories(res.data));
-    axios.get("http://localhost:8000/api/types").then((res) => setTypes(res.data));
-    axios.get("http://localhost:8000/api/colors").then((res) => setColors(res.data));
-    axios.get("http://localhost:8000/api/sizes").then((res) => setSizes(res.data));
-    axios.get("http://localhost:8000/api/vendors").then((res) => setVendors(res.data));
+    const closeDropdown = () => {
+      setFormData((prev) => ({ ...prev, showColorDropdown: false }));
+    };
+    window.addEventListener("click", closeDropdown);
+
+    return () => window.removeEventListener("click", closeDropdown);
   }, []);
 
   /* ----------------------------------------------------------
@@ -168,6 +190,8 @@ const AddProduct = () => {
       cost_price: "",
       selling_price: "",
       tax_percent: "",
+      searchColor: "",
+      showColorDropdown: false,
     });
   };
 
@@ -177,12 +201,7 @@ const AddProduct = () => {
     axios
       .post("http://localhost:8000/api/products/store", formData)
       .then(() => {
-        setAlert({
-          isOpen: true,
-          title: "Product Added Successfully!",
-          message: "What would you like to do next?",
-          type: "success",
-        });
+        openAlert("Product Added Successfully!", "What would you like to do next?");
       })
       .catch((err) => {
         openAlert("Failed to Add Product", err.response?.data?.message || "Something went wrong!", "error");
@@ -190,7 +209,7 @@ const AddProduct = () => {
   };
 
   /* ----------------------------------------------------------
-     RENDER UI
+     RENDER
   ---------------------------------------------------------- */
   return (
     <div className="p-6 bg-white rounded-xl shadow max-w-3xl mx-auto">
@@ -199,31 +218,45 @@ const AddProduct = () => {
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         {/* Product Code */}
-        <input type="text" placeholder="Product Code" className="border p-2 rounded"
+        <input
+          type="text"
+          placeholder="Product Code"
+          className="border p-2 rounded"
           value={formData.product_code}
           onChange={(e) => setFormData({ ...formData, product_code: e.target.value })}
         />
 
         {/* SKU */}
-        <input type="text" placeholder="SKU" className="border p-2 rounded"
+        <input
+          type="text"
+          placeholder="SKU"
+          className="border p-2 rounded"
           value={formData.sku}
           onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
         />
 
         {/* Product Name */}
-        <input type="text" placeholder="Product Name" className="border p-2 rounded"
+        <input
+          type="text"
+          placeholder="Product Name"
+          className="border p-2 rounded"
           value={formData.product_name}
           onChange={(e) => setFormData({ ...formData, product_name: e.target.value })}
         />
 
         {/* Description */}
-        <textarea placeholder="Description" className="border p-2 rounded col-span-2"
+        <textarea
+          placeholder="Description"
+          className="border p-2 rounded col-span-2"
           value={formData.product_description}
-          onChange={(e) => setFormData({ ...formData, product_description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, product_description: e.target.value })
+          }
         />
 
         {/* Category */}
-        <select className="border p-2 rounded"
+        <select
+          className="border p-2 rounded"
           onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
         >
           <option value="">Select Category</option>
@@ -235,7 +268,8 @@ const AddProduct = () => {
         </select>
 
         {/* Type */}
-        <select className="border p-2 rounded"
+        <select
+          className="border p-2 rounded"
           onChange={(e) => setFormData({ ...formData, type_id: e.target.value })}
         >
           <option value="">Select Type</option>
@@ -247,7 +281,8 @@ const AddProduct = () => {
         </select>
 
         {/* Size */}
-        <select className="border p-2 rounded"
+        <select
+          className="border p-2 rounded"
           onChange={(e) => setFormData({ ...formData, size_id: e.target.value })}
         >
           <option value="">Select Size</option>
@@ -259,7 +294,8 @@ const AddProduct = () => {
         </select>
 
         {/* Vendor */}
-        <select className="border p-2 rounded"
+        <select
+          className="border p-2 rounded"
           onChange={(e) => setFormData({ ...formData, vendor_id: e.target.value })}
         >
           <option value="">Select Vendor</option>
@@ -269,6 +305,75 @@ const AddProduct = () => {
             </option>
           ))}
         </select>
+        <select
+  className="border p-2 rounded"
+  onChange={(e) => setFormData({ ...formData, material_id: e.target.value })}
+>
+  <option value="">Select Material</option>
+  {materials.map((m) => (
+    <option key={m.material_id} value={m.material_id}>
+      {m.material_name}
+    </option>
+  ))}
+</select>
+
+
+        {/* COLOR PICKER */}
+        <div className="col-span-2">
+          <label className="block mb-2 font-semibold text-gray-800 text-sm">
+            Select Color
+          </label>
+
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            {/* SEARCH BOX */}
+            <input
+              type="text"
+              placeholder="Search color..."
+              className="w-full border p-2 rounded"
+              value={formData.searchColor}
+              onChange={(e) =>
+                setFormData({ ...formData, searchColor: e.target.value })
+              }
+              onFocus={() => setFormData({ ...formData, showColorDropdown: true })}
+            />
+
+            {/* DROPDOWN LIST */}
+            {formData.showColorDropdown && (
+              <div className="absolute z-20 bg-white border rounded w-full max-h-56 overflow-y-auto shadow">
+                {colors
+                  .filter((c) =>
+                    c.color_name.toLowerCase().includes(formData.searchColor.toLowerCase())
+                  )
+                  .map((color) => (
+                    <div
+                      key={color.color_id}
+                      className="flex items-center gap-3 p-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          color_id: color.color_id,
+                          searchColor: color.color_name,
+                          showColorDropdown: false,
+                        });
+                      }}
+                    >
+                      <span
+                        className="w-5 h-5 rounded border"
+                        style={{ backgroundColor: color.color_code }}
+                      ></span>
+
+                      <span className="text-sm">{color.color_name}</span>
+                    </div>
+                  ))}
+
+                {colors.filter((c) =>
+                  c.color_name
+                    .toLowerCase()
+                    .includes(formData.searchColor.toLowerCase())
+                ).length === 0 && (
+                  <div className="p-2 text-gray-500 text-sm">No colors found</div>
+                )}
+              </div>
 
        {/* Color Picker - Searchable Dropdown */}
     <div className="col-span-2">
@@ -334,6 +439,23 @@ const AddProduct = () => {
         )}
       </div>
 
+          {/* Selected Color Preview */}
+          {formData.color_id && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-sm text-gray-700">Selected:</span>
+              <span
+                className="w-6 h-6 rounded border shadow"
+                style={{
+                  backgroundColor:
+                    colors.find((c) => c.color_id === formData.color_id)?.color_code || "#fff",
+                }}
+              ></span>
+
+              <span className="text-sm text-gray-600">
+                {colors.find((c) => c.color_id === formData.color_id)?.color_name}
+              </span>
+            </div>
+          )}
       {/* Selected Color Preview */}
       {formData.color_id && (
         <div className="mt-2 flex items-center gap-2">
@@ -355,42 +477,63 @@ const AddProduct = () => {
     </div>
 
         {/* Unit of Measure */}
-        <input type="text" placeholder="Unit of Measure" className="border p-2 rounded"
+        <input
+          type="text"
+          placeholder="Unit of Measure"
+          className="border p-2 rounded"
           value={formData.unit_of_measure}
           onChange={(e) => setFormData({ ...formData, unit_of_measure: e.target.value })}
         />
 
         {/* Quantity */}
-        <input type="number" placeholder="Quantity on Hand" className="border p-2 rounded"
+        <input
+          type="number"
+          placeholder="Quantity on Hand"
+          className="border p-2 rounded"
           value={formData.quantity_on_hand}
           onChange={(e) => setFormData({ ...formData, quantity_on_hand: e.target.value })}
         />
 
         {/* Min Stock */}
-        <input type="number" placeholder="Min Stock Level" className="border p-2 rounded"
+        <input
+          type="number"
+          placeholder="Min Stock Level"
+          className="border p-2 rounded"
           value={formData.min_stock_level}
           onChange={(e) => setFormData({ ...formData, min_stock_level: e.target.value })}
         />
 
         {/* Cost Price */}
-        <input type="number" placeholder="Cost Price" className="border p-2 rounded"
+        <input
+          type="number"
+          placeholder="Cost Price"
+          className="border p-2 rounded"
           value={formData.cost_price}
           onChange={(e) => setFormData({ ...formData, cost_price: e.target.value })}
         />
 
         {/* Selling Price */}
-        <input type="number" placeholder="Selling Price" className="border p-2 rounded"
+        <input
+          type="number"
+          placeholder="Selling Price"
+          className="border p-2 rounded"
           value={formData.selling_price}
           onChange={(e) => setFormData({ ...formData, selling_price: e.target.value })}
         />
 
         {/* Tax */}
-        <input type="number" placeholder="Tax %" className="border p-2 rounded"
+        <input
+          type="number"
+          placeholder="Tax %"
+          className="border p-2 rounded"
           value={formData.tax_percent}
           onChange={(e) => setFormData({ ...formData, tax_percent: e.target.value })}
         />
 
-        <button type="submit" className="col-span-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          className="col-span-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
           Save Product
         </button>
       </form>

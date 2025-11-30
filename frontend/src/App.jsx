@@ -28,13 +28,15 @@ import ProductSizePage from "./Pages/ProductSizePage";
 import Colors from "./Pages/Colors";
 import Roles from "./Pages/Roles";
 import UserRoles from "./Pages/UserRoles";
-
+import PurchaseInvoice from "./Pages/PurchaseInvoice";
 // Product pages
 import AddProduct from "./pages/AddProduct";
 import ViewProducts from "./pages/ViewProducts";
+import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItem";
 
 // MISSING IMPORT FIXED
 import CreateUser from "./Pages/CreateUser";
+import InventoryTransactions from "./Pages/InventoryTransaction"
 
 function App() {
   return (
@@ -209,6 +211,25 @@ function App() {
             </PrivateRoute>
           }
         />
+
+           <Route
+          path="/PurchaseInvoice"
+          element={
+            <PrivateRoute>
+              <PurchaseInvoice />
+            </PrivateRoute>
+          }
+        />
+               <Route
+          path="/PurchaseInvoiceItem"
+          element={
+            <PrivateRoute>
+              <PurchaseInvoiceItems />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+
         {/* Default */}
         <Route path="*" element={<Login />} />
         <Route path="/customer-form" element={<CustomerDetailsForm />} />

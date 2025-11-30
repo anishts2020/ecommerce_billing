@@ -29,6 +29,7 @@ class ProductsController extends Controller
             'product_description' => 'nullable|string',
             'category_id' => 'required|integer',
             'type_id' => 'required|integer',
+            'material_id' => 'nullable|exists:materials,material_id',
             'color_id' => 'required|integer',
             'size_id' => 'required|integer',
             'vendor_id' => 'required|integer',
