@@ -4,15 +4,29 @@ import AlertModal from "../Modal/AlertModal";
 
 function UserRoles() {
   const [userRoles, setUserRoles] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
+
+  const [search, setSearch] = useState("");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  const indexOfLast = currentPage * pageSize;
+  const indexOfFirst = indexOfLast - pageSize;
+  const paginatedData = filtered.slice(indexOfFirst, indexOfLast);
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
 
   const [formData, setFormData] = useState({ user_id: "", role_id: "" });
   const [editingId, setEditingId] = useState(null);
 
   const [formModalOpen, setFormModalOpen] = useState(false);
 
-  // ALERT MODAL CONTROL
+  // Alert
   const [alert, setAlert] = useState({
     isOpen: false,
     title: "",
@@ -28,6 +42,10 @@ function UserRoles() {
     fetchAll();
   }, []);
 
+  useEffect(() => {
+    handleSearch();
+  }, [search, userRoles]);
+
   const fetchAll = async () => {
     try {
       const [urRes, uRes, rRes] = await Promise.all([
@@ -36,11 +54,24 @@ function UserRoles() {
         axios.get("http://localhost:8000/api/roles"),
       ]);
       setUserRoles(urRes.data);
+      setFiltered(urRes.data);
       setUsers(uRes.data);
       setRoles(rRes.data);
     } catch (err) {
       openAlert("error", "Error", "Failed to load data");
     }
+  };
+
+  const handleSearch = () => {
+    const s = search.toLowerCase();
+    setFiltered(
+      userRoles.filter(
+        (item) =>
+          item.user?.name.toLowerCase().includes(s) ||
+          item.role?.name.toLowerCase().includes(s)
+      )
+    );
+    setCurrentPage(1);
   };
 
   const isDuplicateEntry = () =>
@@ -67,24 +98,15 @@ function UserRoles() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.user_id) {
-      openAlert("error", "Validation Failed", "Please select a User");
-      return;
-    }
 
-    if (!formData.role_id) {
-      openAlert("error", "Validation Failed", "Please select a Role");
-      return;
-    }
-    // Duplicate validation popup
-    if (isDuplicateEntry()) {
-      openAlert(
-        "error",
-        "Failed",
-        "User is already assigned with this role"
-      );
-      return;
-    }
+    if (!formData.user_id)
+      return openAlert("error", "Validation Failed", "Please select a User");
+
+    if (!formData.role_id)
+      return openAlert("error", "Validation Failed", "Please select a Role");
+
+    if (isDuplicateEntry())
+      return openAlert("error", "Failed", "User is already assigned with this role");
 
     try {
       if (editingId) {
@@ -92,10 +114,10 @@ function UserRoles() {
           `http://localhost:8000/api/user-role/${editingId}`,
           formData
         );
-        openAlert("success", "Success", "User Role updated successfully!");
+        openAlert("success", "Success", "User role updated successfully");
       } else {
         await axios.post("http://localhost:8000/api/user-role", formData);
-        openAlert("success", "Success", "Role assigned to user successfully!");
+        openAlert("success", "Success", "Role assigned successfully!");
       }
 
       setFormModalOpen(false);
@@ -116,7 +138,6 @@ function UserRoles() {
     );
   };
 
-
   const confirmDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/user-role/${id}`);
@@ -127,14 +148,23 @@ function UserRoles() {
     }
   };
 
-
   return (
     <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
 
-        <h2 className="text-2xl font-bold text-center mb-4">User Roles</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">User Roles</h2>
 
-        {/* CENTER CREATE BUTTON */}
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search..."
+            className="border p-2 rounded w-64"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
         <div className="flex justify-center mb-4">
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -148,18 +178,20 @@ function UserRoles() {
           <table className="min-w-full border-collapse border">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border p-2">ID</th>
+                <th className="border p-2">SI No</th>
                 <th className="border p-2">User</th>
                 <th className="border p-2">Role</th>
                 <th className="border p-2">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {userRoles.map((item) => (
+              {paginatedData.map((item, index) => (
                 <tr key={item.id} className="text-center hover:bg-gray-50">
-                  <td className="border p-2">{item.id}</td>
-                  <td className="border p-2">{item.user?.name ?? "N/A"}</td>
-                  <td className="border p-2">{item.role?.name ?? "N/A"}</td>
+                  <td className="border p-2">
+                    {(currentPage - 1) * pageSize + (index + 1)}
+                  </td>
+                  <td className="border p-2">{item.user?.name}</td>
+                  <td className="border p-2">{item.role?.name}</td>
                   <td className="border p-2 flex justify-center gap-2">
                     <button
                       onClick={() => openFormModal(item)}
@@ -177,15 +209,46 @@ function UserRoles() {
                 </tr>
               ))}
 
-              {userRoles.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-4 text-center text-gray-500">
-                    No records found.
+                  <td colSpan={4} className="text-center p-4 text-gray-500">
+                    No matching records found.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* PAGINATION */}
+        <div className="flex justify-center items-center gap-3 mt-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-3 py-1 border rounded ${
+                currentPage === i + 1 ? "bg-blue-600 text-white" : ""
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
 

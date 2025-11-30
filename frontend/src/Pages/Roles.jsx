@@ -8,7 +8,9 @@ export default function Roles() {
   const [editingId, setEditingId] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
-
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
   // Alert Modal State
   const [modal, setModal] = useState({
     open: false,
@@ -119,11 +121,42 @@ export default function Roles() {
     }
   };
 
+  // -----------------------------
+  // SEARCH + PAGINATION LOGIC
+  // -----------------------------
+  const filtered = roles.filter((r) =>
+    r.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+
+  const paginated = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
   return (
     <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+        {/* Heading + Search Bar */}
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl font-bold">Manage Roles</h1>
 
-        <h1 className="text-3xl font-bold text-center mb-6">Manage Roles</h1>
+          <input
+            type="text"
+            placeholder="Search roles..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="border p-2 rounded w-64 shadow-sm"
+          />
+        </div>
 
         <div className="flex justify-center mb-4">
           <button
@@ -148,10 +181,12 @@ export default function Roles() {
             </tr>
           </thead>
           <tbody>
-            {roles.length > 0 ? (
-              roles.map((role) => (
+            {paginated.length > 0 ? (
+              paginated.map((role, index) => (
                 <tr key={role.id} className="hover:bg-gray-100 transition">
-                  <td className="border p-2 text-center">{role.id}</td>
+                  <td className="border p-2 text-center">
+                    {(currentPage - 1) * pageSize + index + 1}
+                  </td>
                   <td className="border p-2">{role.name}</td>
                   <td className="border p-2">{role.description}</td>
                   <td className="border p-2 flex gap-2 justify-center">
@@ -182,6 +217,40 @@ export default function Roles() {
             )}
           </tbody>
         </table>
+        {/* Pagination */}
+        <div className="flex justify-center items-center gap-2 mt-4">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-3 py-1 rounded border ${
+              currentPage === 1 ? "opacity-50" : ""
+            }`}
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goToPage(i + 1)}
+              className={`px-3 py-1 rounded border ${
+                currentPage === i + 1 ? "bg-blue-600 text-white" : ""
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-3 py-1 rounded border ${
+              currentPage === totalPages ? "opacity-50" : ""
+            }`}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {/* ADD/EDIT FORM MODAL */}
