@@ -45,14 +45,12 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
       buttonColor = "bg-red-600 hover:bg-red-700";
       confirmText = "Yes, Delete!";
       break;
-
     case "success":
       icon = <CheckCircleIcon className="w-10 h-10 text-green-500" />;
       bgColor = "bg-green-50 border-green-500";
       buttonColor = "bg-green-600 hover:bg-green-700";
       confirmText = "Close";
       break;
-
     case "error":
       icon = <XCircleIcon className="w-10 h-10 text-red-500" />;
       bgColor = "bg-red-50 border-red-500";
@@ -87,18 +85,16 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
 export default function ProductSizePage() {
   const [sizes, setSizes] = useState([]);
   const [form, setForm] = useState({ size_name: "", description: "", is_active: true });
-
   const [editModal, setEditModal] = useState(false);
   const [editData, setEditData] = useState({ size_id: "", size_name: "", description: "", is_active: true });
-
   const [alertState, setAlertState] = useState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const closeAlert = () => setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
-
   const handleAlertConfirm = () => {
-    if (alertState.type === "confirm" && alertState.actionToRun) {
-      alertState.actionToRun();
-    }
+    if (alertState.type === "confirm" && alertState.actionToRun) alertState.actionToRun();
     closeAlert();
   };
 
@@ -108,13 +104,11 @@ export default function ProductSizePage() {
       const response = await axios.get("http://localhost:8000/api/product-sizes");
       setSizes(response.data);
     } catch (error) {
-      console.error("Error fetching product sizes:", error);
+      setAlertState({ isOpen: true, title: "Error", message: "Failed to fetch sizes", type: "error" });
     }
   };
 
-  useEffect(() => {
-    fetchSizes();
-  }, []);
+  useEffect(() => { fetchSizes(); }, []);
 
   // ===== Add Product Size =====
   const handleSubmit = async (e) => {
@@ -122,15 +116,15 @@ export default function ProductSizePage() {
     try {
       await axios.post("http://127.0.0.1:8000/api/product-sizes", form);
       setAlertState({ isOpen: true, title: "Success", message: "Size added successfully!", type: "success" });
-      fetchSizes();
       setForm({ size_name: "", description: "", is_active: true });
+      fetchSizes();
     } catch {
       setAlertState({ isOpen: true, title: "Error", message: "Failed to add size", type: "error" });
     }
   };
 
   // ===== Delete Confirmation =====
-  const handleDelete = (id) =>
+  const handleDelete = (id) => {
     setAlertState({
       isOpen: true,
       title: "Are you sure?",
@@ -139,61 +133,54 @@ export default function ProductSizePage() {
       actionToRun: async () => {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/product-sizes/${id}`);
+          setAlertState({ isOpen: true, title: "Deleted", message: "Size deleted successfully!", type: "success" });
           fetchSizes();
-          setAlertState({
-            isOpen: true,
-            title: "Deleted",
-            message: "Size deleted successfully!",
-            type: "success",
-          });
         } catch {
-          setAlertState({
-            isOpen: true,
-            title: "Error",
-            message: "Failed to delete size",
-            type: "error",
-          });
+          setAlertState({ isOpen: true, title: "Error", message: "Failed to delete size", type: "error" });
         }
       },
     });
-
-  // ===== Edit Modal =====
-  const openEdit = (size) => {
-    setEditData(size);
-    setEditModal(true);
   };
 
+  // ===== Edit Modal =====
+  const openEdit = (size) => { setEditData(size); setEditModal(true); };
   const updateSize = async (e) => {
     e.preventDefault();
     try {
       await axios.put(`http://127.0.0.1:8000/api/product-sizes/${editData.size_id}`, editData);
       setEditModal(false);
-      fetchSizes();
       setAlertState({ isOpen: true, title: "Success", message: "Size updated successfully!", type: "success" });
+      fetchSizes();
     } catch {
       setAlertState({ isOpen: true, title: "Error", message: "Update failed", type: "error" });
     }
   };
 
+  // ===== Filter & Pagination =====
+  const filteredSizes = sizes.filter(s => s.size_name.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase()));
+  const totalPages = Math.ceil(filteredSizes.length / itemsPerPage);
+  const displayedSizes = filteredSizes.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold mb-6">Product Size Management</h2>
 
+      {/* SEARCH */}
+      <input
+        type="text"
+        placeholder="Search sizes..."
+        className="mb-4 p-2 w-full border rounded"
+        value={search}
+        onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+      />
+
       {/* ADD FORM */}
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-8 space-y-4">
-        <input className="border p-2 w-full rounded" placeholder="Size Name"
-          value={form.size_name} name="size_name"
-          onChange={(e) => setForm({ ...form, size_name: e.target.value })} required />
-
-        <textarea className="border p-2 w-full rounded" placeholder="Description"
-          value={form.description} name="description"
-          onChange={(e) => setForm({ ...form, description: e.target.value })} />
-
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-4 space-y-4">
+        <input className="border p-2 w-full rounded" placeholder="Size Name" value={form.size_name} onChange={(e)=>setForm({...form,size_name:e.target.value})} required/>
+        <textarea className="border p-2 w-full rounded" placeholder="Description" value={form.description} onChange={(e)=>setForm({...form,description:e.target.value})}/>
         <label className="flex items-center gap-2">
-          <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />
-          Active
+          <input type="checkbox" checked={form.is_active} onChange={(e)=>setForm({...form,is_active:e.target.checked})}/> Active
         </label>
-
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Add Size</button>
       </form>
 
@@ -210,25 +197,33 @@ export default function ProductSizePage() {
             </tr>
           </thead>
           <tbody>
-            {sizes.map((s) => (
+            {displayedSizes.map(s => (
               <tr key={s.size_id} className="text-center border-b">
                 <td className="p-2">{s.size_id}</td>
                 <td className="p-2">{s.size_name}</td>
                 <td className="p-2">{s.description}</td>
                 <td className="p-2">{s.is_active ? "Yes" : "No"}</td>
                 <td className="flex justify-center gap-2 p-2">
-                  <button className="bg-yellow-500 px-3 py-1 text-white rounded" onClick={() => openEdit(s)}>
-                    <EditIcon className="w-4 h-4" />
-                  </button>
-                  <button className="bg-red-600 px-3 py-1 text-white rounded" onClick={() => handleDelete(s.size_id)}>
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
+                  <button className="bg-yellow-500 px-3 py-1 text-white rounded" onClick={()=>openEdit(s)}><EditIcon className="w-4 h-4"/></button>
+                  <button className="bg-red-600 px-3 py-1 text-white rounded" onClick={()=>handleDelete(s.size_id)}><TrashIcon className="w-4 h-4"/></button>
                 </td>
               </tr>
             ))}
+            {displayedSizes.length===0 && (
+              <tr><td colSpan={5} className="p-4 text-center">No sizes found.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* PAGINATION */}
+      {totalPages>1 && (
+        <div className="flex justify-center gap-2 mt-4">
+          <button disabled={currentPage===1} onClick={()=>setCurrentPage(currentPage-1)} className="px-3 py-1 border rounded">Prev</button>
+          {Array.from({length: totalPages}, (_,i)=>(<button key={i} onClick={()=>setCurrentPage(i+1)} className={`px-3 py-1 border rounded ${currentPage===i+1?'bg-blue-600 text-white':''}`}>{i+1}</button>))}
+          <button disabled={currentPage===totalPages} onClick={()=>setCurrentPage(currentPage+1)} className="px-3 py-1 border rounded">Next</button>
+        </div>
+      )}
 
       {/* EDIT MODAL */}
       {editModal && (
@@ -236,22 +231,14 @@ export default function ProductSizePage() {
           <div className="bg-white p-6 rounded shadow w-96">
             <h3 className="text-xl font-bold mb-4">Edit Size</h3>
             <form onSubmit={updateSize} className="space-y-4">
-
-              <input className="w-full border rounded p-2"
-                value={editData.size_name} onChange={(e)=>setEditData({...editData,size_name:e.target.value})} />
-
-              <textarea className="w-full border rounded p-2"
-                value={editData.description} onChange={(e)=>setEditData({...editData,description:e.target.value})} />
-
+              <input className="w-full border rounded p-2" value={editData.size_name} onChange={(e)=>setEditData({...editData,size_name:e.target.value})}/>
+              <textarea className="w-full border rounded p-2" value={editData.description} onChange={(e)=>setEditData({...editData,description:e.target.value})}/>
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={editData.is_active}
-                  onChange={(e)=>setEditData({...editData,is_active:e.target.checked})} />
-                Active
+                <input type="checkbox" checked={editData.is_active} onChange={(e)=>setEditData({...editData,is_active:e.target.checked})}/> Active
               </label>
-
               <div className="flex justify-between">
                 <button className="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Update</button>
-                <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={()=>setEditModal(false)} type="button">Cancel</button>
+                <button className="bg-gray-500 text-white px-4 py-2 rounded" type="button" onClick={()=>setEditModal(false)}>Cancel</button>
               </div>
             </form>
           </div>
@@ -261,5 +248,5 @@ export default function ProductSizePage() {
       {/* GLOBAL ALERT */}
       <CustomAlert {...alertState} onConfirm={handleAlertConfirm} onClose={closeAlert} />
     </div>
-  );
+  );  
 }

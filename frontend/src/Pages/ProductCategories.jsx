@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-// ---------------------------------------------------------
-// SVG ICONS
-// ---------------------------------------------------------
+// SVG ICONS (omitted for brevity, assume they are still here)
 const AlertTriangleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
     viewBox="0 0 24 24" stroke="currentColor">
@@ -31,10 +29,7 @@ const XCircleIcon = (props) => (
       2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
-
-// ---------------------------------------------------------
-// CUSTOM ALERT COMPONENT
-// ---------------------------------------------------------
+// CUSTOM ALERT COMPONENT (omitted for brevity, assume it is still here)
 const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   if (!isOpen) return null;
 
@@ -106,6 +101,7 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   );
 };
 
+
 // ---------------------------------------------------------
 // PRODUCT CATEGORIES MAIN COMPONENT
 // ---------------------------------------------------------
@@ -116,6 +112,11 @@ export default function ProductCategories() {
   const [product_category_name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const [searchText, setSearchText] = useState("");
+
+  // PAGINATION STATE 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5); 
 
   // GLOBAL ALERT
   const [alertState, setAlertState] = useState({
@@ -160,6 +161,8 @@ export default function ProductCategories() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // ... (handleSave and handleDelete logic remains the same)
 
   // ---------------------------------------------------------
   const handleSave = () => {
@@ -224,7 +227,7 @@ export default function ProductCategories() {
         });
     }
   };
-
+  
   // ---------------------------------------------------------
   const handleDelete = (id) => {
     setAlertState({
@@ -257,6 +260,49 @@ export default function ProductCategories() {
     });
   };
 
+  // ---------------------------------------------------------
+  // PAGINATION LOGIC
+  // ---------------------------------------------------------
+  
+  // Filter categories based on search text
+  const filteredCategories = categories.filter((cat) =>
+    cat.product_category_name
+      .toLowerCase()
+      .includes(searchText.toLowerCase())
+  );
+
+  // Calculate total pages for the *filtered* data
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+
+  // Recalculate the current page if it's out of bounds after filtering/deleting
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+        setCurrentPage(totalPages);
+    } else if (totalPages === 0) {
+        setCurrentPage(1); 
+    }
+  }, [totalPages, currentPage]);
+
+
+  // Get current items for the current page
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCategories = filteredCategories.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  
+  // Handlers for Previous/Next buttons
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+  
+  // ---------------------------------------------------------
+  // RENDER FUNCTION
   // ---------------------------------------------------------
   return (
     <div className="p-5">
@@ -323,10 +369,25 @@ export default function ProductCategories() {
           Category List
         </h3>
 
+        {/* Search Input */}
+        <div className="w-full flex justify-end mb-4">
+          <input
+            type="text"
+            placeholder="Search category..."
+            value={searchText}
+            onChange={(e) => {
+                setSearchText(e.target.value);
+                setCurrentPage(1); // Reset to page 1 on new search
+            }}
+            className="border p-2 w-56 rounded-xl shadow-sm"
+          />
+        </div>
+
         <table className="w-full border-collapse shadow rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-gray-200">
-              <th className="p-3 border">ID</th>
+              {/* UPDATED HEADER HERE */}
+              <th className="p-3 border">Sl. No.</th> 
               <th className="p-3 border">Name</th>
               <th className="p-3 border">Description</th>
               <th className="p-3 border">Action</th>
@@ -334,40 +395,45 @@ export default function ProductCategories() {
           </thead>
 
           <tbody>
-            {categories.length > 0 ? (
-              categories.map((cat) => (
-                <tr key={cat.product_category_id} className="hover:bg-gray-100">
-                  <td className="p-3 border">
-                    {cat.product_category_id}
-                  </td>
-                  <td className="p-3 border">
-                    {cat.product_category_name}
-                  </td>
-                  <td className="p-3 border">{cat.description}</td>
-                  <td className="p-3 border text-center">
-                    <button
-                      onClick={() => {
-                        setSelectedId(cat.product_category_id);
-                        setName(cat.product_category_name);
-                        setDescription(cat.description);
-                        setOpenModal(true);
-                      }}
-                      className="bg-blue-600 text-white px-4 py-1.5 mr-2 rounded"
-                    >
-                      Edit
-                    </button>
+            {currentCategories.length > 0 ? ( 
+              currentCategories.map((cat, index) => {
+                // CALCULATE SL. NO. HERE
+                const slNo = indexOfFirstItem + index + 1; 
 
-                    <button
-                      onClick={() =>
-                        handleDelete(cat.product_category_id)
-                      }
-                      className="bg-red-500 text-white px-4 py-1.5 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
+                return (
+                  <tr key={cat.product_category_id} className="hover:bg-gray-100">
+                    <td className="p-3 border">
+                      {slNo} {/* DISPLAY SL. NO. */}
+                    </td>
+                    <td className="p-3 border">
+                      {cat.product_category_name}
+                    </td>
+                    <td className="p-3 border">{cat.description}</td>
+                    <td className="p-3 border text-center">
+                      <button
+                        onClick={() => {
+                          setSelectedId(cat.product_category_id);
+                          setName(cat.product_category_name);
+                          setDescription(cat.description);
+                          setOpenModal(true);
+                        }}
+                        className="bg-blue-600 text-white px-4 py-1.5 mr-2 rounded"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          handleDelete(cat.product_category_id)
+                        }
+                        className="bg-red-500 text-white px-4 py-1.5 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td className="p-3 border text-center" colSpan="4">
@@ -377,6 +443,40 @@ export default function ProductCategories() {
             )}
           </tbody>
         </table>
+        
+        {/* PAGINATION CONTROLS */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center mt-4 p-3 bg-white rounded-lg border shadow-sm">
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages} ({filteredCategories.length} items)
+            </span>
+            <div className="flex space-x-2">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg text-white transition ${
+                  currentPage === 1 
+                    ? 'bg-gray-300 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                Previous
+              </button>
+              
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className={`px-4 py-2 rounded-lg text-white transition ${
+                  currentPage === totalPages || totalPages === 0
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* GLOBAL ALERT */}

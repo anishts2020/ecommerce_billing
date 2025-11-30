@@ -13,7 +13,7 @@ function AlertModal({ isOpen, type, title, message, onClose, onConfirm }) {
       : "text-blue-600";
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-opacity-40 backdrop-blur-sm flex justify-center items-center z-50">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md relative">
 
         {/* Close Button */}
