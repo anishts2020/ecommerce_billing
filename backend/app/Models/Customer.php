@@ -5,20 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vendor extends Model
+class Customer extends Model
 {
     use HasFactory;
-
-    protected $primaryKey = 'vendor_id';
-
-    protected $fillable = [
-        'vendor_name',
-        'email',
+     protected $fillable = [
+        'customer_name',
         'phone',
+        'email',
         'address',
-        'city',
+         'city',
         'state',
         'pincode',
         'gst_number',
-    ];
+     ];
+        
 }
