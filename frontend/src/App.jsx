@@ -37,7 +37,9 @@ import UserRoles from "./Pages/UserRoles";
 import CreateUser from "./Pages/CreateUser";
 
 /* PURCHASE */
-import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItem";
+import PurchaseInvoice from "./Pages/PurchaseInvoice";
+import PurchaseinvoiceList from "./Pages/PurchaseInvoiceList";
+import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItems";
 
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
@@ -92,7 +94,9 @@ export default function App() {
           <Route path="/createuser" element={<CreateUser />} />
 
           {/* PURCHASE */}
-          <Route path="/purchase-invoice-items" element={<PurchaseInvoiceItems />} />
+          <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
+           <Route path="/purchase_list" element={<PurchaseinvoiceList />} />
+             <Route path="/purchase-invoice-items/:id" element={<PurchaseInvoiceItems />} />
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
