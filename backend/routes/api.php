@@ -71,7 +71,16 @@ Route::post('/salary-payments', [SalaryPaymentController::class, 'store']);
 Route::put('/salary-payments/{id}', [SalaryPaymentController::class,'update']);
 Route::delete('/salary-payments/{id}', [SalaryPaymentController::class,'destroy']);
 
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/{id}', [UserController::class, 'show']);
+Route::post('/users', [UserController::class, 'store']);
+Route::put('/users/{id}', [UserController::class, 'update']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
+Route::get('/roles', [RoleController::class, 'index']);
+Route::post('/roles', [RoleController::class, 'store']);
+Route::put('/roles/{id}', [RoleController::class, 'update']);
+Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 /*
 |--------------------------------------------------------------------------
 | PRODUCT CATEGORIES

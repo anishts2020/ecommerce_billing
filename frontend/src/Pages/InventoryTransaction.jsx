@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function InventoryTransaction() {
   const [products, setProducts] = useState([]);
@@ -212,253 +213,326 @@ export default function InventoryTransaction() {
   );
 
   return (
-    <>
-      <AlertModal
-        isOpen={alert.isOpen}
-        type={alert.type}
-        title={alert.title}
-        message={alert.message}
-        onClose={() => setAlert({ ...alert, isOpen: false })}
-        onConfirm={alert.onConfirm}
-      />
+  <div className="bg-gray-50 min-h-screen">
+    <AlertModal
+      isOpen={alert.isOpen}
+      type={alert.type}
+      title={alert.title}
+      message={alert.message}
+      onClose={() => setAlert({ ...alert, isOpen: false })}
+      onConfirm={alert.onConfirm}
+    />
+
+    {/* HEADER BAR */}
+    <div className="max-w-6xl mx-auto mb-6">
+      <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
+        <div>
+          <h1 className="text-3xl font-extrabold text-indigo-700">
+            📄 Inventory Transactions
+          </h1>
+        </div>
+      </div>
+    </div>
 
       {/* Form */}
-      <div className="max-w-xl mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg mb-10">
-        <h2 className="text-xl font-bold mb-4">
-          {editingId
-            ? "Edit Inventory Transaction"
-            : "Create Inventory Transaction"}
-        </h2>
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="bg-white shadow-lg rounded-2xl p-6 md:p-8">
+            <h2 className="text-2xl font-bold text-[#1e3a8a] mb-6 text-center">
+              {editingId ? "Edit Inventory Transaction" : "Add Inventory Transaction"}
+            </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Product */}
-          <div>
-            <label className="block font-semibold mb-1">Product</label>
-            <select
-              className="w-full border rounded p-2"
-              value={form.product_id}
-              onChange={(e) =>
-                setForm({ ...form, product_id: e.target.value })
-              }
-            >
-              <option value="">Select Product</option>
-              {products.map((p) => (
-                <option key={p.product_id} value={p.product_id}>
-                  {p.product_name}
-                </option>
-              ))}
-            </select>
-          </div>
+            <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+              {/* FLEX WRAPPER FOR 2 COLUMNS */}
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "20px",
+                  width: "100%",
+                }}
+              >
+                {/* Product */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Product
+                  </label>
+                  <select
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.product_id}
+                    onChange={(e) => setForm({ ...form, product_id: e.target.value })}
+                  >
+                    <option value="">Select Product</option>
+                    {products.map((p) => (
+                      <option key={p.product_id} value={p.product_id}>
+                        {p.product_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* Transaction Type */}
-          <div>
-            <label className="block font-semibold mb-1">
-              Transaction Type
-            </label>
-            <select
-              className="w-full border rounded p-2"
-              value={form.transaction_type}
-              onChange={(e) =>
-                setForm({ ...form, transaction_type: e.target.value })
-              }
-            >
-              <option value="">Select Type</option>
-              {transactionTypes.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.transaction_type}
-                </option>
-              ))}
-            </select>
-          </div>
+                {/* Transaction Type */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Transaction Type
+                  </label>
+                  <select
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.transaction_type}
+                    onChange={(e) => setForm({ ...form, transaction_type: e.target.value })}
+                  >
+                    <option value="">Select Type</option>
+                    {transactionTypes.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.transaction_type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* Reference Table */}
-          <div>
-            <label className="block font-semibold mb-1">
-              Reference Table
-            </label>
-            <select
-              className="w-full border rounded p-2"
-              value={form.reference_table}
-              onChange={(e) =>
-                setForm({ ...form, reference_table: e.target.value })
-              }
-            >
-              <option value="">Select Reference</option>
-              {references.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.reference_table}
-                </option>
-              ))}
-            </select>
-          </div>
+                {/* Reference Table */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Reference Table
+                  </label>
+                  <select
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.reference_table}
+                    onChange={(e) => setForm({ ...form, reference_table: e.target.value })}
+                  >
+                    <option value="">Select Reference</option>
+                    {references.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.reference_table}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          <input
-            type="text"
-            placeholder="Reference ID"
-            className="w-full border rounded p-2"
-            value={form.reference_id}
-            onChange={(e) =>
-              setForm({ ...form, reference_id: e.target.value })
-            }
-          />
+                {/* Reference ID */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Reference ID
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Reference ID"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.reference_id}
+                    onChange={(e) => setForm({ ...form, reference_id: e.target.value })}
+                  />
+                </div>
 
-          <input
-            type="text"
-            placeholder="Quantity"
-            className="w-full border rounded p-2"
-            value={form.quantity}
-            onChange={(e) =>
-              setForm({ ...form, quantity: e.target.value })
-            }
-          />
+                {/* Quantity */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Quantity"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.quantity}
+                    onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+                  />
+                </div>
 
-          <input
-            type="text"
-            placeholder="Unit Cost"
-            className="w-full border rounded p-2"
-            value={form.unit_cost}
-            onChange={(e) =>
-              setForm({ ...form, unit_cost: e.target.value })
-            }
-          />
+                {/* Unit Cost */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Unit Cost
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Unit Cost"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.unit_cost}
+                    onChange={(e) => setForm({ ...form, unit_cost: e.target.value })}
+                  />
+                </div>
 
-          <input
-            type="date"
-            className="w-full border rounded p-2"
-            value={form.transaction_date}
-            onChange={(e) =>
-              setForm({ ...form, transaction_date: e.target.value })
-            }
-          />
+                {/* Transaction Date */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Transaction Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.transaction_date}
+                    onChange={(e) =>
+                      setForm({ ...form, transaction_date: e.target.value })
+                    }
+                  />
+                </div>
 
-          <textarea
-            placeholder="Remarks"
-            className="w-full border rounded p-2"
-            value={form.remarks}
-            onChange={(e) =>
-              setForm({ ...form, remarks: e.target.value })
-            }
-          />
+                {/* Remarks */}
+                <div style={{ flex: "1 1 48%" }}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Remarks
+                  </label>
+                  <textarea
+                    placeholder="Remarks"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    value={form.remarks}
+                    onChange={(e) => setForm({ ...form, remarks: e.target.value })}
+                  />
+                </div>
+              </div>
 
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-          >
-            {editingId ? "Update Transaction" : "Save Transaction"}
-          </button>
-        </form>
-      </div>
-
-      {/* TABLE */}
-      <div className="max-w-5xl mx-auto mt-6 overflow-auto">
-        <div className="flex justify-between items-center mb-2">
-    <h2 className="text-xl font-bold">Inventory Transactions</h2>
-
-    <input
-      type="text"
-      placeholder="Search transactions..."
-      className="border p-2 rounded w-72 shadow-sm"
-      value={search}
-      onChange={(e) => {
-        setSearch(e.target.value);
-        setCurrentPage(1);
-      }}
-    />
-  </div>
-
-        <table className="w-full border border-collapse">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">SI No</th>
-              <th className="border p-2">Product</th>
-              <th className="border p-2">Transaction Type</th>
-              <th className="border p-2">Reference Table</th>
-              <th className="border p-2">Quantity</th>
-              <th className="border p-2">Unit Cost</th>
-              <th className="border p-2">Date</th>
-              <th className="border p-2">Remarks</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {paginatedData.length > 0 ? (
-              paginatedData.map((tr, index) => (
-                <tr key={tr.inventory_id}>
-                  <td className="border p-2">{(currentPage - 1) * pageSize + index + 1}</td>
-                  <td className="border p-2">{tr.product_name}</td>
-                  <td className="border p-2">
-                    {tr.transaction_type_name}
-                  </td>
-                  <td className="border p-2">{tr.reference_name}</td>
-                  <td className="border p-2">{tr.quantity}</td>
-                  <td className="border p-2">{tr.unit_cost}</td>
-                  <td className="border p-2">{tr.transaction_date}</td>
-                  <td className="border p-2">{tr.remarks}</td>
-
-                  <td className="border p-2">
-                    <button
-                      onClick={() => handleEdit(tr)}
-                      className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(tr.inventory_id)}
-                      className="bg-red-600 text-white px-2 py-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="8"
-                  className="text-center py-3"
+              {/* Button full width */}
+              <div className="mt-6 flex justify-center" style={{ width: "100%" }}>
+                <button
+                  type="submit"
+                  className="md:w-auto px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold 
+               rounded-full shadow hover:bg-blue-700 transition-colors"
                 >
-                  No matching records found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                  {editingId ? "Update Transaction" : "Save Transaction"}
+                </button>
+              </div>
+            </form>
+
+
+          </div>
+        </div>
+
+
+            {/* TABLE CARD */}
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white shadow-lg rounded-xl p-4">
+          {/* Header + Search */}
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h2 className="text-lg font-bold text-[#27204b]">
+              Inventory Transactions
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Search transactions..."
+              value={search}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border p-2 w-64 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          {/* TABLE */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#4c30ff] text-white text-left">
+                  <th className="px-4 py-2 rounded-tl-lg">SI No</th>
+                  <th className="px-4 py-2">Product</th>
+                  <th className="px-4 py-2">Transaction Type</th>
+                  <th className="px-4 py-2">Reference</th>
+                  <th className="px-4 py-2 text-right">Quantity</th>
+                  <th className="px-4 py-2 text-right">Unit Cost</th>
+                  <th className="px-4 py-2">Date</th>
+                  <th className="px-4 py-2">Remarks</th>
+                  <th className="px-4 py-2 rounded-tr-lg text-center">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((tr, index) => (
+                    <tr
+                      key={tr.inventory_id}
+                      className="border-b last:border-0 hover:bg-gray-50 transition"
+                    >
+                      <td className="px-4 py-2 text-gray-700">
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </td>
+                      <td className="px-4 py-2 font-medium text-gray-800">
+                        {tr.product_name}
+                      </td>
+                      <td className="px-4 py-2">
+                        <span className="px-4 py-2 font-medium text-gray-800 ">
+                          {tr.transaction_type_name}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">
+                        {tr.reference_name}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-800">
+                        {tr.quantity}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-800">
+                        ₹{tr.unit_cost}
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">
+                        {tr.transaction_date}
+                      </td>
+                      <td className="px-4 py-2 text-gray-600">
+                        {tr.remarks}
+                      </td>
+                      <td className="px-4 py-2 text-center">
+                        <button
+                          onClick={() => handleEdit(tr)}
+                          className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition duration-150"
+                          title="Edit"
+                        >
+                          <FaEdit className="w-5 h-5"/>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(tr.inventory_id)}
+                          className="text-red-600 hover:bg-red-100 p-2 rounded-full transition duration-150"
+                          title="Delete"
+                        >
+                          <FaTrash className="w-5 h-5"/>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="9"
+                      className="px-4 py-4 text-center text-gray-500"
+                    >
+                      No matching records found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* PAGINATION */}
+          <div className="flex justify-center items-center mt-4 gap-2">
+            <button
+              className="px-3 py-1 rounded-full bg-gray-200 text-sm disabled:opacity-40"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              Prev
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-3 py-1 rounded-full text-sm ${
+                  currentPage === i + 1
+                    ? "bg-[#4c30ff] text-white"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              className="px-3 py-1 rounded-full bg-gray-200 text-sm disabled:opacity-40"
+              disabled={currentPage === totalPages || totalPages === 0}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
-
-      {/* PAGINATION */}
-      <div className="flex justify-center items-center mt-4 gap-2">
-        <button
-          className="px-3 py-1 bg-gray-300 rounded disabled:opacity-40"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          Prev
-        </button>
-
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === i + 1
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-
-        <button
-          className="px-3 py-1 bg-gray-300 rounded disabled:opacity-40"
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          Next
-        </button>
-      </div>
-    </>
-  );
+    </div>
+);
 }
