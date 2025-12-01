@@ -88,7 +88,8 @@ export default function Layout() {
 
             {openMenu === "purchase" && (
               <div className="ml-5 mt-1 space-y-1">
-                <Link to="/purchase-invoice-items" className={submenuClass}>Invoice</Link>
+                <Link to="/purchase-invoice" className={submenuClass}>Add Invoice</Link>
+                <Link to="/purchase_list" className={submenuClass}>Purchase Invoice List</Link>
                 <Link to="/inventory-transactions" className={submenuClass}>Inventory</Link>
               </div>
             )}
