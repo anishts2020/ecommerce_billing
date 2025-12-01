@@ -229,7 +229,7 @@ export default function PurchaseInvoiceItems() {
     <div className="min-h-screen p-6 bg-gray-100">
       {/* Header & Product Select */}
       <div className="bg-white shadow-lg p-5 rounded-xl mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h1 className="text-2xl font-bold text-purple-700">📦 Purchase Invoice Items</h1>
+        <h1 className="text-3xl font-bold text-indigo-700">📦 Purchase Invoice Items</h1>
         <div className="flex gap-3 items-center w-full sm:w-auto">
           <Select
             options={productOptions}
@@ -239,7 +239,7 @@ export default function PurchaseInvoiceItems() {
             isClearable
             className="w-full sm:w-80"
           />
-          <button onClick={addProductItem} className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700">Add</button>
+          <button onClick={addProductItem} className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700">Add</button>
         </div>
       </div>
 
@@ -264,7 +264,7 @@ export default function PurchaseInvoiceItems() {
       {/* Products Table */}
       <div className="bg-white shadow-xl rounded-xl overflow-hidden mb-6">
         <table className="w-full">
-          <thead className="bg-purple-700 text-white">
+          <thead className="bg-indigo-600 text-white">
             <tr>
               <th className="p-3">SI NO</th>
               <th className="p-3">PRODUCT NAME</th>
@@ -302,8 +302,8 @@ export default function PurchaseInvoiceItems() {
       <div className="bg-white shadow-xl p-6 rounded-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 mb-3 gap-4">
           <div>
-            <h2 className="text-xl font-bold text-purple-700">Grand Total:</h2>
-            <span className="text-xl font-bold text-purple-700">₹{grandTotal.toFixed(2)}</span>
+            <h2 className="text-xl font-bold">Grand Total:</h2>
+            <span className="text-xl font-bold ">₹{grandTotal.toFixed(2)}</span>
           </div>
         </div>
 
@@ -340,7 +340,7 @@ export default function PurchaseInvoiceItems() {
         </div>
 
         <div className="flex justify-center mt-6">
-          <button onClick={handleSaveInvoice} className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg shadow-md">Save Invoice</button>
+          <button onClick={handleSaveInvoice} className="bg-indigo-700 hover:bg-indigo-600 text-white px-5 py-2 rounded-lg shadow-md">Save Invoice</button>
         </div>
       </div>
 

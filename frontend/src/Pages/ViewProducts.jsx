@@ -112,37 +112,37 @@ const ViewProducts = () => {
 
   const fetchCategories = () => {
     axios.get("http://localhost:8000/api/categories")
-      .then((res) => setCategories(Array.isArray(res.data) ? res.data : []))
+      .then((res) => setCategories(res.data))
       .catch(() => setCategories([]));
   };
 
   const fetchTypes = () => {
     axios.get("http://localhost:8000/api/types")
-      .then((res) => setTypes(Array.isArray(res.data) ? res.data : []))
+      .then((res) => setTypes(res.data))
       .catch(() => setTypes([]));
   };
 
   const fetchColors = () => {
     axios.get("http://localhost:8000/api/colors")
-      .then((res) => setColors(Array.isArray(res.data) ? res.data : []))
+      .then((res) => setColors(res.data))
       .catch(() => setColors([]));
   };
 
   const fetchSizes = () => {
     axios.get("http://localhost:8000/api/sizes")
-      .then((res) => setSizes(Array.isArray(res.data) ? res.data : []))
+      .then((res) => setSizes(res.data))
       .catch(() => setSizes([]));
   };
 
   const fetchVendors = () => {
     axios.get("http://localhost:8000/api/vendors")
-      .then((res) => setVendors(Array.isArray(res.data) ? res.data : []))
+      .then((res) => setVendors(res.data))
       .catch(() => setVendors([]));
   };
 
   const fetchMaterials = () => {
     axios.get("http://localhost:8000/api/materials")
-      .then((res) => setMaterials(Array.isArray(res.data) ? res.data : []))
+      .then((res) => setMaterials(res.data))
       .catch(() => setMaterials([]));
   };
 
@@ -240,9 +240,14 @@ const ViewProducts = () => {
               <th className="border p-2">Selling</th>
               <th className="border p-2">Tax</th>
               <th className="border p-2">Barcode</th>
+
+              {/* NEW IMAGE COLUMN */}
+              <th className="border p-2">Image</th>
+
               <th className="border p-2">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {products.map((p) => (
               <tr key={p.product_id}>
@@ -262,155 +267,37 @@ const ViewProducts = () => {
                 <td className="border p-2">{p.cost_price}</td>
                 <td className="border p-2">{p.selling_price}</td>
                 <td className="border p-2">{p.tax_percent}</td>
+
+                {/* BARCODE */}
                 <td className="border p-2">
                   <Barcode value={p.product_id.toString()} height={40} width={1.5} fontSize={12} />
                 </td>
+
+                {/* NEW IMAGE CELL */}
+                <td className="border p-2">
+                  {p.product_image ? (
+                    <img
+                      src={`http://localhost:8000/product_images/${p.product_image}`}
+                      alt="Product"
+                      className="w-16 h-16 object-cover rounded shadow"
+                    />
+                  ) : (
+                    <span className="text-gray-500">No Image</span>
+                  )}
+                </td>
+
+                {/* ACTIONS */}
                 <td className="border p-2">
                   <button onClick={() => handleEdit(p)} className="px-3 py-1 bg-yellow-500 text-white mr-2 rounded">Edit</button>
                   <button onClick={() => handleDelete(p.product_id)} className="px-3 py-1 bg-red-600 text-white rounded">Delete</button>
                 </td>
+
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
-
-      {/* EDIT MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
-          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-              <h3 className="text-2xl font-bold text-indigo-700">Edit Product</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50">✕</button>
-            </div>
-
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { key: "product_code", label: "Product Code" },
-                  { key: "sku", label: "SKU" },
-                  { key: "product_name", label: "Product Name" },
-                  { key: "product_description", label: "Description" },
-                  { key: "unit_of_measure", label: "Unit of Measure" },
-                  { key: "quantity_on_hand", label: "Quantity" },
-                  { key: "min_stock_level", label: "Minimum Stock Level" },
-                  { key: "cost_price", label: "Cost Price" },
-                  { key: "selling_price", label: "Selling Price" },
-                  { key: "tax_percent", label: "Tax Percentage" },
-                ].map((field) => (
-                  <div key={field.key}>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">{field.label}</label>
-                    <input
-                      type="text"
-                      value={editData[field.key] || ""}
-                      onChange={(e) => setEditData({ ...editData, [field.key]: e.target.value })}
-                      className="block w-full p-3 border rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                    />
-                  </div>
-                ))}
-
-                {/* CATEGORY */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
-                  <select
-                    value={editData.category_id || ""}
-                    onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}
-                    className="block w-full p-3 border rounded-lg shadow-inner"
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((c) => (
-                      <option key={c.product_category_id} value={c.product_category_id.toString()}>
-                        {c.product_category_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* TYPE */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Type</label>
-                  <select
-                    value={editData.type_id || ""}
-                    onChange={(e) => setEditData({ ...editData, type_id: e.target.value })}
-                    className="block w-full p-3 border rounded-lg shadow-inner"
-                  >
-                    <option value="">Select Type</option>
-                    {types.map((t) => (
-                      <option key={t.product_type_id} value={t.product_type_id.toString()}>
-                        {t.product_type_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* COLOR */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Color</label>
-                  <select
-                    value={editData.color_id || ""}
-                    onChange={(e) => setEditData({ ...editData, color_id: e.target.value })}
-                    className="block w-full p-3 border rounded-lg shadow-inner"
-                  >
-                    <option value="">Select Color</option>
-                    {colors.map((c) => (
-                      <option key={c.color_id} value={c.color_id.toString()}>{c.color_name}</option>
-                    ))}
-                  </select>
-                </div>
-                {/* SIZE */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Size</label>
-                  <select
-                    value={editData.size_id || ""}
-                    onChange={(e) => setEditData({ ...editData, size_id: e.target.value })}
-                    className="block w-full p-3 border rounded-lg shadow-inner"
-                  >
-                    <option value="">Select Size</option>
-                    {sizes.map((s) => (
-                      <option key={s.size_id} value={s.size_id.toString()}>{s.size_name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* VENDOR */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Vendor</label>
-                  <select
-                    value={editData.vendor_id || ""}
-                    onChange={(e) => setEditData({ ...editData, vendor_id: e.target.value })}
-                    className="block w-full p-3 border rounded-lg shadow-inner"
-                  >
-                    <option value="">Select Vendor</option>
-                    {vendors.map((v) => (
-                      <option key={v.vendor_id} value={v.vendor_id.toString()}>{v.vendor_name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* MATERIAL */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Material</label>
-                  <select
-                    value={editData.material_id || ""}
-                    onChange={(e) => setEditData({ ...editData, material_id: e.target.value })}
-                    className="block w-full p-3 border rounded-lg shadow-inner"
-                  >
-                    <option value="">Select Material</option>
-                    {materials.map((m) => (
-                      <option key={m.material_id} value={m.material_id.toString()}>{m.material_name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-4 flex justify-end gap-4 border-t">
-                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2 border">Cancel</button>
-                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white">Save Changes</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* GLOBAL ALERT */}
       <CustomAlert

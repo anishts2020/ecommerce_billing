@@ -368,25 +368,33 @@ function Employee() {
       <div className="max-w-7xl mx-auto">
         
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
-          <h1 className="text-3xl font-extrabold text-indigo-700">
+        <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg gap-4">
+
+          {/* Title */}
+          <h1 className="text-2xl font-extrabold text-indigo-700 whitespace-nowrap">
             <span className="text-gray-900">🏢</span> Employee Management
           </h1>
+
+          {/* Search Bar (smaller) */}
           <input
-    type="text"
-    placeholder="Search by name..."
-    className="w-full md:w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-300 outline-none"
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-  />
+            type="text"
+            placeholder="Search by name..."
+            className="w-40 md:w-48 lg:w-56 px-3 py-1.5 border border-gray-300 rounded-full shadow-sm
+               focus:ring-2 focus:ring-indigo-300 outline-none text-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          {/* Add Button */}
           <button
             onClick={openAddModal}
-            className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-full 
-                       shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:scale-105"
+            className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-full 
+               shadow-md hover:bg-indigo-700 transition duration-300 text-sm whitespace-nowrap"
           >
-            <FaPlus size={16} />
+            <FaPlus size={14} />
             <span className="font-semibold">Add New Employee</span>
           </button>
+
         </div>
 
         {/* Employee Table - Same styling as before */}
@@ -481,8 +489,11 @@ function Employee() {
       {/* Add/Edit Employee Modal - Unchanged */}
       {showModal && (
         <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
-          {/* ... Modal content remains the same ... */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl transform transition-all duration-300 scale-100">
+
+          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl 
+         max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
+
+            {/* Modal Header */}
             <div className="flex justify-between items-center mb-6 border-b pb-4">
               <h3 className="text-2xl font-bold text-indigo-700">
                 {editingId ? "Edit Employee Details" : "Add New Employee"}
@@ -490,121 +501,158 @@ function Employee() {
               <button
                 type="button"
                 onClick={closeAndResetModal}
-                className="text-gray-400 hover:text-red-500 transition duration-150 p-2 rounded-full hover:bg-red-50"
-                title="Close"
+                className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                ✕
               </button>
             </div>
+
+            {/* FORM START */}
             <form onSubmit={editingId ? handleUpdateEmployee : handleAddEmployee} className="space-y-6">
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                
+
+                {/* Employee Code */}
                 <div>
-                  <label htmlFor="code" className="block text-sm font-semibold text-gray-700 mb-1">Employee Code</label>
+                  <label className="block text-sm font-semibold mb-1">Employee Code</label>
                   <input
-                    id="code" type="text" value={employee_code} onChange={(e) => setEmployeeCode(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="E.g., EMP001" required />
+                    type="text"
+                    value={employee_code}
+                    onChange={(e) => setEmployeeCode(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* NAME */}
                 <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-1">Employee Name</label>
+                  <label className="block text-sm font-semibold mb-1">Employee Name</label>
                   <input
-                    id="name" type="text" value={employee_name} onChange={(e) => setEmployeeName(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="Full Name" required />
+                    type="text"
+                    value={employee_name}
+                    onChange={(e) => setEmployeeName(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* PHONE */}
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
+                  <label className="block text-sm font-semibold mb-1">Phone</label>
                   <input
-                    id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="123-456-7890" required />
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* Email */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-semibold mb-1">Email</label>
                   <input
-                    id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="name@company.com" required />
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* Designation */}
                 <div>
-                  <label htmlFor="designation" className="block text-sm font-semibold text-gray-700 mb-1">Designation</label>
+                  <label className="block text-sm font-semibold mb-1">Designation</label>
                   <input
-                    id="designation" type="text" value={designation} onChange={(e) => setDesignation(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="E.g., Software Engineer" required />
+                    type="text"
+                    value={designation}
+                    onChange={(e) => setDesignation(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* Joining Date */}
                 <div>
-                  <label htmlFor="joining_date" className="block text-sm font-semibold text-gray-700 mb-1">Joining Date</label>
+                  <label className="block text-sm font-semibold mb-1">Joining Date</label>
                   <input
-                    id="joining_date" type="date" value={joining_date} onChange={(e) => setJoiningDate(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    required />
+                    type="date"
+                    value={joining_date}
+                    onChange={(e) => setJoiningDate(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* Base Salary */}
                 <div>
-                  <label htmlFor="base_salary" className="block text-sm font-semibold text-gray-700 mb-1">Base Salary</label>
+                  <label className="block text-sm font-semibold mb-1">Base Salary</label>
                   <input
-                    id="base_salary" type="number" value={base_salary} onChange={(e) => setBaseSalary(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="e.g., 50000" required />
+                    type="number"
+                    value={base_salary}
+                    onChange={(e) => setBaseSalary(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    required
+                  />
                 </div>
+
+                {/* Salary Type */}
                 <div>
-                  <label htmlFor="salary_type" className="block text-sm font-semibold text-gray-700 mb-1">Salary Type</label>
+                  <label className="block text-sm font-semibold mb-1">Salary Type</label>
                   <select
-                    id="salary_type" value={salary_type} onChange={(e) => setSalaryType(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    required>
+                    value={salary_type}
+                    onChange={(e) => setSalaryType(e.target.value)}
+                    className="w-full p-3 border rounded-lg bg-white"
+                    required
+                  >
                     <option value="" disabled>Select Type</option>
                     <option value="0">Monthly</option>
                     <option value="1">Daily</option>
                   </select>
                 </div>
-                <div className="col-span-1 sm:col-span-2 lg:col-span-3">
-                  <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
-                  <input
-                    id="address" type="text" value={address} onChange={(e) => setAddress(e.target.value)}
-                    className="block w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-150"
-                    placeholder="Street, City, Country" required />
-                </div>
-                <div className="flex items-center gap-3">
-                  <label className="text-sm font-semibold text-gray-700">Status:</label>
+
+                {/* Address */}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-1">Address</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                  required
+                />
+              </div>
+
+              {/* Status Toggle */}
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-semibold">Status:</label>
+                <div
+                  onClick={() => setIsActive(is_active === 1 ? 0 : 1)}
+                  className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition ${is_active ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                >
                   <div
-                    onClick={() => setIsActive(is_active === 1 ? 0 : 1)}
-                    className={`w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-all duration-300 ${
-                      is_active ? "bg-green-500" : "bg-gray-400"
-                    } shadow-inner`}
-                  >
-                    <div
-                      className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-all duration-300 ${
-                        is_active ? "translate-x-7" : "translate-x-0"
+                    className={`bg-white w-5 h-5 rounded-full shadow transform transition ${is_active ? "translate-x-7" : "translate-x-0"
                       }`}
-                    />
-                  </div>
-                  <span className={`text-sm font-medium ${is_active ? "text-green-600" : "text-gray-600"}`}>
-                    {is_active ? "Active" : "Inactive"}
-                  </span>
+                  />
                 </div>
               </div>
 
-              <div className="pt-6 flex justify-end gap-4 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={closeAndResetModal}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200 font-medium"
-                >
+              {/* Buttons */}
+              <div className="pt-6 flex justify-end gap-4 border-t">
+                <button type="button" onClick={closeAndResetModal} className="px-6 py-2 border rounded-lg">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 font-medium transform hover:scale-105"
-                >
+                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-lg">
                   {editingId ? "Save Changes" : "Create Employee"}
                 </button>
               </div>
 
             </form>
+
+            {/* FORM END */}
           </div>
         </div>
       )}
