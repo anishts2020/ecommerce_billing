@@ -67,6 +67,7 @@ export default function Layout() {
               <div className="ml-5 mt-1 space-y-1">
                 <Link to="/view-products" className={submenuClass}>Products</Link>
                 <Link to="/product-categories" className={submenuClass}>Product Categories</Link>
+                <Link to="/product-types" className={submenuClass}>Product Types</Link>
                 <Link to="/product-sizes" className={submenuClass}>Product Sizes</Link>
                 <Link to="/materials" className={submenuClass}>Materials</Link>
                 <Link to="/colors" className={submenuClass}>Colors</Link>
