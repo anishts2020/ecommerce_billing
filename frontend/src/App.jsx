@@ -30,6 +30,7 @@ import ProductSizePage from "./Pages/ProductSizePage";
 import Colors from "./Pages/Colors";
 import AddProduct from "./Pages/AddProduct";
 import ViewProducts from "./Pages/ViewProducts";
+import ProductTypes from "./Pages/ProductTypes";
 
 /* USERS & ROLES */
 import Roles from "./Pages/Roles";
@@ -82,6 +83,7 @@ export default function App() {
           <Route path="/vendors" element={<Vendors />} />
           <Route path="/product-sizes" element={<ProductSizePage />} />
           <Route path="/colors" element={<Colors />} />
+          <Route path="/product-types" element={<ProductTypes />} />
 
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/view-products" element={<ViewProducts />} />

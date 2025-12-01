@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-// 1. Importing FaEdit and FaTrash for action buttons
+// Importing FaEdit and FaTrash for action buttons
 import { FaEdit, FaTrash } from "react-icons/fa"; 
 
 // === ICON COMPONENTS (Keeping the utility icons for AlertModal) ===
 
-// SVG Icons (re-included for completeness)
+// SVG Icons (same as your ProductCategories file)
 const AlertTriangleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
     viewBox="0 0 24 24" stroke="currentColor">
@@ -34,15 +34,15 @@ const XCircleIcon = (props) => (
   </svg>
 );
 
-// GLOBAL ALERT COMPONENT (Updated the 'confirm' case to match the new delete logic)
+// GLOBAL ALERT COMPONENT (Remains untouched)
 const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   if (!isOpen) return null;
 
   let icon, borderColor, buttonColor, confirmText;
 
   switch (type) {
-    case "confirm": // Original was "confirm"
-    case "delete-confirm": // Adding specific delete confirm type for clarity
+    case "confirm":
+    case "delete-confirm": 
       icon = <AlertTriangleIcon className="w-10 h-10 text-yellow-500" />;
       borderColor = "border-yellow-500";
       buttonColor = "bg-red-600 hover:bg-red-700";
@@ -108,22 +108,24 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
 };
 
 // ---------------------------------------------------------
-// PRODUCT CATEGORIES MAIN COMPONENT
+// PRODUCT TYPES MAIN COMPONENT
 // ---------------------------------------------------------
-export default function ProductCategories() {
-  const [categories, setCategories] = useState([]);
+export default function ProductTypes() {
+  const [types, setTypes] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
-  const [product_category_name, setName] = useState("");
+  const [product_type_name, setName] = useState("");
   const [description, setDescription] = useState("");
+
+
   const [selectedId, setSelectedId] = useState(null);
   const [searchText, setSearchText] = useState("");
 
-  // PAGINATION STATE
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const itemsPerPage = 5;
 
-  // GLOBAL ALERT
+  // Global alert
   const [alertState, setAlertState] = useState({
     isOpen: false,
     title: "",
@@ -133,211 +135,182 @@ export default function ProductCategories() {
   });
 
   const closeAlert = () =>
-    setAlertState({
-      isOpen: false,
-      title: "",
-      message: "",
-      type: "success",
-      actionToRun: null,
-    });
+    setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
 
   const handleAlertConfirm = () => {
-    if ((alertState.type === "confirm" || alertState.type === "delete-confirm") && alertState.actionToRun) {
+    if (alertState.type === "delete-confirm" && alertState.actionToRun) {
       alertState.actionToRun();
     }
-    closeAlert();
+    closeAlert(); 
   };
 
-  // ---------------------------------------------------------
-  const fetchCategories = () => {
+  // Fetch product types
+  const fetchTypes = () => {
     axios
-      .get("http://localhost:8000/api/product-categories")
-      .then((res) => setCategories(res.data))
+      .get("http://localhost:8000/api/product-types")
+      .then((res) => setTypes(res.data))
       .catch(() =>
         setAlertState({
           isOpen: true,
           title: "Error",
-          message: "Failed to load categories",
+          message: "Failed to load product types",
           type: "error",
         })
       );
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchTypes();
   }, []);
 
   // ---------------------------------------------------------
+  // SAVE
+  // ---------------------------------------------------------
   const handleSave = () => {
-    const data = { product_category_name, description };
+    const baseData = { product_type_name, description };
 
     if (selectedId) {
-      axios
-        .put(`http://localhost:8000/api/product-categories/${selectedId}`, data)
-        .then(() => {
-          fetchCategories();
-          setOpenModal(false);
-          setName("");
-          setDescription("");
-          setSelectedId(null);
+        const existingType = types.find(t => t.product_type_id === selectedId);
+        const updateData = {
+          ...baseData,
+          is_active: existingType ? existingType.is_active : true, 
+        };
 
-          setAlertState({
-            isOpen: true,
-            title: "Updated!",
-            message: "Category updated successfully",
-            type: "success",
-          });
-        })
-        .catch(() =>
-          setAlertState({
-            isOpen: true,
-            title: "Error",
-            message: "Update failed",
-            type: "error",
+        axios
+          .put(`http://localhost:8000/api/product-types/${selectedId}`, updateData)
+          .then(() => {
+            fetchTypes();
+            setOpenModal(false);
+            setName("");
+            setDescription("");
+            setSelectedId(null);
+
+            setAlertState({
+              isOpen: true,
+              title: "Updated!",
+              message: "Product type updated successfully",
+              type: "success",
+            });
           })
-        );
+          .catch(() =>
+            setAlertState({
+              isOpen: true,
+              title: "Error",
+              message: "Update failed",
+              type: "error",
+            })
+          );
     } else {
-      axios
-        .post("http://localhost:8000/api/product-categories", data)
-        .then(() => {
-          fetchCategories();
-          setOpenModal(false);
-          setName("");
-          setDescription("");
+        const addData = {
+            ...baseData,
+            is_active: true, 
+        };
 
-          setAlertState({
-            isOpen: true,
-            title: "Success",
-            message: "Category added successfully",
-            type: "success",
-          });
-        })
-        .catch((err) => {
-          let msg = "Could not add category";
+        axios
+          .post("http://localhost:8000/api/product-types", addData)
+          .then(() => {
+            fetchTypes();
+            setOpenModal(false);
+            setName("");
+            setDescription("");
 
-          if (err.response?.status === 422) {
-            msg =
-              err.response.data.errors?.product_category_name?.[0] ||
-              "Validation error";
-          }
-
-          setAlertState({
-            isOpen: true,
-            title: "Error",
-            message: msg,
-            type: "error",
-          });
-        });
+            setAlertState({
+              isOpen: true,
+              title: "Success",
+              message: "Product type added successfully",
+              type: "success",
+            });
+          })
+          .catch(() =>
+            setAlertState({
+              isOpen: true,
+              title: "Error",
+              message: "Could not add product type",
+              type: "error",
+            })
+          );
     }
   };
 
   // ---------------------------------------------------------
-  const deleteCategory = async (id) => {
-    try {
-      await axios.delete(
-        `http://localhost:8000/api/product-categories/${id}`
-      );
-      fetchCategories();
-
-      setAlertState({
-        isOpen: true,
-        title: "Deleted",
-        message: "Category deleted successfully",
-        type: "success",
-      });
-    } catch {
-      setAlertState({
-        isOpen: true,
-        title: "Error",
-        message: "Delete failed. This category may be in use.",
-        type: "error",
-      });
-    }
+  // DELETE 
+  // ---------------------------------------------------------
+  const deleteProductType = (id) => {
+    axios
+        .delete(`http://localhost:8000/api/product-types/${id}`)
+        .then(() => {
+            fetchTypes();
+            setAlertState({
+                isOpen: true,
+                title: "Deleted!",
+                message: "Product type deleted successfully",
+                type: "success",
+            });
+        })
+        .catch(() => {
+            setAlertState({
+                isOpen: true,
+                title: "Error",
+                message: "Failed to delete product type. It may be in use.",
+                type: "error",
+            });
+        });
   };
-  
+
   const handleDelete = (id) => {
     setAlertState({
       isOpen: true,
       title: "Confirm Deletion",
-      message: "Are you sure you want to delete this category permanently?",
-      type: "delete-confirm", // Using delete-confirm type
-      actionToRun: () => deleteCategory(id),
+      message: "Are you sure you want to delete this product type?",
+      type: "delete-confirm",
+      actionToRun: () => deleteProductType(id), 
     });
   };
 
   // ---------------------------------------------------------
-  // PAGINATION LOGIC
+  // SEARCH + PAGINATION
   // ---------------------------------------------------------
-
-  // Filter categories based on search text
-  const filteredCategories = categories.filter((cat) =>
-    cat.product_category_name
-      .toLowerCase()
-      .includes(searchText.toLowerCase())
+  const filtered = types.filter((t) =>
+    t.product_type_name.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // Calculate total pages for the *filtered* data
-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
-  // Recalculate the current page if it's out of bounds after filtering/deleting
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     } else if (totalPages === 0) {
       setCurrentPage(1);
     }
-  }, [totalPages, currentPage]);
+  }, [totalPages]);
 
-
-  // Get current items for the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCategories = filteredCategories.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-
-  // Handlers for Previous/Next buttons
-  const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const current = filtered.slice(indexOfFirst, indexOfLast);
 
   // ---------------------------------------------------------
-  // RENDER FUNCTION
+  // RENDER 
   // ---------------------------------------------------------
   return (
-    // Updated: p-8 and bg-gray-100 for a cleaner background
     <div className="p-8 bg-gray-100 min-h-screen">
-      
       {/* MODAL */}
       {openModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          {/* Updated: Rounded and shadow styling */}
           <div className="bg-white p-6 rounded-xl w-96 shadow-2xl">
             {/* Close Button */}
-            <button 
-                className="absolute top-3 right-3 text-xl font-bold text-gray-400 hover:text-gray-600" 
-                onClick={() => setOpenModal(false)}>
-                    ×
-            </button>
+            <button className="absolute top-3 right-3 text-xl font-bold text-gray-400 hover:text-gray-600" onClick={() => setOpenModal(false)}>×</button>
             <h2 className="text-xl font-semibold mb-4 text-gray-800 text-center">
-              {selectedId ? "Edit Product Category" : "Add Product Category"}
+              {selectedId ? "Edit Product Type" : "Add Product Type"}
             </h2>
 
-            {/* Updated: Input styling */}
             <input
               type="text"
-              placeholder="Category Name"
-              value={product_category_name}
+              placeholder="Product Type Name"
+              value={product_type_name}
               onChange={(e) => setName(e.target.value)}
               className="border border-gray-300 p-2.5 w-full mb-4 rounded-lg focus:ring-blue-500 focus:border-blue-500"
             />
 
-            {/* Updated: Textarea styling */}
             <textarea
               placeholder="Description"
               value={description}
@@ -346,7 +319,6 @@ export default function ProductCategories() {
             />
 
             <div className="flex justify-end gap-3 mt-4">
-              {/* Updated: Button styling */}
               <button
                 onClick={() => setOpenModal(false)}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm transition duration-150"
@@ -364,23 +336,24 @@ export default function ProductCategories() {
           </div>
         </div>
       )}
-      
+
       {/* Main Container Card */}
       <div className="max-w-6xl mx-auto">
-        
+
         {/* 1. TOP HEADER (Title, Search, and Add Button) */}
         <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-lg mb-6">
           
-          {/* Title Area - Updated title and style */}
-          <h1 className="text-3xl font-extrabold text-indigo-700">🧾 Product Categories</h1> 
+          {/* Title Area */}
+          <h1 className="text-3xl font-extrabold text-indigo-700">🧾 Product Types</h1> 
           
+
           {/* Search and Add Button Area */}
           <div className="flex items-center gap-4">
             
-            {/* Search Bar - Updated styling */}
+            {/* Search Bar */}
             <input
               type="text"
-              placeholder="Search categories..."
+              placeholder="Search product types..."
               value={searchText}
               onChange={(e) => {
                 setSearchText(e.target.value);
@@ -389,7 +362,7 @@ export default function ProductCategories() {
               className="border p-2 w-64 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
 
-            {/* Add Button - Updated styling */}
+            {/* Add Button */}
             <button
               onClick={() => {
                 setSelectedId(null);
@@ -397,47 +370,45 @@ export default function ProductCategories() {
                 setDescription("");
                 setOpenModal(true);
               }}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow-md transition duration-150"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
-              + Add Category
+              + Add Product Type
             </button>
           </div>
         </div>
 
         {/* 2. TABLE CONTENT */}
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            {/* Table wrapper updated to remove border-collapse and use the divide-y structure */}
-          <table className="min-w-full"> 
+          <table className="min-w-full divide-y divide-gray-200">
             
-            {/* Table Header - Updated background and text style */}
+            {/* Table Header */}
             <thead className="bg-blue-600 text-white">
               <tr>
                 <th className="py-3 px-4 text-center text-sm font-bold uppercase tracking-wider w-[10%]">SI NO</th>
-                <th className="py-3 px-4 text-center text-sm font-bold uppercase tracking-wider w-[20%]">Category Name</th>
+                <th className="py-3 px-4 text-center text-sm font-bold uppercase tracking-wider w-[20%]">Product Type</th>
                 <th className="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider w-[50%]">Description</th>
                 <th className="py-3 px-4 text-center text-sm font-bold uppercase tracking-wider w-[20%]">Action</th>
               </tr>
             </thead>
 
-            {/* Table Body - Updated with dark divider lines */}
-            <tbody className="bg-white divide-y  divide-gray-200">
-              {currentCategories.length > 0 ? (
-                currentCategories.map((cat, idx) => (
-                  // Row styling updated for better hover effect
-                  <tr key={cat.product_category_id} className="hover:bg-gray-50 transition duration-150">
+            {/* Table Body */}
+            <tbody className="bg-white divide-y divide-gray-200">
+              {current.length > 0 ? (
+                current.map((pt, idx) => (
+                  <tr key={pt.product_type_id} className="hover:bg-gray-50 transition duration-150">
                     {/* SI NO */}
                     <td className="py-3 px-4 text-center text-base text-gray-800">
-                      {indexOfFirstItem + idx + 1}
+                      {indexOfFirst + idx + 1}
                     </td>
 
-                    {/* Category Name */}
+                    {/* Product Type (Removed font-semibold class) */}
                     <td className="py-3 px-4 text-center text-base text-gray-900">
-                      {cat.product_category_name}
+                      {pt.product_type_name}
                     </td>
 
                     {/* Description */}
                     <td className="py-3 px-4 text-base text-gray-800 text-left">
-                      <div className="truncate">{cat.description}</div>
+                      <div className="truncate">{pt.description}</div>
                     </td>
 
                     {/* ACTION BUTTONS (FaEdit and FaTrash Icons) */}
@@ -446,12 +417,12 @@ export default function ProductCategories() {
                         {/* Edit Icon Button */}
                         <button
                           onClick={() => {
-                            setSelectedId(cat.product_category_id);
-                            setName(cat.product_category_name);
-                            setDescription(cat.description);
+                            setSelectedId(pt.product_type_id);
+                            setName(pt.product_type_name);
+                            setDescription(pt.description);
                             setOpenModal(true);
                           }}
-                          // Using indigo color for edit
+                          // Using indigo color for edit, consistent with CreateUser
                           className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition duration-150"
                           title="Edit"
                         >
@@ -460,7 +431,7 @@ export default function ProductCategories() {
 
                         {/* Delete Icon Button */}
                         <button
-                          onClick={() => handleDelete(cat.product_category_id)}
+                          onClick={() => handleDelete(pt.product_type_id)}
                           className="text-red-600 hover:bg-red-100 p-2 rounded-full transition duration-150"
                           title="Delete"
                         >
@@ -473,19 +444,19 @@ export default function ProductCategories() {
               ) : (
                 <tr>
                   <td colSpan="4" className="text-center py-5 text-gray-500 font-semibold">
-                    No categories found
+                    No product types found
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
           
-          {/* Pagination - Updated styling */}
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center p-4 border-t border-gray-200 bg-gray-50">
               <div className="flex space-x-1 text-sm">
                 <button
-                  onClick={handlePrevPage}
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   disabled={currentPage === 1}
                   className={`px-4 py-2 rounded-lg border ${
                     currentPage === 1
@@ -502,7 +473,7 @@ export default function ProductCategories() {
                 </span>
 
                 <button
-                  onClick={handleNextPage}
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   className={`px-4 py-2 rounded-lg border ${
                     currentPage === totalPages

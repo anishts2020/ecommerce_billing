@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\SalaryPaymentController;
 
 use App\Http\Controllers\Api\ProductCategoriesController;
-use App\Http\Controllers\Api\ProductTypes;
+use App\Http\Controllers\Api\ProductTypeController;
 use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
@@ -78,7 +78,7 @@ Route::delete('/salary-payments/{id}', [SalaryPaymentController::class,'destroy'
 |--------------------------------------------------------------------------
 */
 Route::apiResource('product-categories', ProductCategoriesController::class);
-Route::get('/categories', [ProductCategoriesController::class, 'index']); // alias for React
+//Route::get('/categories', [ProductCategoriesController::class, 'index']); // alias for React
 
 
 /*
@@ -86,8 +86,12 @@ Route::get('/categories', [ProductCategoriesController::class, 'index']); // ali
 | PRODUCT TYPES
 |--------------------------------------------------------------------------
 */
-Route::get('/types', [ProductTypes::class, 'index']);
-
+Route::apiResource('product-types', ProductTypeController::class);
+Route::get('/product-types', [ProductTypeController::class, 'index']);
+Route::post('/product-types/store', [ProductTypeController::class, 'store']);
+Route::get('/product-types/{id}', [ProductTypeController::class, 'show']);
+Route::put('/product-types/{id}', [ProductTypeController::class, 'update']);
+Route::delete('/product-types/{id}', [ProductTypeController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
