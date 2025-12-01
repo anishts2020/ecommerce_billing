@@ -103,8 +103,9 @@ Route::get('/sizes', [ProductSizeController::class, 'index']); // alias
 | COLORS
 |--------------------------------------------------------------------------
 */
-Route::get('/colors', [ColorController::class, 'index']);
-Route::post('/colors', [ColorController::class, 'store']);
+// COLORS
+Route::apiResource('colors', App\Http\Controllers\Api\ColorController::class);
+
 
 
 /*

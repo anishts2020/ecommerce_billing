@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 /* --------------------- SVG Icons --------------------- */
 const AlertTriangleIcon = (props) => (
@@ -59,7 +60,6 @@ const CustomAlert = ({ isOpen, title, message, type, onClose }) => {
   );
 };
 
-/* Delete Confirm Alert with SVGs */
 const DeleteConfirmAlert = ({ isOpen, colorName, onConfirm, onClose }) => {
   if (!isOpen) return null;
 
@@ -141,7 +141,6 @@ export default function Colors() {
       setSelectedColor({ value: "", code: "", id: null });
       fetchColors(currentPage, searchTerm);
     } catch (err) {
-      console.log(err.response?.data);
       openAlert("Save Failed", "Failed to save the color.", "error");
     }
   };
@@ -165,10 +164,19 @@ export default function Colors() {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h2 className="text-3xl font-bold mb-6">Color Management</h2>
+      <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
+        <h1 className="text-3xl font-extrabold text-indigo-700">
+          🎨 Colors
+        </h1>
 
-      {/* Search */}
-      <input type="text" placeholder="Search colors..." className="border p-2 rounded mb-4 w-full" value={searchTerm} onChange={handleSearch} />
+        <input
+          type="text"
+          placeholder="Search by color name..."
+          className="w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm 
+                       focus:ring-2 focus:ring-indigo-300 outline-none"
+          value={searchTerm} onChange={handleSearch}
+        />
+      </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow mb-8 grid gap-4">
@@ -186,6 +194,7 @@ export default function Colors() {
         <table className="w-full">
           <thead>
             <tr className="bg-blue-600 text-white">
+              <th className="p-2">SL No</th>
               <th className="p-2">Color Name</th>
               <th className="p-2">Color Code</th>
               <th className="p-2">Active</th>
@@ -195,18 +204,24 @@ export default function Colors() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="p-4 text-center">Loading colors...</td></tr>
+              <tr><td colSpan={6} className="p-4 text-center">Loading colors...</td></tr>
             ) : colors.length === 0 ? (
-              <tr><td colSpan={5} className="p-4 text-center">No colors found.</td></tr>
-            ) : colors.map(c => (
+              <tr><td colSpan={6} className="p-4 text-center">No colors found.</td></tr>
+            ) : colors.map((c, index) => (
               <tr key={c.color_id} className="border-b text-center hover:bg-gray-100">
+                
+                {/* ⭐ SERIAL NUMBER */}
+                <td className="p-2">
+                  {(currentPage - 1) * colors.length + index + 1}
+                </td>
+
                 <td>{c.color_name}</td>
                 <td>{c.color_code}</td>
                 <td>{c.is_active ? "Yes" : "No"}</td>
                 <td><div className="w-6 h-6 mx-auto rounded" style={{ backgroundColor: c.color_code }}></div></td>
                 <td className="flex justify-center gap-2">
-                  <button onClick={() => handleEdit(c)} className="bg-yellow-500 px-2 py-1 rounded hover:bg-yellow-600 text-white">Edit</button>
-                  <button onClick={() => openDeleteConfirm(c.color_id, c.color_name)} className="bg-red-500 px-2 py-1 rounded hover:bg-red-600 text-white">Delete</button>
+                  <button onClick={() => handleEdit(c)} className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150"><FaEdit/></button>
+                  <button onClick={() => openDeleteConfirm(c.color_id, c.color_name)} className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150"><FaTrash/></button>
                 </td>
               </tr>
             ))}

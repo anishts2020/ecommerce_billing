@@ -157,22 +157,28 @@ export default function ProductSizePage() {
   };
 
   // ===== Filter & Pagination =====
-  const filteredSizes = sizes.filter(s => s.size_name.toLowerCase().includes(search.toLowerCase()) || s.description.toLowerCase().includes(search.toLowerCase()));
+  const filteredSizes = sizes.filter(s =>
+    s.size_name.toLowerCase().includes(search.toLowerCase()) ||
+    s.description.toLowerCase().includes(search.toLowerCase())
+  );
   const totalPages = Math.ceil(filteredSizes.length / itemsPerPage);
-  const displayedSizes = filteredSizes.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
+  const displayedSizes = filteredSizes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h2 className="text-3xl font-bold mb-6">Product Size Management</h2>
-
-      {/* SEARCH */}
-      <input
-        type="text"
-        placeholder="Search sizes..."
-        className="mb-4 p-2 w-full border rounded"
-        value={search}
-        onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-      />
+      <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
+        <h1 className="text-3xl font-extrabold text-indigo-700">
+          📐 Product Size Management
+        </h1>
+        <input
+          type="text"
+          placeholder="Search by Product Size..."
+          className="w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm 
+                       focus:ring-2 focus:ring-indigo-300 outline-none"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+        />
+      </div>
 
       {/* ADD FORM */}
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-4 space-y-4">
@@ -189,7 +195,7 @@ export default function ProductSizePage() {
         <table className="w-full">
           <thead>
             <tr className="bg-blue-600 text-white">
-              <th className="p-2">ID</th>
+              <th className="p-2">SL No</th>
               <th className="p-2">Name</th>
               <th className="p-2">Description</th>
               <th className="p-2">Active</th>
@@ -197,15 +203,24 @@ export default function ProductSizePage() {
             </tr>
           </thead>
           <tbody>
-            {displayedSizes.map(s => (
+            {displayedSizes.map((s, index) => (
               <tr key={s.size_id} className="text-center border-b">
-                <td className="p-2">{s.size_id}</td>
+
+                {/* SERIAL NUMBER */}
+                <td className="p-2">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>
+
                 <td className="p-2">{s.size_name}</td>
                 <td className="p-2">{s.description}</td>
                 <td className="p-2">{s.is_active ? "Yes" : "No"}</td>
                 <td className="flex justify-center gap-2 p-2">
-                  <button className="bg-yellow-500 px-3 py-1 text-white rounded" onClick={()=>openEdit(s)}><EditIcon className="w-4 h-4"/></button>
-                  <button className="bg-red-600 px-3 py-1 text-white rounded" onClick={()=>handleDelete(s.size_id)}><TrashIcon className="w-4 h-4"/></button>
+                  <button className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150" onClick={()=>openEdit(s)}>
+                    <EditIcon className="w-4 h-4"/>
+                  </button>
+                  <button className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150" onClick={()=>handleDelete(s.size_id)}>
+                    <TrashIcon className="w-4 h-4"/>
+                  </button>
                 </td>
               </tr>
             ))}
