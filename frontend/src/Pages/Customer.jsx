@@ -111,6 +111,17 @@ function Customer() {
   };
 
   const [formData, setFormData] = useState(emptyForm);
+  
+
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add("hide-admin-header");
+    } else {
+      document.body.classList.remove("hide-admin-header");
+    }
+  }, [showModal]);
+
+
 
   const [alert, setAlert] = useState({
     isOpen: false,
@@ -305,7 +316,8 @@ function Customer() {
 
         {/* CUSTOMER FORM MODAL */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4">
+
             <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl">
 
               <div className="flex justify-between items-center border-b pb-3 mb-4">

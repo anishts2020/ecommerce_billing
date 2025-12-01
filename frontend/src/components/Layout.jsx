@@ -118,18 +118,23 @@ export default function Layout() {
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* TOP HEADER */}
-        <header className="h-14 flex items-center justify-between px-6 sticky top-0 z-20"
-        style={{ backgroundColor: "#003366" }}>
-        
-        <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
+        <div className="admin-header">
 
-        <button
-            onClick={handleLogout}
-            className="border border-white text-white px-4 py-1 rounded hover:bg-white hover:text-[#006699] transition"
-        >
-            Logout
-        </button>
-        </header>
+
+
+        <header className="h-14 flex items-center justify-between px-6 sticky top-0 z-20"
+            style={{ backgroundColor: "#003366" }}>
+
+            <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
+
+            <button
+              onClick={handleLogout}
+              className="border border-white text-white px-4 py-1 rounded hover:bg-white hover:text-[#006699] transition"
+            >
+              Logout
+            </button>
+          </header>
+        </div>
 
         {/* DYNAMIC PAGE CONTENT */}
         <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
