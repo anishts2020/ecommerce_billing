@@ -30,6 +30,7 @@ export default function Dashboard() {
 
   const iconClass = "h-10 w-10 text-blue-700";
 
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Welcome, {user.username}</h2>
@@ -133,10 +134,12 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600">Manage user accounts</p>
             </div>
           </div>
-
         </div>
 
       </div>
     </div>
+
+
+
   );
 }

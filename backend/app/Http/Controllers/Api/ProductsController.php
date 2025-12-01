@@ -41,7 +41,16 @@ class ProductsController extends Controller
             'tax_percent' => 'required|numeric',
             'is_published' => 'nullable|integer',
             'is_active' => 'nullable|integer',
+            'product_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+            // Handle image upload
+    if ($request->hasFile('product_image')) {
+        $file = $request->file('product_image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/products'), $filename);
+        $validated['product_image'] = $filename;
+    }
 
         $product = Products::create($validated);
 
@@ -97,6 +106,20 @@ class ProductsController extends Controller
         'is_published',
         'is_active'
     ]);
+
+        // Handle image upload
+    if ($request->hasFile('product_image')) {
+        $file = $request->file('product_image');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/products'), $filename);
+
+        // OPTIONAL: delete old image
+        if ($product->product_image && file_exists(public_path('uploads/products/' . $product->product_image))) {
+            unlink(public_path('uploads/products/' . $product->product_image));
+        }
+
+        $validated['product_image'] = $filename;
+    }
 
     $product->update($validated);
 
