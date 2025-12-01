@@ -1,72 +1,99 @@
 // src/Pages/Materials.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
-/* ---------- Custom Alert Icons & Component (same as before) ---------- */
-const CheckCircleIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-const XCircleIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+// ICONS (kept as svg for alert modal)
 const AlertTriangleIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
+    viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 
+      2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 
+      0L3.34 16c-.77 1.333.192 3 1.732 3z" />
   </svg>
 );
 
+const CheckCircleIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
+    viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 
+      0 9 9 0 0118 0z" />
+  </svg>
+);
+
+const XCircleIcon = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none"
+    viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 
+      2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+
+// GLOBAL ALERT COMPONENT
 const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   if (!isOpen) return null;
 
-  let icon, bgColor, buttonColor, confirmText;
+  let icon, borderColor, buttonColor, confirmText;
+
   switch (type) {
     case "confirm":
+    case "delete-confirm":
       icon = <AlertTriangleIcon className="w-10 h-10 text-yellow-500" />;
-      bgColor = "bg-yellow-50 border-yellow-500";
+      borderColor = "border-yellow-500";
       buttonColor = "bg-red-600 hover:bg-red-700";
-      confirmText = "Yes, continue";
+      confirmText = "Yes, Delete";
       break;
     case "success":
       icon = <CheckCircleIcon className="w-10 h-10 text-green-500" />;
-      bgColor = "bg-green-50 border-green-500";
+      borderColor = "border-green-500";
       buttonColor = "bg-green-600 hover:bg-green-700";
-      confirmText = "Close";
+      confirmText = "OK";
       break;
     case "error":
       icon = <XCircleIcon className="w-10 h-10 text-red-500" />;
-      bgColor = "bg-red-50 border-red-500";
+      borderColor = "border-red-500";
       buttonColor = "bg-red-600 hover:bg-red-700";
       confirmText = "Close";
       break;
     default:
       icon = <AlertTriangleIcon className="w-10 h-10 text-gray-500" />;
-      bgColor = "bg-white border-gray-500";
+      borderColor = "border-gray-500";
       buttonColor = "bg-blue-600 hover:bg-blue-700";
       confirmText = "OK";
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 p-4" onClick={onClose}>
-      <div className={`bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border-t-8 ${bgColor}`} onClick={(e) => e.stopPropagation()}>
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-white p-6 rounded-xl w-96 border-t-8 shadow-xl ${borderColor}`}
+      >
         <div className="flex flex-col items-center space-y-4">
           {icon}
-          <h2 className="text-xl font-bold text-gray-800 text-center">{title}</h2>
+          <h1 className="text-xl font-bold text-center">{title}</h1>
           <p className="text-gray-600 text-center">{message}</p>
         </div>
-        <div className="mt-6 flex justify-center space-x-4">
-          {type === "confirm" && (
+
+        <div className="flex justify-center gap-3 mt-6">
+          {(type === "confirm" || type === "delete-confirm") && (
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition duration-150"
+              className="px-4 py-2 border border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100"
             >
               Cancel
             </button>
           )}
-          <button onClick={onConfirm} className={`px-4 py-2 text-white font-semibold rounded-lg transition duration-150 shadow-md ${buttonColor}`}>
+
+          <button
+            onClick={onConfirm}
+            className={`px-4 py-2 text-white rounded-lg shadow ${buttonColor}`}
+          >
             {confirmText}
           </button>
         </div>
@@ -74,16 +101,18 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
     </div>
   );
 };
-/* ---------- End Alert ---------- */
 
+// MAIN COMPONENT
 export default function Materials() {
+  // data + UI state
   const [materials, setMaterials] = useState([]);
-  const [formData, setFormData] = useState({ material_name: "", description: "" }); // add form state (for Add)
+  const [formData, setFormData] = useState({ material_name: "", description: "" });
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [editData, setEditData] = useState({ id: "", material_name: "", description: "" }); // separate edit state
+  const [editData, setEditData] = useState({ id: "", material_name: "", description: "" });
 
-  // alert state
+  // validation + alerts
+  const [nameError, setNameError] = useState("");
   const [alertState, setAlertState] = useState({
     isOpen: false,
     title: "",
@@ -92,26 +121,29 @@ export default function Materials() {
     actionToRun: null,
   });
 
-  // validation state
-  const [nameError, setNameError] = useState("");
+  // search + pagination (styling borrowed from ProductCategories)
+  const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(8);
 
-  const closeAlert = () => setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
+  const closeAlert = () =>
+    setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
 
   const handleAlertConfirm = async () => {
-    if (alertState.type === "confirm" && alertState.actionToRun) {
+    if ((alertState.type === "confirm" || alertState.type === "delete-confirm") && alertState.actionToRun) {
       await alertState.actionToRun();
-    } else {
-      closeAlert();
     }
+    closeAlert();
   };
 
+  // ensure consistent id/name fields
   const normalize = (arr) =>
     (arr || []).map((m) => {
-      // ensure names are trimmed for consistent comparisons
       const name = (m.material_name ?? "").toString().trim();
       return { ...m, id: m.id ?? m.material_id ?? null, material_name: name, description: (m.description ?? "").toString().trim() };
     });
 
+  // fetch
   const fetchMaterials = async () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/materials");
@@ -128,9 +160,7 @@ export default function Materials() {
   // lock scroll when modal open
   useEffect(() => {
     document.body.style.overflow = addModal || editModal ? "hidden" : "auto";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
+    return () => { document.body.style.overflow = "auto"; };
   }, [addModal, editModal]);
 
   // ---------- Add ----------
@@ -138,14 +168,13 @@ export default function Materials() {
     e.preventDefault();
 
     const name = (formData.material_name || "").trim();
-    // final validation
     if (!/^[A-Za-z ]+$/.test(name)) {
       setNameError("Name can contain only letters and spaces.");
       return;
     }
     setNameError("");
 
-    // duplicate check (case-insensitive)
+    // duplicate check
     const exists = materials.some((m) => (m.material_name || "").toLowerCase() === name.toLowerCase());
     if (exists) {
       setAlertState({ isOpen: true, title: "Already exists", message: "A material with that name already exists.", type: "error" });
@@ -175,9 +204,9 @@ export default function Materials() {
   const deleteMaterial = (id) => {
     setAlertState({
       isOpen: true,
-      title: "Are you sure?",
-      message: "This will permanently delete the material.",
-      type: "confirm",
+      title: "Confirm Deletion",
+      message: "Are you sure you want to delete this material permanently?",
+      type: "delete-confirm",
       actionToRun: async () => {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/materials/${id}`);
@@ -193,7 +222,7 @@ export default function Materials() {
   // ---------- Edit ----------
   const openEdit = (v) => {
     setEditData({ id: v.id ?? v.material_id, material_name: v.material_name ?? "", description: v.description ?? "" });
-    setNameError(""); // clear previous error
+    setNameError("");
     setEditModal(true);
   };
 
@@ -207,7 +236,7 @@ export default function Materials() {
     }
     setNameError("");
 
-    // duplicate check excluding current item (case-insensitive)
+    // duplicate check excluding current item
     const exists = materials.some((m) => {
       const mid = m.id ?? m.material_id;
       return mid !== editData.id && (m.material_name || "").toLowerCase() === name.toLowerCase();
@@ -235,6 +264,7 @@ export default function Materials() {
     }
   };
 
+  // keyboard escape to close modals
   const handleKeyDown = (e) => {
     if (e.key === "Escape") {
       setAddModal(false);
@@ -242,90 +272,168 @@ export default function Materials() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center p-6">
-          <h2 className="text-2xl sm:text-2xl font-extrabold text-gray-800">Materials</h2>
+  // ---------- SEARCH + PAGINATION ----------
+  const filteredMaterials = materials.filter((m) =>
+    (m.material_name || "").toLowerCase().includes(searchText.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredMaterials.length / itemsPerPage);
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages);
+    else if (totalPages === 0) setCurrentPage(1);
+  }, [totalPages, currentPage]);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMaterials = filteredMaterials.slice(indexOfFirstItem, indexOfLastItem);
 
-          {/* Primary action styled like Salary view */}
-          <button
-            onClick={() => {
-              setFormData({ material_name: "", description: "" });
-              setNameError("");
-              setAddModal(true);
-            }}
-            className="mt-4 sm:mt-0 flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-blue-300 font-semibold"
-          >
-            + Add Material
-          </button>
+  const handleNextPage = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
+  const handlePrevPage = () => setCurrentPage((p) => Math.max(p - 1, 1));
+
+  // ---------- RENDER ----------
+  return (
+    <div className="p-8 bg-gray-100 min-h-screen" onKeyDown={handleKeyDown}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-lg mb-6">
+          <h1 className="text-3xl font-extrabold text-indigo-700">🧾 Materials</h1>
+
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              placeholder="Search materials..."
+              value={searchText}
+              onChange={(e) => { setSearchText(e.target.value); setCurrentPage(1); }}
+              className="border p-2 w-64 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+
+            <button
+              onClick={() => {
+                setFormData({ material_name: "", description: "" });
+                setNameError("");
+                setAddModal(true);
+              }}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 shadow-md transition duration-150"
+            >
+              + Add Material
+            </button>
+          </div>
         </div>
 
-        <div className="bg-white shadow-2xl rounded-xl overflow-hidden border border-gray-200">
-          {materials.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm divide-y divide-gray-200 table-fixed">
-                <thead className="bg-blue-600 text-white uppercase tracking-wider">
-                  <tr>
-                    <th className="w-16 p-4 text-center font-bold rounded-tl-xl">SL</th>
-                    <th className="p-4 text-left font-bold">Name</th>
-                    <th className="p-4 text-left font-bold">Description</th>
-                    <th className="w-40 p-4 text-center font-bold rounded-tr-xl">Actions</th>
+        {/* Table Card */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-blue-600 text-white">
+              <tr>
+                <th className="py-3 px-4 text-center text-sm font-bold uppercase tracking-wider w-[10%]">SI NO</th>
+                <th className="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider w-[35%]">Name</th>
+                <th className="py-3 px-4 text-left text-sm font-bold uppercase tracking-wider w-[40%]">Description</th>
+                <th className="py-3 px-4 text-center text-sm font-bold uppercase tracking-wider w-[15%]">Action</th>
+              </tr>
+            </thead>
+
+            <tbody className="bg-white divide-y divide-gray-200">
+              {currentMaterials.length > 0 ? (
+                currentMaterials.map((v, idx) => (
+                  <tr key={v.id} className="hover:bg-gray-50 transition duration-150">
+                    <td className="py-3 px-4 text-center text-base text-gray-800">
+                      {indexOfFirstItem + idx + 1}
+                    </td>
+
+                    <td className="py-3 px-4 text-base text-gray-900 text-left break-words">
+                      {v.material_name || "\u00A0"}
+                    </td>
+
+                    <td className="py-3 px-4 text-base text-gray-800 text-left break-words">
+                      <div className="truncate">{v.description || "\u00A0"}</div>
+                    </td>
+
+                    <td className="py-3 px-4">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => openEdit(v)}
+                          className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition duration-150"
+                          title="Edit"
+                        >
+                          <FaEdit className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          onClick={() => deleteMaterial(v.id)}
+                          className="text-red-600 hover:bg-red-100 p-2 rounded-full transition duration-150"
+                          title="Delete"
+                        >
+                          <FaTrash className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {materials.map((v, index) => (
-                    <tr key={v.id} className={`transition duration-150 ease-in-out ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50`}>
-                      <td className="p-4 text-center font-medium text-gray-700">{index + 1}</td>
-                      <td className="p-4 font-medium text-gray-700 text-left break-words">{v.material_name || "\u00A0"}</td>
-                      <td className="p-4 text-gray-600 text-left break-words">{v.description || "\u00A0"}</td>
-                      <td className="p-4 text-center">
-                        <div className="flex gap-2 justify-center">
-                          <button onClick={() => openEdit(v)} className="p-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 transition duration-200 transform hover:scale-105" title="Edit">
-                            Edit
-                          </button>
-                          <button onClick={() => deleteMaterial(v.id)} className="p-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition duration-200 transform hover:scale-105" title="Delete">
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="p-6 text-center text-gray-500">
-              <p>No materials found. Click 'Add Material' to create the first entry.</p>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center py-8 text-gray-500 font-semibold">
+                    No materials found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center p-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex space-x-1 text-sm">
+                <button
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-lg border ${
+                    currentPage === 1 ? "text-gray-400 bg-gray-100 cursor-not-allowed" : "text-blue-600 border-blue-600 hover:bg-blue-50"
+                  }`}
+                >
+                  Prev
+                </button>
+
+                <span className="px-4 py-2 border bg-blue-600 text-white rounded-lg">
+                  {currentPage}
+                </span>
+
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-lg border ${
+                    currentPage === totalPages ? "text-gray-400 bg-gray-100 cursor-not-allowed" : "text-blue-600 border-blue-600 hover:bg-blue-50"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal (Add / Edit) */}
       {(addModal || editModal) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur bg-opacity-30 p-4" onKeyDown={handleKeyDown}>
-          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-transform duration-300 scale-100">
-            <div className="flex justify-between items-center mb-6 border-b pb-3">
-              <h3 className="text-2xl font-bold text-gray-800">{addModal ? "Add Material" : "Edit Material"}</h3>
-              <button
-                type="button"
-                onClick={() => {
-                  setAddModal(false);
-                  setEditModal(false);
-                }}
-                className="text-gray-400 hover:text-gray-600 transition duration-150"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="relative bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
+            <button
+              className="absolute top-3 right-3 text-xl font-bold text-gray-400 hover:text-gray-600"
+              onClick={() => {
+                setAddModal(false);
+                setEditModal(false);
+                setEditData({ id: "", material_name: "", description: "" });
+                setFormData({ material_name: "", description: "" });
+                setNameError("");
+              }}
+              aria-label="Close"
+            >
+              ×
+            </button>
 
-            {/* Form */}
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 text-center">
+              {addModal ? "Add Material" : "Edit Material"}
+            </h2>
+
             {addModal ? (
               <form onSubmit={handleAdd} className="space-y-4">
-                {/* Name (letters + spaces only) */}
                 <div>
                   <label className="sr-only">Name</label>
                   <input
@@ -333,7 +441,6 @@ export default function Materials() {
                     placeholder="Name (letters & spaces only)"
                     value={formData.material_name}
                     onChange={(e) => {
-                      // sanitize: allow only letters and spaces
                       const sanitized = e.target.value.replace(/[^A-Za-z ]+/g, "");
                       setFormData((prev) => ({ ...prev, material_name: sanitized }));
                       setNameError(sanitized.trim() === "" ? "Name is required" : "");
@@ -357,17 +464,23 @@ export default function Materials() {
                 </div>
 
                 <div className="pt-4 flex justify-end gap-3 border-t">
-                  <button type="button" onClick={() => { setAddModal(false); setFormData({ material_name: "", description: "" }); setNameError(""); }} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200">
+                  <button
+                    type="button"
+                    onClick={() => { setAddModal(false); setFormData({ material_name: "", description: "" }); setNameError(""); }}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200"
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02]">
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02]"
+                  >
                     Add
                   </button>
                 </div>
               </form>
             ) : (
               <form onSubmit={updateMaterial} className="space-y-4">
-                {/* Name (letters + spaces only) */}
                 <div>
                   <label className="sr-only">Name</label>
                   <input
@@ -398,10 +511,17 @@ export default function Materials() {
                 </div>
 
                 <div className="pt-4 flex justify-end gap-3 border-t">
-                  <button type="button" onClick={() => { setEditModal(false); setEditData({ id: "", material_name: "", description: "" }); setNameError(""); }} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200">
+                  <button
+                    type="button"
+                    onClick={() => { setEditModal(false); setEditData({ id: "", material_name: "", description: "" }); setNameError(""); }}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 transition duration-200"
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02]">
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02]"
+                  >
                     Update
                   </button>
                 </div>
@@ -411,8 +531,15 @@ export default function Materials() {
         </div>
       )}
 
-      {/* Global Custom Alert */}
-      <CustomAlert isOpen={alertState.isOpen} title={alertState.title} message={alertState.message} type={alertState.type} onConfirm={handleAlertConfirm} onClose={closeAlert} />
+      {/* Global Alert */}
+      <CustomAlert
+        isOpen={alertState.isOpen}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+        onConfirm={handleAlertConfirm}
+        onClose={closeAlert}
+      />
     </div>
   );
 }
