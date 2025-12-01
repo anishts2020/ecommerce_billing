@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 // SVG Icons
 const EditIcon = (props) => (
@@ -173,15 +174,29 @@ export default function Vendors() {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <h2 className="text-3xl font-bold mb-6">Vendor Management</h2>
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
+        <h1 className="text-3xl font-extrabold text-indigo-700">
+          🧾 Vendor Management
+        </h1>
+
+        <input
+          type="text"
+          placeholder="Search by customer name..."
+          className="w-72 px-4 py-2 border border-gray-300 rounded-full shadow-sm 
+                       focus:ring-2 focus:ring-indigo-300 outline-none"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+        />
+      </div>
 
       {/* ADD VENDOR FORM */}
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-lg shadow mb-4">
-        {["vendor_name","email","phone","address","state","city","pincode","gst_number"].map((field) => (
+        {["vendor_name", "email", "phone", "address", "state", "city", "pincode", "gst_number"].map((field) => (
           <input
             key={field}
             type={field === "email" ? "email" : "text"}
-            placeholder={field.replace("_"," ").toUpperCase()}
+            placeholder={field.replace("_", " ").toUpperCase()}
             value={formData[field]}
             onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
             className="border rounded px-3 py-2"
@@ -191,30 +206,28 @@ export default function Vendors() {
         <button type="submit" className="col-span-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Add Vendor</button>
       </form>
 
-      {/* SEARCH */}
-      <div className="mb-4 flex justify-end">
-        <input
-          type="text"
-          placeholder="Search vendors..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-          className="border rounded px-3 py-2 w-1/3"
-        />
-      </div>
-
       {/* VENDORS TABLE */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="bg-blue-600 text-white">
-              {["Name","Email","Phone","Address","State","City","Pincode","GST","Actions"].map((th) => (
+
+              {/* ✔ Added SL No column */}
+              <th className="p-2">SL No</th>
+
+              {["Name", "Email", "Phone", "Address", "State", "City", "Pincode", "GST", "Actions"].map((th) => (
                 <th key={th} className="p-2">{th}</th>
               ))}
             </tr>
           </thead>
+
           <tbody>
             {vendors.map((v) => (
               <tr key={v.vendor_id} className="border-b text-center hover:bg-gray-100">
+
+                {/* ✔ Serial Number with pagination */}
+                <td className="p-2">{(currentPage - 1) * perPage + vendors.indexOf(v) + 1}</td>
+
                 <td className="p-2">{v.vendor_name}</td>
                 <td className="p-2">{v.email}</td>
                 <td className="p-2">{v.phone}</td>
@@ -224,8 +237,8 @@ export default function Vendors() {
                 <td className="p-2">{v.pincode}</td>
                 <td className="p-2">{v.gst_number}</td>
                 <td className="p-2 flex justify-center gap-2">
-                  <button onClick={() => openEdit(v)} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"><EditIcon className="w-4 h-4" /></button>
-                  <button onClick={() => handleDelete(v.vendor_id)} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"><TrashIcon className="w-4 h-4" /></button>
+                  <button onClick={() => openEdit(v)} className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150"><FaEdit size={16}/></button>
+                  <button onClick={() => handleDelete(v.vendor_id)} className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150"><FaTrash size={16} /></button>
                 </td>
               </tr>
             ))}
@@ -248,7 +261,7 @@ export default function Vendors() {
           <div className="bg-white p-6 rounded shadow-lg w-96">
             <h3 className="text-xl font-bold mb-4">Edit Vendor</h3>
             <form onSubmit={updateVendor} className="space-y-3">
-              {["vendor_name","email","phone","address","state","city","pincode","gst_number"].map((field) => (
+              {["vendor_name", "email", "phone", "address", "state", "city", "pincode", "gst_number"].map((field) => (
                 <input
                   key={field}
                   type={field === "email" ? "email" : "text"}
@@ -259,7 +272,7 @@ export default function Vendors() {
               ))}
               <div className="flex justify-between mt-4">
                 <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
-                <button type="button" onClick={() => setEditModal(false)} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+                <button type="button" onClick={() => setEditModal(false)} className="p-2 rounded-full text-red-600 hover:bg-red-100 transition duration-150">Cancel</button>
               </div>
             </form>
           </div>
