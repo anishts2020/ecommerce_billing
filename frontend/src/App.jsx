@@ -44,6 +44,7 @@ import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItems";
 
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
+import CouponMaster from "./Pages/CouponMaster";
 
 
 export default function App() {
@@ -97,11 +98,13 @@ export default function App() {
 
           {/* PURCHASE */}
           <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
-           <Route path="/purchase_list" element={<PurchaseinvoiceList />} />
-             <Route path="/purchase-invoice-items/:id" element={<PurchaseInvoiceItems />} />
+          <Route path="/purchase_list" element={<PurchaseinvoiceList />} />
+          <Route path="/purchase-invoice-items/:id" element={<PurchaseInvoiceItems />} />
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+          {/* Coupons and Discount */}
+          <Route path="/coupon-master" element={<CouponMaster />} />
 
         </Route>
 
