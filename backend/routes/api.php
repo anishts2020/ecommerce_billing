@@ -27,6 +27,8 @@ use App\Http\Controllers\Api\ProductController; // for barcode scan
 
 use App\Http\Controllers\Api\VendorController;
 
+
+
 use App\Http\Controllers\Api\PurchaseInvoiceController;
 use App\Http\Controllers\Api\PurchaseInvoiceItemController;
 
@@ -35,6 +37,9 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
 
 
 /*
@@ -137,6 +142,7 @@ Route::apiResource('materials', MaterialsController::class);
 Route::apiResource('vendors', VendorController::class);
 
 
+
 /*
 |--------------------------------------------------------------------------
 | PRODUCTS
@@ -188,3 +194,32 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+Route::get('/purchase-report', function (Request $request) {
+
+     $query = DB::table('purchase_invoices as p')
+        ->leftJoin('vendors as v', 'v.vendor_id', '=', 'p.vendor_id')
+        ->leftJoin('purchase_invoice_items as pi', 'pi.purchase_id', '=', 'p.purchase_id')
+        ->leftJoin('products as pr', 'pr.product_id', '=', 'pi.product_id')
+        ->select(
+            'p.purchase_id',
+            'p.purchase_no',
+            'p.net_amount',
+            'v.vendor_name',
+            DB::raw('GROUP_CONCAT(DISTINCT pr.product_name ORDER BY pr.product_name SEPARATOR ", ") AS product_names')
+        )
+        ->groupBy(
+            'p.purchase_id',
+            'p.purchase_no',
+            'p.net_amount',
+            'v.vendor_name'
+        );
+
+    if ($request->from) {
+        $query->whereDate('p.purchase_date', '>=', $request->from);
+    }
+    if ($request->to) {
+        $query->whereDate('p.purchase_date', '<=', $request->to);
+    }
+
+    return $query->get();
+});

@@ -45,6 +45,9 @@ import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItems";
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
 
+import PurchaseReport from "./Pages/PurchaseReport";
+
+
 
 export default function App() {
   return (
@@ -102,6 +105,10 @@ export default function App() {
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+
+             {/* REPORT */}
+          <Route path="/purchasereport" element={<PurchaseReport />} />
+          
 
         </Route>
 
