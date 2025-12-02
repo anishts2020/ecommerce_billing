@@ -37,6 +37,10 @@ use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
 
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -188,3 +192,38 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+
+Route::get('/salesreport', function (Request $request) {
+
+    $query = DB::table('sales_invoices as s')
+        ->leftJoin('customers as c', 'c.id', '=', 's.customer_id') // customer PK is `id`
+        ->leftJoin('sales_invoice_items as si', 'si.sales_invoice_id', '=', 's.sales_invoice_id')
+        ->leftJoin('products as p', 'p.product_id', '=', 'si.product_id')
+        ->select(
+            's.sales_invoice_id',
+            's.invoice_no',
+            's.invoice_date',
+            'c.customer_name',
+            DB::raw('GROUP_CONCAT(p.product_name SEPARATOR ", ") as product_names'),
+            's.grand_total as total_grand'
+        )
+        ->groupBy(
+            's.sales_invoice_id',
+            's.invoice_no',
+            's.invoice_date',
+            'c.customer_name',
+            's.grand_total'
+        );
+
+    // Optional date filters
+    if ($request->from) {
+        $query->whereDate('s.invoice_date', '>=', $request->from);
+    }
+
+    if ($request->to) {
+        $query->whereDate('s.invoice_date', '<=', $request->to);
+    }
+
+    return $query->get();
+});
