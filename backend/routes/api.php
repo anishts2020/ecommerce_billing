@@ -35,7 +35,8 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
-
+use App\Http\Controllers\Api\CouponMasterController;
+use App\Http\Controllers\Api\CouponCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -188,3 +189,18 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+/*
+|--------------------------------------------------------------------------
+| COUPONS AND DISCOUNTS
+|--------------------------------------------------------------------------
+*/
+Route::get('/coupons', [CouponMasterController::class, 'index']);
+
+Route::get('/coupon-categories', [CouponCategoryController::class, 'index']);
+Route::post('/coupon-categories', [CouponCategoryController::class, 'store']);
+Route::put('/coupon-categories/{id}', [CouponCategoryController::class, 'update']);
+Route::delete('/coupon-categories/{id}', [CouponCategoryController::class, 'destroy']);
+
+
+

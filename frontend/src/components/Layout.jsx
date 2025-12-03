@@ -112,6 +112,21 @@ export default function Layout() {
               </div>
             )}
           </div>
+          {/* CASH AND DISCOUNTS*/}
+          <div>
+            <button
+              onClick={() => toggleMenu("purchase")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupon and Discounts
+            </button>
+
+            {openMenu === "purchase" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-category" className={submenuClass}>Coupon Categories</Link>
+              </div>
+            )}
+          </div>
 
         </nav>
       </aside>
