@@ -45,6 +45,8 @@ import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItems";
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
 
+/* Coupons & Discounts */
+import CouponProducts from "./Pages/CouponProducts";
 
 export default function App() {
   return (
@@ -102,6 +104,9 @@ export default function App() {
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+
+          {/* Coupens & Discounts */}
+          <Route path="/coupon-products" element={<CouponProducts />} />
 
         </Route>
 

@@ -36,7 +36,8 @@ use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
 
-
+use App\Http\Controllers\Api\CouponProductsController;
+use App\Http\Controllers\Api\CouponMasterController;
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -77,10 +78,30 @@ Route::post('/users', [UserController::class, 'store']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
+/*
+|--------------------------------------------------------------------------
+| Role
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/roles', [RoleController::class, 'index']);
 Route::post('/roles', [RoleController::class, 'store']);
 Route::put('/roles/{id}', [RoleController::class, 'update']);
 Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+/*
+
+/*
+|--------------------------------------------------------------------------
+| User Role
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/user-role', [UserRoleController::class, 'index']);
+Route::get('/user-role/{id}', [UserRoleController::class, 'show']);
+Route::post('/user-role', [UserRoleController::class, 'store']);
+Route::put('/user-role/{id}', [UserRoleController::class, 'update']);
+Route::delete('/user-role/{id}', [UserRoleController::class, 'destroy']);
+
 /*
 |--------------------------------------------------------------------------
 | PRODUCT CATEGORIES
@@ -188,3 +209,12 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+/*
+|--------------------------------------------------------------------------
+| Coupons & Discount
+|--------------------------------------------------------------------------
+*/
+
+Route::apiResource('coupon-products', CouponProductsController::class);
+Route::apiResource('coupon', CouponMasterController::class);
