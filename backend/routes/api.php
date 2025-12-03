@@ -35,7 +35,7 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
-
+use App\Http\Controllers\Api\StichingTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -168,8 +168,16 @@ Route::delete('/purchase-invoices/{invoice}', [PurchaseInvoiceController::class,
 | SALES INVOICE
 |--------------------------------------------------------------------------
 */
-Route::apiResource('sales-invoices', SalesInvoiceController::class);
-Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getItems']);
+// Route::apiResource('sales-invoices', SalesInvoiceController::class);
+Route::get('/sales-invoices', [SalesInvoiceController::class, 'index']);
+Route::post('/sales-invoices', [SalesInvoiceController::class, 'store']);
+Route::get('/sales-invoices/stitching-items', [SalesInvoiceController::class, 'stitchingItems']);
+Route::get(
+    '/sales-invoices/{invoice_id}/stitching-items',
+    [SalesInvoiceController::class, 'getStitchingForInvoice']
+);
+Route::get('/sales-invoices/{id}', [SalesInvoiceController::class, 'show']);
+
 
 
 /*
@@ -188,3 +196,13 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+/*
+|--------------------------------------------------------------------------
+| STICHING TYPES
+|--------------------------------------------------------------------------
+*/
+Route::get('/stiching-types', [StichingTypeController::class, 'index']);
+Route::post('/stiching-types', [StichingTypeController::class, 'store']);
+Route::put('/stiching-types/{id}', [StichingTypeController::class, 'update']);
+Route::delete('/stiching-types/{id}', [StichingTypeController::class, 'destroy']);

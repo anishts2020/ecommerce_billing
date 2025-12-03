@@ -6,67 +6,142 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SalesInvoice;
 use App\Models\SalesInvoiceItem;
+use App\Models\SalesInvoiceStichingItem;
+use App\Models\StichingType;
 
 class SalesInvoiceController extends Controller
 {
-    public function index()
-    {
-        return SalesInvoice::with(['customer','items.product'])
-            ->orderBy('sales_invoice_id', 'DESC')
-            ->get();
-    }
 
-    /**
-     * Store invoice + items
-     */
+    public function stitchingItems()
+{
+    return SalesInvoiceStichingItem::orderBy('id', 'DESC')->get();
+}
+
+public function index()
+{
+    return SalesInvoice::with('customer')
+        ->orderBy('sales_invoice_id', 'DESC')
+        ->get();
+}
+public function show($id)
+{
+    return SalesInvoice::with([
+        'customer',
+        'items.product',
+        'stitching.product',
+        'stitching.customer'
+    ])
+    ->where('sales_invoice_id', $id)
+    ->first();
+}
+
+
+public function getStitchingForInvoice($invoice_id)
+{
+    return SalesInvoiceStichingItem::with(['product', 'customer'])
+    ->where('sales_invoice_id', $invoice_id)
+        ->orderBy('id', 'DESC')
+        ->get();
+}
+
+
+
     public function store(Request $request)
     {
         $request->validate([
-            'invoice_no'   => 'required',
-            'invoice_date' => 'required',
-            'customer_id'  => 'required',
-            'grand_total'  => 'required',
-            'discount'     => 'required',
-            'tax'          => 'required',
-            'net_total'    => 'required',
-            'payment_mode' => 'required',
-            'items'        => 'required|array'
+            'invoice_no'      => 'required',
+            'invoice_date'    => 'required|date',
+            'customer_id'     => 'nullable|integer',
+            'grand_total'     => 'required|numeric',
+            'discount'        => 'nullable|numeric',
+            'tax'             => 'nullable|numeric',
+            'net_total'       => 'required|numeric',
+            'payment_mode'    => 'required',
+            'items'           => 'required|array|min:1',
+            'stiching_items'  => 'nullable|array'
         ]);
 
-        // CREATE invoice only ONCE
+        // CREATE invoice
         $invoice = SalesInvoice::create([
             'invoice_no'   => $request->invoice_no,
             'invoice_date' => $request->invoice_date,
             'customer_id'  => $request->customer_id,
+            
             'cashier_id'   => $request->cashier_id ?? null,
             'grand_total'  => $request->grand_total,
-            'discount'     => $request->discount,
-            'tax'          => $request->tax,
+            'discount'     => $request->discount ?? 0,
+            'tax'          => $request->tax ?? 0,
             'net_total'    => $request->net_total,
             'payment_mode' => $request->payment_mode,
-            'status'       => 'Completed',
+            'status'       => $request->status ?? 'Completed',
             'remarks'      => $request->remarks ?? '',
         ]);
 
-        // TOTAL quantity for proportional distribution
-        $totalQty = collect($request->items)->sum('quantity');
-        if ($totalQty == 0) $totalQty = 1;
+        // Map: temp_id => sales_invoice_item_id (temp_id provided by client)
+        $createdItems = [];
+        // Also map by product_id as fallback (may be ambiguous if duplicates)
+        $createdByProduct = [];
 
-        // INSERT items only ONCE
         foreach ($request->items as $item) {
-
-            $itemDiscount = ($request->discount / $totalQty) * $item['quantity'];
-            $itemTax      = ($request->tax / $totalQty) * $item['quantity'];
-
-            SalesInvoiceItem::create([
+            $savedItem = SalesInvoiceItem::create([
                 'sales_invoice_id' => $invoice->sales_invoice_id,
-                'product_id'       => $item['product_id'],
-                'quantity'         => $item['quantity'],
-                'unit_price'       => $item['unit_price'],
-                'discount_amount'  => round($itemDiscount, 2),
-                'tax_percent'      => round($itemTax, 2),
-                'grand_total'      => $item['grand_total'],
+                'product_id'       => $item['product_id'] ?? null,
+                
+
+                'quantity'         => $item['quantity'] ?? 0,
+                'unit_price'       => $item['unit_price'] ?? 0,
+                'discount_amount'  => $item['discount_amount'] ?? 0,
+                'tax_percent'      => $item['tax_percent'] ?? 0,
+                'grand_total'      => $item['grand_total'] ?? 0,
             ]);
+
+            if (!empty($item['temp_id'])) {
+                $createdItems[$item['temp_id']] = $savedItem->sales_invoice_item_id;
+            }
+
+            if (!empty($item['product_id'])) {
+                // store array of ids in case multiple same product
+                $createdByProduct[$item['product_id']][] = $savedItem->sales_invoice_item_id;
+            }
+        }
+
+        // Save stitching items
+        if ($request->has('stiching_items') && is_array($request->stiching_items)) {
+            foreach ($request->stiching_items as $s) {
+                // Prefer mapping by item_temp_id
+                $invoiceItemId = null;
+                if (!empty($s['item_temp_id']) && isset($createdItems[$s['item_temp_id']])) {
+                    $invoiceItemId = $createdItems[$s['item_temp_id']];
+                } elseif (!empty($s['product_id']) && !empty($createdByProduct[$s['product_id']])) {
+                    // if multiple mapped, take last created for that product
+                    $arr = $createdByProduct[$s['product_id']];
+                    $invoiceItemId = end($arr);
+                }
+
+                // if we still don't have invoiceItemId, skip this stitching row
+                if (!$invoiceItemId) {
+                    continue;
+                }
+
+                $stitchName = $s['stiching_type_name'] ?? null;
+                if (!$stitchName && !empty($s['stiching_type_id'])) {
+                    $type = StichingType::find($s['stiching_type_id']);
+                    if ($type) $stitchName = $type->name;
+                }
+            
+                SalesInvoiceStichingItem::create([
+    'sales_invoice_id'      => $invoice->sales_invoice_id,
+    'sales_invoice_item_id' => $invoiceItemId,
+    'customer_id'           => $invoice->customer_id,
+    'customer_name'         => $request->customer_name ?? null,   // MUST ADD
+    'product_id'            => $s['product_id'] ?? null,
+    'product_name'          => $s['product_name'] ?? null,        // MUST ADD
+    'stiching_type_id'      => $s['stiching_type_id'] ?? null,
+    'stiching_type_name'    => $stitchName,
+    'rate'                  => $s['rate'] ?? 0,
+]);
+
+}
         }
 
         return response()->json([
@@ -74,77 +149,4 @@ class SalesInvoiceController extends Controller
             'invoice' => $invoice
         ], 201);
     }
-
-    /**
-     * Show Single Invoice
-     */
-    public function show($id)
-    {
-        $invoice = SalesInvoice::with(['customer','items.product'])->find($id);
-
-        if (!$invoice) {
-            return response()->json(['message' => 'Invoice not found'], 404);
-        }
-
-        return response()->json([
-            'invoice_id'    => $invoice->sales_invoice_id,
-            'invoice_no'    => $invoice->invoice_no,
-            'invoice_date'  => $invoice->invoice_date,
-            'customer_name' => $invoice->customer->customer_name ?? 'Unknown',
-            'discount'      => $invoice->discount,
-            'tax'           => $invoice->tax,
-            'grand_total'   => $invoice->grand_total,
-            'net_total'     => $invoice->net_total,
-
-            'items' => $invoice->items->map(function ($i) {
-                return [
-                    'sales_invoice_item_id' => $i->sales_invoice_item_id,
-                    'product_name'          => $i->product->product_name ?? 'N/A',
-                    'quantity'              => $i->quantity,
-                    'unit_price'            => $i->unit_price,
-                    'discount_amount'       => $i->discount_amount ?? 0,
-                    'tax_percent'           => $i->tax_percent ?? 0,
-                    'grand_total'           => $i->grand_total,
-                ];
-            }),
-        ]);
     }
-
-    /**
-     * Get only items for React table
-     */
-    public function getItems($id)
-    {
-        $items = SalesInvoiceItem::with('product')
-            ->where('sales_invoice_id', $id)
-            ->get()
-            ->map(function ($i) {
-                return [
-                    'sales_invoice_item_id' => $i->sales_invoice_item_id,
-                    'product'               => [
-                        'product_name' => $i->product->product_name ?? 'N/A'
-                    ],
-                    'quantity'              => $i->quantity,
-                    'unit_price'            => $i->unit_price,
-                    'discount_amount'       => $i->discount_amount ?? 0,
-                    'tax_percent'           => $i->tax_percent ?? 0,
-                    'grand_total'           => $i->grand_total,
-                ];
-            });
-
-        return response()->json($items);
-    }
-
-    public function destroy($id)
-    {
-        $invoice = SalesInvoice::find($id);
-
-        if (!$invoice) {
-            return response()->json(['message' => 'Invoice not found'], 404);
-        }
-
-        $invoice->delete();
-
-        return response()->json(['message' => 'Invoice deleted successfully']);
-    }
-}
