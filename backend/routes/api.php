@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
+use App\Http\Controllers\Api\TopSaleProductController;
 
 
 /*
@@ -188,3 +189,10 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+/*
+|--------------------------------------------------------------------------
+Top Selling Product
+|--------------------------------------------------------------------------
+*/
+Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);

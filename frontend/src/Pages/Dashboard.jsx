@@ -1,5 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import TopSellingModal from "../Modal/TopSellingModal";
 
 // Import Icons
 import {
@@ -15,6 +17,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 export default function Dashboard() {
+  const [showTopSellingModal, setShowTopSellingModal] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
@@ -134,6 +137,25 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600">Manage user accounts</p>
             </div>
           </div>
+
+
+          {/* Top Selling Product Card */}
+          <div className={cardClass} onClick={() => setShowTopSellingModal(true)}>
+            <ChartBarIcon className={iconClass} />
+            <div>
+              <h3 className="font-semibold text-lg">Top Selling Product</h3>
+              <p className="text-sm text-gray-600">View products with highest sales</p>
+            </div>
+          </div>
+
+          {/* Modal */}
+          {showTopSellingModal && (
+            <TopSellingModal onClose={() => setShowTopSellingModal(false)} />
+          )}
+
+
+
+
         </div>
 
       </div>
