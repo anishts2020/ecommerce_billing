@@ -22,6 +22,10 @@ import Salesinvoice from "./Pages/Salesinvoice";
 import SalesinvoiceList from "./Pages/SalesinvoiceList";
 import SalesInvoiceItems from "./Pages/SalesInvoiceItems";
 
+/* COUPON USER */
+import CouponUserView from "./Pages/CouponUserView";
+
+
 /* PRODUCTS */
 import Materials from "./Pages/Materials";
 import ProductCategories from "./Pages/ProductCategories";
@@ -78,6 +82,9 @@ export default function App() {
           <Route path="/sales-invoice" element={<Salesinvoice />} />
           <Route path="/salesinvoice_list" element={<SalesinvoiceList />} />
           <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems />} />
+
+          <Route path="/coupon-user" element={<CouponUserView />} />
+
 
           {/* PRODUCT MANAGEMENT */}
           <Route path="/product-categories" element={<ProductCategories />} />
