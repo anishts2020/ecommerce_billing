@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
+use App\Http\Controllers\Api\PurchaseChartController;
 
 
 /*
@@ -170,7 +171,8 @@ Route::delete('/purchase-invoices/{invoice}', [PurchaseInvoiceController::class,
 */
 Route::apiResource('sales-invoices', SalesInvoiceController::class);
 Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getItems']);
-
+Route::get('/sales/monthly-summary', [SalesInvoiceController::class, 'monthlySummary']);
+Route::get('/sales/monthly-summary/{year}', [SalesInvoiceController::class, 'monthlySummaryByYear']);
 
 /*
 |--------------------------------------------------------------------------
@@ -188,3 +190,11 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+
+Route::get('/monthly-category-sales', [App\Http\Controllers\ReportController::class, 'monthlyCategorySales']);
+
+Route::get('/sales-profit-line', [App\Http\Controllers\ReportController::class, 'salesProfitLine']);
+Route::get('/purchase-chart-data', [PurchaseChartController::class, 'monthlyPurchaseChart']);
+
+
