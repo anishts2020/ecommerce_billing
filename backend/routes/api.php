@@ -41,6 +41,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 
+use App\Http\Controllers\Api\TotalSalesController;
+
+Route::get('/total-sales-today', [TotalSalesController::class, 'index']);
+
+
+
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -192,6 +198,13 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
+
+
+Route::get('/total-sales-today', [TotalSalesController::class, 'index']);
+
+
+
+
 
 
 Route::get('/salesreport', function (Request $request) {
