@@ -52,6 +52,13 @@ use App\Http\Controllers\Api\CouponMasterController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+
+use App\Http\Controllers\Api\TotalSalesController;
+
+Route::get('/total-sales-today', [TotalSalesController::class, 'index']);
+
+
+
 use App\Http\Controllers\Api\CouponProductsController;
 use App\Http\Controllers\Api\CouponMasterController;
 /*
@@ -341,6 +348,13 @@ Route::get('/purchase-report', function (Request $request) {
 
     return $query->get();
 });
+
+
+Route::get('/total-sales-today', [TotalSalesController::class, 'index']);
+
+
+
+
 
 
 Route::get('/salesreport', function (Request $request) {
