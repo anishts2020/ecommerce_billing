@@ -18,6 +18,7 @@ class CouponMaster extends Model
     protected $fillable = [
         'coupon_code',
         'description',
+        'discount_type',           // 0/1 (or 1/2) — depends on your meaning
         'discount_type',         
         'discount_value',
         'minimum_order_amount',
@@ -38,6 +39,7 @@ class CouponMaster extends Model
         'usage_limit_per_user' => 'integer',
         'valid_from' => 'date',
         'valid_to' => 'date',
+        'is_active' => 'boolean', // Laravel will convert 0/1 to false/true
         'is_active' => 'boolean',
     ];
 

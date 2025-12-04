@@ -54,6 +54,7 @@ import SalesReport from "./Pages/SalesReport"
 
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
+import CouponCategories  from "./Pages/CouponCategories";
 import SalesChart from "./Pages/SalesChart";
 import MonthlyCategoryPieChart from "./Pages/MonthlyCategoryPieChart";
 import ProfitLineChart from "./Pages/ProfitLineChart";
@@ -135,6 +136,11 @@ export default function App() {
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+         
+         
+          {/* COUPONS AND DISCOUNTS */}
+          <Route path="/coupon-category" element={<CouponCategories />} />
+        
           {/* Coupons and Discount */}
           <Route path="/coupon-master" element={<CouponMaster />} />
 

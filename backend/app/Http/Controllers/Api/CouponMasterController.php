@@ -86,6 +86,19 @@ class CouponMasterController extends Controller
         return response()->json(['message' => 'Coupon deleted successfully']);
     }
 
+    /**
+     * Toggle status
+     */
+    public function toggleStatus(CouponMaster $couponMaster): JsonResponse
+    {
+        $couponMaster->is_active = !$couponMaster->is_active;
+        $couponMaster->save();
+
+        return response()->json([
+            'message' => 'Status updated',
+            'data' => ['is_active' => (int) $couponMaster->is_active],
+        ]);
+    }
  
 
     /**
