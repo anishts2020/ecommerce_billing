@@ -11,13 +11,23 @@ export default function Layout() {
   };
 
  // Track which menu is expanded
+  // Track which menu is expanded
   const [openMenu, setOpenMenu] = useState(null);
+  const [pageModalOpen, setPageModalOpen] = useState(false);
 
   const toggleMenu = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
 
   const submenuClass = "block px-3 py-2 rounded-md transition-all duration-200 hover:bg-white/20 hover:translate-x-1";
+
+  // const convertToMonthName = (monthStr) => {
+  //   const [year, month] = monthStr.split("-");
+  //   return new Date(year, month - 1).toLocaleString("en-US", { month: "long" });
+  // };
+
+
+
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -49,6 +59,7 @@ export default function Layout() {
               <div className="ml-5 mt-1 space-y-1">
                 <Link to="/createuser" className={submenuClass}>Users</Link>
                 <Link to="/createroles" className={submenuClass}>Roles</Link>
+                <Link to="/createuserroles" className={submenuClass}>User Roles</Link>
               </div>
             )}
           </div>
@@ -73,6 +84,24 @@ export default function Layout() {
                 <Link to="/vendors" className={submenuClass}>Vendors</Link>
                 <Link to="/customers" className={submenuClass}>Customers</Link>
                 <Link to="/employees" className={submenuClass}>Employees</Link>
+                <Link to="/stiching" className={submenuClass}>Stiching</Link>
+              </div>
+            )}
+          </div>
+
+          {/* COUPONS AND DISCOUNT */}
+          <div>
+            <button
+              onClick={() => toggleMenu("coupons")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupons and Discount
+            </button>
+
+            {openMenu === "coupons" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-master" className={submenuClass}>Coupon Master</Link>
+                <Link to="/coupon-user" className={submenuClass}>Coupon User</Link>
               </div>
             )}
           </div>
@@ -129,6 +158,52 @@ export default function Layout() {
             )}
           </div>
 
+          <div>
+            <button
+              onClick={() => toggleMenu("charts")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Charts
+            </button>
+
+            {openMenu === "charts" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/purchaseChart" className={submenuClass}>Purchase chart</Link>
+                <Link to="/saleschart" className={submenuClass}>Sales chart</Link>
+                <Link to="/productcategorychart" className={submenuClass}>Product category chart</Link>
+                <Link to="/productprofitbymonth" className={submenuClass}>Profit & Sales</Link>
+              onClick={() => toggleMenu("coupons and discount")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupons & Discounts
+            </button>
+
+            {openMenu === "coupons and discount" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-products" className={submenuClass}>Coupon Products</Link>
+              </div>
+            )}
+          </div>
+          {/* REPORT */}
+          
+          {/* SYSTEM */}
+          <div>
+            <button
+              onClick={() => toggleMenu("report")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Report
+            </button>
+
+            {openMenu === "report" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/purchasereport" className={submenuClass}>Purchase Report</Link>
+                
+                <Link to="/salesreport" className={submenuClass}>Sales Report</Link>
+              </div>
+            )}
+          </div>
+
         </nav>
       </aside>
 
@@ -166,3 +241,4 @@ export default function Layout() {
     </div>
   );
 }
+

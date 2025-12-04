@@ -27,18 +27,32 @@ use App\Http\Controllers\Api\ProductController; // for barcode scan
 
 use App\Http\Controllers\Api\VendorController;
 
+
+
 use App\Http\Controllers\Api\PurchaseInvoiceController;
 use App\Http\Controllers\Api\PurchaseInvoiceItemController;
 
 use App\Http\Controllers\Api\SalesInvoiceController;
-
+use App\Http\Controllers\Api\TotalRevenueController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\CouponMasterController;
 use App\Http\Controllers\Api\CouponUserController;
+use App\Http\Controllers\Api\TopSaleProductController;
+use App\Http\Controllers\Api\StichingTypeController;
+use App\Http\Controllers\Api\PurchaseChartController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Api\CouponMasterController;
 
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Api\CouponProductsController;
+use App\Http\Controllers\Api\CouponMasterController;
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -79,11 +93,31 @@ Route::post('/users', [UserController::class, 'store']);
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
+/*
+|--------------------------------------------------------------------------
+| Role
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/roles', [RoleController::class, 'index']);
 Route::post('/roles', [RoleController::class, 'store']);
 Route::put('/roles/{id}', [RoleController::class, 'update']);
 Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 
+
+/*
+
+/*
+|--------------------------------------------------------------------------
+| User Role
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/user-role', [UserRoleController::class, 'index']);
+Route::get('/user-role/{id}', [UserRoleController::class, 'show']);
+Route::post('/user-role', [UserRoleController::class, 'store']);
+Route::put('/user-role/{id}', [UserRoleController::class, 'update']);
+Route::delete('/user-role/{id}', [UserRoleController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
@@ -139,6 +173,7 @@ Route::apiResource('materials', MaterialsController::class);
 Route::apiResource('vendors', VendorController::class);
 
 
+
 /*
 |--------------------------------------------------------------------------
 | PRODUCTS
@@ -170,8 +205,25 @@ Route::delete('/purchase-invoices/{invoice}', [PurchaseInvoiceController::class,
 | SALES INVOICE
 |--------------------------------------------------------------------------
 */
+// Route::apiResource('sales-invoices', SalesInvoiceController::class);
+Route::get('/sales-invoices', [SalesInvoiceController::class, 'index']);
+Route::post('/sales-invoices', [SalesInvoiceController::class, 'store']);
+Route::get('/sales-invoices/stitching-items', [SalesInvoiceController::class, 'stitchingItems']);
+Route::get(
+    '/sales-invoices/{invoice_id}/stitching-items',
+    [SalesInvoiceController::class, 'getStitchingForInvoice']
+);
+Route::get('/sales-invoices/{id}', [SalesInvoiceController::class, 'show']);
+
+
 Route::apiResource('sales-invoices', SalesInvoiceController::class);
 Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getItems']);
+Route::get('/sales/monthly-summary', [SalesInvoiceController::class, 'monthlySummary']);
+Route::get('/sales/monthly-summary/{year}', [SalesInvoiceController::class, 'monthlySummaryByYear']);
+
+Route::get('/total-revenue-today', [TotalRevenueController::class, 'revenueToday']);
+
+
 
 
 /*
@@ -220,4 +272,106 @@ Route::put('/coupon-users/{coupon_user_id}', [CouponUserController::class, 'upda
 
 // Delete coupon user
 Route::delete('/coupon-users/{coupon_user_id}', [CouponUserController::class, 'destroy']);
+/*
+|--------------------------------------------------------------------------
+Top Selling Product
+|--------------------------------------------------------------------------
+*/
+Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
+| STICHING TYPES
+|--------------------------------------------------------------------------
+*/
+Route::get('/stiching-types', [StichingTypeController::class, 'index']);
+Route::post('/stiching-types', [StichingTypeController::class, 'store']);
+Route::put('/stiching-types/{id}', [StichingTypeController::class, 'update']);
+Route::delete('/stiching-types/{id}', [StichingTypeController::class, 'destroy']);
+
+Route::get('/monthly-category-sales', [App\Http\Controllers\ReportController::class, 'monthlyCategorySales']);
+
+Route::get('/sales-profit-line', [App\Http\Controllers\ReportController::class, 'salesProfitLine']);
+Route::get('/purchase-chart-data', [PurchaseChartController::class, 'monthlyPurchaseChart']);
+/*
+|--------------------------------------------------------------------------
+| Coupons & Discount
+|--------------------------------------------------------------------------
+*/
+
+Route::apiResource('coupon-products', CouponProductsController::class);
+Route::apiResource('coupon', CouponMasterController::class);
+Route::get('/purchase-report', function (Request $request) {
+
+     $query = DB::table('purchase_invoices as p')
+        ->leftJoin('vendors as v', 'v.vendor_id', '=', 'p.vendor_id')
+        ->leftJoin('purchase_invoice_items as pi', 'pi.purchase_id', '=', 'p.purchase_id')
+        ->leftJoin('products as pr', 'pr.product_id', '=', 'pi.product_id')
+        ->select(
+            'p.purchase_id',
+            'p.purchase_no',
+            'p.net_amount',
+            'v.vendor_name',
+            DB::raw('GROUP_CONCAT(DISTINCT pr.product_name ORDER BY pr.product_name SEPARATOR ", ") AS product_names')
+        )
+        ->groupBy(
+            'p.purchase_id',
+            'p.purchase_no',
+            'p.net_amount',
+            'v.vendor_name'
+        );
+
+    if ($request->from) {
+        $query->whereDate('p.purchase_date', '>=', $request->from);
+    }
+    if ($request->to) {
+        $query->whereDate('p.purchase_date', '<=', $request->to);
+    }
+
+    return $query->get();
+});
+
+
+Route::get('/salesreport', function (Request $request) {
+
+    $query = DB::table('sales_invoices as s')
+        ->leftJoin('customers as c', 'c.id', '=', 's.customer_id') // customer PK is `id`
+        ->leftJoin('sales_invoice_items as si', 'si.sales_invoice_id', '=', 's.sales_invoice_id')
+        ->leftJoin('products as p', 'p.product_id', '=', 'si.product_id')
+        ->select(
+            's.sales_invoice_id',
+            's.invoice_no',
+            's.invoice_date',
+            'c.customer_name',
+            DB::raw('GROUP_CONCAT(p.product_name SEPARATOR ", ") as product_names'),
+            's.grand_total as total_grand'
+        )
+        ->groupBy(
+            's.sales_invoice_id',
+            's.invoice_no',
+            's.invoice_date',
+            'c.customer_name',
+            's.grand_total'
+        );
+
+    // Optional date filters
+    if ($request->from) {
+        $query->whereDate('s.invoice_date', '>=', $request->from);
+    }
+
+    if ($request->to) {
+        $query->whereDate('s.invoice_date', '<=', $request->to);
+    }
+
+    return $query->get();
+});
+/*
+|--------------------------------------------------------------------------
+Coupon Master
+|--------------------------------------------------------------------------
+*/
+Route::get('/coupons', [CouponMasterController::class, 'index']);          
+Route::post('/coupons', [CouponMasterController::class, 'store']);          
+Route::get('/coupons/{couponMaster}', [CouponMasterController::class, 'show']); 
+Route::put('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::patch('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::delete('/coupons/{couponMaster}', [CouponMasterController::class, 'destroy']); 
+
 
