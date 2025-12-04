@@ -10,6 +10,7 @@ export default function Layout() {
     navigate("/login");
   };
 
+ // Track which menu is expanded
   // Track which menu is expanded
   const [openMenu, setOpenMenu] = useState(null);
   const [pageModalOpen, setPageModalOpen] = useState(false);
@@ -84,6 +85,23 @@ export default function Layout() {
                 <Link to="/customers" className={submenuClass}>Customers</Link>
                 <Link to="/employees" className={submenuClass}>Employees</Link>
                 <Link to="/stiching" className={submenuClass}>Stiching</Link>
+              </div>
+            )}
+          </div>
+
+          {/* COUPONS AND DISCOUNT */}
+          <div>
+            <button
+              onClick={() => toggleMenu("coupons")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupons and Discount
+            </button>
+
+            {openMenu === "coupons" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-master" className={submenuClass}>Coupon Master</Link>
+                <Link to="/coupon-user" className={submenuClass}>Coupon User</Link>
               </div>
             )}
           </div>

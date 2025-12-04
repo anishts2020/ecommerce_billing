@@ -24,6 +24,10 @@ import SalesInvoiceItems from "./Pages/SalesInvoiceItems";
 import Stiching from "./Pages/Stiching";
 import SalesInvoiceStitchingList from "./Pages/SalesInvoiceStichingList"
 
+/* COUPON USER */
+import CouponUserView from "./Pages/CouponUserView";
+
+
 /* PRODUCTS */
 import Materials from "./Pages/Materials";
 import ProductCategories from "./Pages/ProductCategories";
@@ -96,6 +100,9 @@ export default function App() {
           <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems />} />
           <Route path="/stiching" element={<Stiching />} />
            <Route path="/sales-invoice/:invoice_id/stitching-items" element={<SalesInvoiceStitchingList />} />
+
+
+          <Route path="/coupon-user" element={<CouponUserView />} />
 
 
           {/* PRODUCT MANAGEMENT */}
