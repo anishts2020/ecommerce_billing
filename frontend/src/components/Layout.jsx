@@ -129,6 +129,24 @@ export default function Layout() {
             )}
           </div>
 
+          
+          {/* SYSTEM */}
+          <div>
+            <button
+              onClick={() => toggleMenu("report")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Report
+            </button>
+
+            {openMenu === "report" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/purchasereport" className={submenuClass}>Purchase Report</Link>
+                <Link to="/salesreport" className={submenuClass}>Sales Report</Link>
+              </div>
+            )}
+          </div>
+
         </nav>
       </aside>
 
