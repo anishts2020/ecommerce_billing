@@ -133,10 +133,31 @@ export default function CouponUserView() {
   const closeAlert = () =>
     setAlertState({ isOpen: false, title: "", message: "", type: "success", actionToRun: null });
 
+  // UPDATED handleAlertConfirm — runs actionToRun (if present) and DOES NOT auto-close afterward.
   const handleAlertConfirm = async () => {
+    // If this is a confirm/delete-confirm and there is an action, run it.
+    // Do NOT auto-close afterward so the actionToRun can show a success/error alert that remains visible.
     if ((alertState.type === "confirm" || alertState.type === "delete-confirm") && alertState.actionToRun) {
-      await alertState.actionToRun();
+      // Capture and clear actionToRun to avoid accidental re-run
+      const action = alertState.actionToRun;
+      setAlertState((s) => ({ ...s, actionToRun: null }));
+      try {
+        await action();
+      } catch (err) {
+        // If action throws, show an error alert (safety net)
+        setAlertState({
+          isOpen: true,
+          title: "Action failed",
+          message: err?.response?.data?.message || err?.message || "Something went wrong.",
+          type: "error",
+          actionToRun: null,
+        });
+      }
+      // Do not auto-close here — allow success/error alert from action to be visible.
+      return;
     }
+
+    // For non-confirm alerts (e.g. success / error with no action), just close when confirm clicked
     closeAlert();
   };
 
@@ -215,6 +236,7 @@ export default function CouponUserView() {
         try {
           await axios.delete(`http://127.0.0.1:8000/api/coupon-users/${id}`);
           await fetchCouponUsers();
+          // Show success alert (this will remain visible until user closes it)
           setAlertState({ isOpen: true, title: "Deleted", message: "Coupon user deleted successfully.", type: "success", actionToRun: null });
         } catch (err) {
           setAlertState({ isOpen: true, title: "Delete failed", message: err.response?.data?.message || err.message, type: "error", actionToRun: null });
@@ -451,7 +473,6 @@ export default function CouponUserView() {
               </div>
               <div>
                 <label className="font-medium">Select User</label>
-                {/* FIXED: classClassName -> className ; option values coerced to string */}
                 <select className="border p-2 w-full rounded mb-3"
                   value={form.user_id}
                   onChange={(e) => setForm({ ...form, user_id: e.target.value })}
