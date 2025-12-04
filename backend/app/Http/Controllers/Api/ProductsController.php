@@ -48,7 +48,7 @@ class ProductsController extends Controller
     if ($request->hasFile('product_image')) {
         $file = $request->file('product_image');
         $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads/products'), $filename);
+        $file->move(public_path('product_images'), $filename);
         $validated['product_image'] = $filename;
     }
 
@@ -111,11 +111,11 @@ class ProductsController extends Controller
     if ($request->hasFile('product_image')) {
         $file = $request->file('product_image');
         $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads/products'), $filename);
+        $file->move(public_path('product_images'), $filename);
 
         // OPTIONAL: delete old image
-        if ($product->product_image && file_exists(public_path('uploads/products/' . $product->product_image))) {
-            unlink(public_path('uploads/products/' . $product->product_image));
+        if ($product->product_image && file_exists(public_path('product_images' . $product->product_image))) {
+            unlink(public_path('product_images/' . $product->product_image));
         }
 
         $validated['product_image'] = $filename;

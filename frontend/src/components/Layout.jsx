@@ -10,7 +10,6 @@ export default function Layout() {
     navigate("/login");
   };
 
-  
   // Track which menu is expanded
   const [openMenu, setOpenMenu] = useState(null);
 
@@ -79,6 +78,23 @@ export default function Layout() {
             )}
           </div>
 
+          {/* COUPONS AND DISCOUNT */}
+          <div>
+            <button
+              onClick={() => toggleMenu("coupons")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupons and Discount
+            </button>
+
+            {openMenu === "coupons" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-master" className={submenuClass}>Coupon Master</Link>
+                <Link to="/coupon-user" className={submenuClass}>Coupon User</Link>
+              </div>
+            )}
+          </div>
+
           {/* PURCHASE */}
           <div>
             <button
@@ -128,6 +144,26 @@ export default function Layout() {
               </div>
             )}
           </div>
+          {/* REPORT */}
+          
+          {/* SYSTEM */}
+          <div>
+            <button
+              onClick={() => toggleMenu("report")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Report
+            </button>
+
+            {openMenu === "report" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/purchasereport" className={submenuClass}>Purchase Report</Link>
+                
+                <Link to="/salesreport" className={submenuClass}>Sales Report</Link>
+              </div>
+            )}
+          </div>
+
         </nav>
       </aside>
 
@@ -137,9 +173,7 @@ export default function Layout() {
         {/* TOP HEADER */}
         <div className="admin-header">
 
-
-
-        <header className="h-14 flex items-center justify-between px-6 sticky top-0 z-20"
+          <header className="h-14 flex items-center justify-between px-6 sticky top-0 z-20"
             style={{ backgroundColor: "#003366" }}>
 
             <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
@@ -160,7 +194,7 @@ export default function Layout() {
 
         {/* FOOTER */}
         <footer className="bg-[#003366] text-white text-center text-sm py-2 shadow-inner">
-        © {new Date().getFullYear()} sita softwares — All rights reserved.
+          © {new Date().getFullYear()} sita softwares — All rights reserved.
         </footer>
 
       </div>
