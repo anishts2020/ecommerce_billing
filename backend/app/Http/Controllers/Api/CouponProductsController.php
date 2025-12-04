@@ -11,7 +11,10 @@ class CouponProductsController extends Controller
     // LIST ALL
     public function index()
     {
-        return CouponProducts::with(['coupon', 'product'])->get();
+        return CouponProducts::with(['coupon', 'product'])
+            ->whereHas('coupon')
+            ->whereHas('product')
+            ->get();
     }
 
     // ADD

@@ -149,7 +149,7 @@ public function getStitchingForInvoice($invoice_id)
             'invoice' => $invoice
         ], 201);
     }
-    }
+    
 
     public function monthlySummary()
 {

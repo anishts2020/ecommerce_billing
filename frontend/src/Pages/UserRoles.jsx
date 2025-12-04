@@ -58,8 +58,12 @@ function UserRoles() {
         axios.get("http://localhost:8000/api/users"),
         axios.get("http://localhost:8000/api/roles"),
       ]);
-      setUserRoles(urRes.data);
-      setFiltered(urRes.data);
+      const validData = urRes.data.filter(
+        (item) => item.user !== null && item.role !== null
+      );
+
+      setUserRoles(validData);
+      setFiltered(validData);
       setUsers(uRes.data);
       setRoles(rRes.data);
     } catch (err) {

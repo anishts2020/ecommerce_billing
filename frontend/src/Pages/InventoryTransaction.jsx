@@ -192,15 +192,18 @@ export default function InventoryTransaction() {
     });
   };
 
+  const validTransactions = transactions.filter(
+    (tr) =>
+      tr.product_name
+  );
+
   // -----------------------------
   // SEARCH FILTER (FIXED)
   // -----------------------------
-  const filteredData = transactions.filter((tr) => {
+  const filteredData = validTransactions.filter((tr) => {
     const s = search.toLowerCase();
     return (
       tr.product_name?.toLowerCase().includes(s) ||
-      tr.transaction_type_name?.toLowerCase().includes(s) ||
-      tr.reference_name?.toLowerCase().includes(s) ||
       tr.remarks?.toLowerCase().includes(s)
     );
   });

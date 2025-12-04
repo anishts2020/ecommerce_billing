@@ -307,6 +307,9 @@ export default function Dashboard() {
                     </td>
                   </tr>
                 ))}
+                <tr>
+                    <td colSpan="3" className="text-center p-4 text-gray-500">No Revenue Today</td>
+                  </tr>
               </tbody>
             </table>
 
