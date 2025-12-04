@@ -12,6 +12,7 @@ export default function Layout() {
 
   // Track which menu is expanded
   const [openMenu, setOpenMenu] = useState(null);
+  const [pageModalOpen, setPageModalOpen] = useState(false);
 
   const toggleMenu = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
@@ -82,6 +83,7 @@ export default function Layout() {
                 <Link to="/vendors" className={submenuClass}>Vendors</Link>
                 <Link to="/customers" className={submenuClass}>Customers</Link>
                 <Link to="/employees" className={submenuClass}>Employees</Link>
+                <Link to="/stiching" className={submenuClass}>Stiching</Link>
               </div>
             )}
           </div>

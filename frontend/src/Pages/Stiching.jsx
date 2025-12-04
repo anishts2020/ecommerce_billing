@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 
 //
 // ------------------------------------------------------------
-// SVG ICONS (CLEAN - ONE TIME ONLY)
+// SVG ICONS
 // ------------------------------------------------------------
 const CheckCircleIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,7 +26,7 @@ const AlertTriangleIcon = (props) => (
 
 //
 // ------------------------------------------------------------
-// CUSTOM ALERT COMPONENT (FIXED AND CLEAN)
+// CUSTOM ALERT COMPONENT
 // ------------------------------------------------------------
 const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   if (!isOpen) return null;
@@ -60,7 +60,8 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+
       <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm text-center">
         <div className="mb-4 flex justify-center">{icon}</div>
 
@@ -91,28 +92,48 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
 
 //
 // ------------------------------------------------------------
-// CUSTOMER COMPONENT
+// MAIN COMPONENT
 // ------------------------------------------------------------
-function Customer() {
-  const [customers, setCustomers] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+function StichingTypes() {
+  const [types, setTypes] = useState([]);
+  const [name, setName] = useState("");
+  const [rate, setRate] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const emptyForm = {
-    customer_name: "",
-    phone: "",
-    email: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-    gst_number: "",
+  const [showModal, setShowModal] = useState(false);
+
+  const [alert, setAlert] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "",
+    onConfirm: () => setAlert((a) => ({ ...a, isOpen: false })),
+    onClose: () => setAlert((a) => ({ ...a, isOpen: false })),
+  });
+
+  const API_URL = "http://localhost:8000/api/stiching-types";
+
+  // FETCH
+  const fetchTypes = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setTypes(res.data);
+    } catch (err) {
+      setAlert({
+        isOpen: true,
+        title: "Error",
+        message: "Could not load stitching types.",
+        type: "error",
+      });
+    }
   };
 
-  const [formData, setFormData] = useState(emptyForm);
-  
+  useEffect(() => {
+    fetchTypes();
+  }, []);
 
+  // HIDE ADMIN HEADER WHEN MODAL OPENS
   useEffect(() => {
     if (showModal) {
       document.body.classList.add("hide-admin-header");
@@ -121,121 +142,93 @@ function Customer() {
     }
   }, [showModal]);
 
-
-
-  const [alert, setAlert] = useState({
-    isOpen: false,
-    title: "",
-    message: "",
-    type: "",
-    onConfirm: () => setAlert(a => ({ ...a, isOpen: false })),
-    onClose: () => setAlert(a => ({ ...a, isOpen: false })),
-  });
-
-  // Load customers
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  const fetchCustomers = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/api/customers");
-      setCustomers(res.data);
-    } catch (err) {
-      setAlert({
-        isOpen: true,
-        title: "Error",
-        message: "Could not load customers.",
-        type: "error",
-        onConfirm: () => setAlert(a => ({ ...a, isOpen: false })),
-      });
-    }
-  };
-
   const openAddModal = () => {
-    setFormData(emptyForm);
     setEditingId(null);
+    setName("");
+    setRate("");
     setShowModal(true);
   };
 
-  const openEditModal = (c) => {
-    setEditingId(c.id);
-    setFormData(c);
+  const openEditModal = (item) => {
+    setEditingId(item.stiching_type_id);
+    setName(item.name);
+    setRate(item.rate);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setEditingId(null);
-    setFormData(emptyForm);
   };
 
-  const handleSave = async (e) => {
+  // SAVE
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url = editingId
-      ? `http://localhost:8000/api/customers/${editingId}`
-      : "http://localhost:8000/api/customers";
+    const data = { name, rate };
 
     try {
-      editingId
-        ? await axios.put(url, formData)
-        : await axios.post(url, formData);
+      if (editingId) {
+        await axios.put(`${API_URL}/${editingId}`, data);
+      } else {
+        await axios.post(API_URL, data);
+      }
 
       closeModal();
-
       setAlert({
         isOpen: true,
         title: "Success",
-        message: `Customer ${editingId ? "updated" : "added"} successfully!`,
+        message: editingId ? "Stiching type updated!" : "Stiching type added!",
         type: "success",
         onConfirm: () => {
-          setAlert(a => ({ ...a, isOpen: false }));
-          fetchCustomers();
-        },
-      });
-    } catch (error) {
-      setAlert({
-        isOpen: true,
-        title: "Error",
-        message: `Failed to save customer.`,
-        type: "error",
-      });
-    }
-  };
-
-  const confirmDelete = (id) => {
-    setAlert({
-      isOpen: true,
-      title: "Delete Customer?",
-      message: "This action cannot be undone.",
-      type: "confirm",
-      onConfirm: () => handleDelete(id),
-      onClose: () => setAlert(a => ({ ...a, isOpen: false })),
-    });
-  };
-
-  const handleDelete = async (id) => {
-    setAlert(a => ({ ...a, isOpen: false }));
-
-    try {
-      await axios.delete(`http://localhost:8000/api/customers/${id}`);
-
-      setAlert({
-        isOpen: true,
-        title: "Deleted",
-        message: "Customer removed successfully.",
-        type: "success",
-        onConfirm: () => {
-          setAlert(a => ({ ...a, isOpen: false }));
-          fetchCustomers();
+          setAlert((a) => ({ ...a, isOpen: false }));
+          fetchTypes();
         },
       });
     } catch (err) {
       setAlert({
         isOpen: true,
         title: "Error",
-        message: "Failed to delete customer.",
+        message: "Failed to save stitching type.",
+        type: "error",
+      });
+    }
+  };
+
+  // CONFIRM DELETE
+  const confirmDelete = (id) => {
+    setAlert({
+      isOpen: true,
+      title: "Delete?",
+      message: "This action cannot be undone.",
+      type: "confirm",
+      onConfirm: () => handleDelete(id),
+      onClose: () => setAlert((a) => ({ ...a, isOpen: false })),
+    });
+  };
+
+  // DELETE
+  const handleDelete = async (id) => {
+    setAlert((a) => ({ ...a, isOpen: false }));
+
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+
+      setAlert({
+        isOpen: true,
+        title: "Deleted",
+        message: "Stiching type removed successfully.",
+        type: "success",
+        onConfirm: () => {
+          setAlert((a) => ({ ...a, isOpen: false }));
+          fetchTypes();
+        },
+      });
+    } catch (err) {
+      setAlert({
+        isOpen: true,
+        title: "Error",
+        message: "Failed to delete.",
         type: "error",
       });
     }
@@ -243,18 +236,18 @@ function Customer() {
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-lg mb-6">
-          <h1 className="text-3xl font-extrabold text-indigo-700">
-            👥 Customer Management
+        <div className="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl shadow-lg mb-6">
+          <h1 className="text-3xl font-extrabold text-indigo-700 flex items-center gap-2">
+            🧵 Stiching Types
           </h1>
 
           <input
             type="text"
-            placeholder="Search customer..."
-            className="w-60 px-3 py-2 border rounded-full"
+            placeholder="Search..."
+            className="px-4 py-2 border rounded-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -263,46 +256,44 @@ function Customer() {
             onClick={openAddModal}
             className="bg-indigo-600 text-white px-5 py-2 rounded-full flex items-center gap-2 hover:bg-indigo-700"
           >
-            <FaPlus /> Add Customer
+            <FaPlus /> Add Stiching Type
           </button>
         </div>
 
-        {/* CUSTOMER TABLE */}
+        {/* TABLE */}
         <div className="overflow-x-auto shadow-xl rounded-xl">
           <table className="w-full bg-white">
             <thead>
               <tr className="bg-indigo-600 text-white text-sm">
                 <th className="p-3 text-left">ID</th>
                 <th className="p-3 text-left">Name</th>
-                <th className="p-3 text-left">Phone</th>
-                <th className="p-3 text-left">Email</th>
-                <th className="p-3 text-left">City</th>
+                <th className="p-3 text-left">Rate</th>
                 <th className="p-3 text-center">Edit</th>
                 <th className="p-3 text-center">Delete</th>
               </tr>
             </thead>
 
             <tbody>
-              {customers
-                .filter(c => c.customer_name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .map(c => (
-                  <tr key={c.id} className="border-b hover:bg-indigo-50">
-                    <td className="p-3">{c.id}</td>
-                    <td className="p-3 font-semibold">{c.customer_name}</td>
-                    <td className="p-3">{c.phone}</td>
-                    <td className="p-3">{c.email}</td>
-                    <td className="p-3">{c.city}</td>
+              {types
+                .filter((t) => t.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .map((item) => (
+                  <tr key={item.stiching_type_id} className="border-b hover:bg-indigo-50">
+                    <td className="p-3">{item.stiching_type_id}</td>
+                    <td className="p-3 font-semibold">{item.name}</td>
+                    <td className="p-3">{item.rate}</td>
+
                     <td className="p-3 text-center">
                       <button
-                        onClick={() => openEditModal(c)}
+                        onClick={() => openEditModal(item)}
                         className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full"
                       >
                         <FaEdit />
                       </button>
                     </td>
+
                     <td className="p-3 text-center">
                       <button
-                        onClick={() => confirmDelete(c.id)}
+                        onClick={() => confirmDelete(item.stiching_type_id)}
                         className="text-red-600 hover:bg-red-100 p-2 rounded-full"
                       >
                         <FaTrash />
@@ -314,103 +305,41 @@ function Customer() {
           </table>
         </div>
 
-        {/* CUSTOMER FORM MODAL */}
+        {/* MODAL */}
         {showModal && (
-          <div className="fixed inset-0 z-40 bg-white-300 bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center p-4">
 
-
-            <div className="bg-white rounded-xl p-6 w-full max-w-2xl shadow-2xl">
+            <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl">
 
               <div className="flex justify-between items-center border-b pb-3 mb-4">
                 <h2 className="text-xl font-bold text-indigo-700">
-                  {editingId ? "Edit Customer" : "Add Customer"}
+                  {editingId ? "Edit Stiching Type" : "Add Stiching Type"}
                 </h2>
                 <button onClick={closeModal} className="text-gray-500 hover:text-red-500">
                   <FaTimes size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                   type="text"
-                  name="customer_name"
-                  placeholder="Name"
-                  value={formData.customer_name}
-                  onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
-                  className="p-3 border rounded-lg"
+                  placeholder="Stiching Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
                   required
                 />
 
                 <input
                   type="text"
-                  name="phone"
-                  placeholder="Phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="p-3 border rounded-lg"
+                  placeholder="Rate"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
                   required
                 />
 
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="p-3 border rounded-lg"
-                  required
-                />
-
-                <input
-                  type="text"
-                  name="gst_number"
-                  placeholder="GST Number"
-                  value={formData.gst_number}
-                  onChange={(e) => setFormData({ ...formData, gst_number: e.target.value })}
-                  className="p-3 border rounded-lg"
-                />
-
-                <input
-                  type="text"
-                  name="address"
-                  placeholder="Address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="p-3 border rounded-lg sm:col-span-2"
-                  required
-                />
-
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="City"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="p-3 border rounded-lg"
-                  required
-                />
-
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  className="p-3 border rounded-lg"
-                  required
-                />
-
-                <input
-                  type="text"
-                  name="pincode"
-                  placeholder="Pincode"
-                  value={formData.pincode}
-                  onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
-                  className="p-3 border rounded-lg sm:col-span-2"
-                  required
-                />
-
-                <div className="sm:col-span-2 flex justify-end gap-4 pt-4">
+                <div className="flex justify-end gap-4 pt-4">
                   <button
                     type="button"
                     onClick={closeModal}
@@ -447,4 +376,4 @@ function Customer() {
   );
 }
 
-export default Customer;
+export default StichingTypes;
