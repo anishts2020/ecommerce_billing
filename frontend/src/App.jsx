@@ -50,6 +50,9 @@ import SalesReport from "./Pages/SalesReport"
 import InventoryTransactions from "./Pages/InventoryTransaction";
 import CouponMaster from "./Pages/CouponMaster";
 
+import PurchaseReport from "./Pages/PurchaseReport";
+
+
 
 export default function App() {
   return (
@@ -113,6 +116,10 @@ export default function App() {
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
           {/* Coupons and Discount */}
           <Route path="/coupon-master" element={<CouponMaster />} />
+
+             {/* REPORT */}
+          <Route path="/purchasereport" element={<PurchaseReport />} />
+          
 
         </Route>
 

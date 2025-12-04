@@ -129,6 +129,7 @@ export default function Layout() {
             )}
           </div>
 
+          {/* REPORT */}
           
           {/* SYSTEM */}
           <div>
@@ -142,6 +143,7 @@ export default function Layout() {
             {openMenu === "report" && (
               <div className="ml-5 mt-1 space-y-1">
                 <Link to="/purchasereport" className={submenuClass}>Purchase Report</Link>
+                
                 <Link to="/salesreport" className={submenuClass}>Sales Report</Link>
               </div>
             )}
