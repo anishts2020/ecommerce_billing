@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_types', function (Blueprint $table) {
-            $table->id('product_type_id');
-             $table->string('product_type_name', 100);  // varchar(100)
-            $table->string('description', 255)->nullable(); // varchar(255)
-            $table->tinyInteger('is_active')->default(1); // tinyint(1) default active
+        Schema::create('stiching_types', function (Blueprint $table) {
+            $table->id('stiching_type_id');
+            $table->string('name');        // alteration, lining, etc.
+        $table->decimal('rate', 10, 2);
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_types');
+        Schema::dropIfExists('stiching_types');
     }
 };

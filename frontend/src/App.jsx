@@ -21,6 +21,8 @@ import CustomerDetailsForm from "./Pages/CustomerDetailsForm";
 import Salesinvoice from "./Pages/Salesinvoice";
 import SalesinvoiceList from "./Pages/SalesinvoiceList";
 import SalesInvoiceItems from "./Pages/SalesInvoiceItems";
+import Stiching from "./Pages/Stiching";
+import SalesInvoiceStitchingList from "./Pages/SalesInvoiceStichingList"
 
 /* PRODUCTS */
 import Materials from "./Pages/Materials";
@@ -42,12 +44,23 @@ import PurchaseInvoice from "./Pages/PurchaseInvoice";
 import PurchaseinvoiceList from "./Pages/PurchaseInvoiceList";
 import PurchaseInvoiceItems from "./Pages/PurchaseInvoiceItems";
 
+/* PURCHASE AND SALES REPORT */
+
+import SalesReport from "./Pages/SalesReport"
+
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
+import SalesChart from "./Pages/SalesChart";
+import MonthlyCategoryPieChart from "./Pages/MonthlyCategoryPieChart";
+import ProfitLineChart from "./Pages/ProfitLineChart";
+import PurchaseChart from "./Pages/PurchaseChart";
+import CouponMaster from "./Pages/CouponMaster";
 
 import PurchaseReport from "./Pages/PurchaseReport";
 
 
+/* Coupons & Discounts */
+import CouponProducts from "./Pages/CouponProducts";
 
 export default function App() {
   return (
@@ -81,6 +94,9 @@ export default function App() {
           <Route path="/sales-invoice" element={<Salesinvoice />} />
           <Route path="/salesinvoice_list" element={<SalesinvoiceList />} />
           <Route path="/sales-invoice-items/:id" element={<SalesInvoiceItems />} />
+          <Route path="/stiching" element={<Stiching />} />
+           <Route path="/sales-invoice/:invoice_id/stitching-items" element={<SalesInvoiceStitchingList />} />
+
 
           {/* PRODUCT MANAGEMENT */}
           <Route path="/product-categories" element={<ProductCategories />} />
@@ -97,18 +113,30 @@ export default function App() {
           <Route path="/createroles" element={<Roles />} />
           <Route path="/createuserroles" element={<UserRoles />} />
           <Route path="/createuser" element={<CreateUser />} />
-
+          <Route path="/saleschart" element={<SalesChart/>} />
+          <Route path="/productcategorychart" element={<MonthlyCategoryPieChart/>} />
+          <Route path="/productprofitbymonth" element={<ProfitLineChart/>} />
+          <Route path="/purchaseChart" element={<PurchaseChart/>} />
           {/* PURCHASE */}
           <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
-           <Route path="/purchase_list" element={<PurchaseinvoiceList />} />
-             <Route path="/purchase-invoice-items/:id" element={<PurchaseInvoiceItems />} />
+          <Route path="/purchase_list" element={<PurchaseinvoiceList />} />
+          <Route path="/purchase-invoice-items/:id" element={<PurchaseInvoiceItems />} />
+
+           {/* Purchase & Roles Report */}
+           <Route path="/salesreport" element={<SalesReport />} />
+          
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+          {/* Coupons and Discount */}
+          <Route path="/coupon-master" element={<CouponMaster />} />
 
              {/* REPORT */}
           <Route path="/purchasereport" element={<PurchaseReport />} />
           
+
+          {/* Coupens & Discounts */}
+          <Route path="/coupon-products" element={<CouponProducts />} />
 
         </Route>
 
