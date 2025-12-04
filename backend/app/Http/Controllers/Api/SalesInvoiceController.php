@@ -150,3 +150,30 @@ public function getStitchingForInvoice($invoice_id)
         ], 201);
     }
     }
+
+    public function monthlySummary()
+{
+    $data = \DB::table('sales_invoices')
+        ->selectRaw("DATE_FORMAT(invoice_date, '%Y-%m') as month, SUM(net_total) as total")
+        ->groupBy('month')
+        ->orderBy('month', 'ASC')
+        ->get();
+
+    return response()->json($data);
+}
+
+public function monthlySummaryByYear($year)
+{
+    $data = \DB::table('sales_invoices')
+        ->selectRaw("DATE_FORMAT(invoice_date, '%Y-%m') as month, SUM(net_total) as total")
+        ->whereYear('invoice_date', $year)
+        ->groupBy('month')
+        ->orderBy('month', 'ASC')
+        ->get();
+
+    return response()->json($data);
+}
+
+
+
+}

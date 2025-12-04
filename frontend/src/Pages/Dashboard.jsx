@@ -61,7 +61,7 @@ export default function Dashboard() {
           {/* Purchase */}
           <div
             className={cardClass}
-            onClick={() => navigate("/purchase-invoice-items")}
+            onClick={() => navigate("/purchase-invoice")}
           >
             <ShoppingCartIcon className={iconClass} />
             <div>
@@ -135,7 +135,6 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
 

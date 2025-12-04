@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function Roles() {
   const [form, setForm] = useState({ name: "", description: "" });
@@ -131,35 +132,45 @@ export default function Roles() {
   const totalPages = Math.ceil(filtered.length / pageSize);
 
   const paginated = filtered.slice(
-    (currentPage - 1) * pageSize,
+    (currentPage*pageSize) - pageSize,
     currentPage * pageSize
   );
-
+  useEffect(() => {
+  if (currentPage > 1 && paginated.length === 0) {
+    setCurrentPage(currentPage - 1);
+  }
+}, [roles, filtered, paginated]);
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
   return (
     <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+      <div className="w-full max-w-4xl rounded-lg shadow-lg p-6">
         {/* Heading + Search Bar */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">Manage Roles</h1>
+        
+        <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-lg mb-6">
+          
+          {/* Title Area - Updated title and style */}
+          <h1 className="text-3xl font-extrabold text-indigo-700">👤 Roles</h1> 
+          
+          {/* Search and Add Button Area */}
+          <div className="flex items-center gap-4">
+            
+            {/* Search Bar - Updated styling */}
+            <input
+              type="text"
+              placeholder="Search role..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border p-2 w-64 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
 
-          <input
-            type="text"
-            placeholder="Search roles..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="border p-2 rounded w-64 shadow-sm"
-          />
-        </div>
-
-        <div className="flex justify-center mb-4">
-          <button
+            {/* Add Button - Updated styling */}
+            <button
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             onClick={() => {
               setForm({ name: "", description: "" });
@@ -169,130 +180,160 @@ export default function Roles() {
           >
             Add Role
           </button>
+          </div>
         </div>
 
-        <table className="w-full border-collapse bg-white">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">ID</th>
-              <th className="border p-2">Role Name</th>
-              <th className="border p-2">Description</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.length > 0 ? (
-              paginated.map((role, index) => (
-                <tr key={role.id} className="hover:bg-gray-100 transition">
-                  <td className="border p-2 text-center">
-                    {(currentPage - 1) * pageSize + index + 1}
-                  </td>
-                  <td className="border p-2">{role.name}</td>
-                  <td className="border p-2">{role.description}</td>
-                  <td className="border p-2 flex gap-2 justify-center">
-                    <button
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                      onClick={() => handleEdit(role)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                      onClick={() => {
-                        setDeleteId(role.id);
-                        setShowDeleteModal(true);
-                      }}
-                    >
-                      Delete
-                    </button>
+        <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md">          <table className="min-w-full text-sm">
+            <thead className="bg-indigo-600 text-white">
+              <tr>
+                <th className="px-6 py-3 text-left font-semibold tracking-wide">SI No</th>
+                <th className="px-6 py-3 text-left font-semibold tracking-wide">
+                  Role Name
+                </th>
+                <th className="px-6 py-3 text-left font-semibold tracking-wide">
+                  Description
+                </th>
+                <th className="px-6 py-3 text-center font-semibold tracking-wide">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginated.length > 0 ? (
+                paginated.map((role, index) => (
+                  <tr key={role.id} className="hover:bg-gray-100 transition border-b border-gray-200">
+                    <td className="px-6 py-3 text-center border-r border-gray-200">
+                      {(currentPage - 1) * pageSize + index + 1}
+                    </td>
+                    <td className="px-6 py-3 border-r border-gray-200">{role.name}</td>
+                    <td className="px-6 py-3 border-r border-gray-200">{role.description}</td>
+                    <td className="px-6 py-3 flex gap-2 justify-center">
+                      <button
+                        className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition duration-150"
+                        title="Edit"
+                        onClick={() => handleEdit(role)}
+                      >
+                        <FaEdit className="w-5 h-5"/>
+                      </button>
+                      <button
+                        className="text-red-600 hover:bg-red-100 p-2 rounded-full transition duration-150"
+                        title="Delete"
+                        onClick={() => {
+                          setDeleteId(role.id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        <FaTrash className="w-5 h-5"/>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="text-center py-3 text-gray-500 border" colSpan="4">
+                    No roles found
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="text-center py-3 text-gray-500 border" colSpan="4">
-                  No roles found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+
         {/* Pagination */}
+        {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-4">
-          <button
+            <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-3 py-1 rounded border ${
-              currentPage === 1 ? "opacity-50" : ""
-            }`}
-          >
-            Prev
-          </button>
-
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goToPage(i + 1)}
-              className={`px-3 py-1 rounded border ${
-                currentPage === i + 1 ? "bg-blue-600 text-white" : ""
-              }`}
+            className={`px-3 py-1 border rounded disabled:opacity-50`}
             >
-              {i + 1}
+            Prev
             </button>
-          ))}
 
-          <button
+            {[...Array(totalPages)].map((_, i) => (
+            <button
+                key={i}
+                onClick={() => goToPage(i + 1)}
+                className={`px-3 py-1 rounded-lg ${
+                currentPage === i + 1 ? "bg-blue-600 text-white" : ""
+                }`}
+            >
+                {i + 1}
+            </button>
+            ))}
+
+            <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded border ${
-              currentPage === totalPages ? "opacity-50" : ""
-            }`}
-          >
+            className={`px-3 py-1 border rounded disabled:opacity-50`}
+            >
             Next
-          </button>
+            </button>
         </div>
+        )}
       </div>
 
       {/* ADD/EDIT FORM MODAL */}
       {showModal && (
-        <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white w-96 p-6 rounded-xl shadow-xl">
-            <h2 className="text-xl font-bold text-center mb-4">
-              {editingId ? "Update Role" : "Create Role"}
-            </h2>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 animate-fadeIn">
 
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Enter Role Name"
-                className="w-full p-2 mb-3 border rounded"
-                required
-              />
+            {/* Header */}
+            <div className="flex justify-between items-center pb-3 border-b">
+              <h2 className="text-xl font-semibold text-gray-800">
+                {editingId ? "Update Role" : "Create Role"}
+              </h2>
+            </div>
 
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                rows="3"
-                placeholder="Enter Description"
-                className="w-full p-2 mb-4 border rounded"
-                required
-              />
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="mt-5">
 
-              <div className="flex gap-3">
+              {/* Role Name */}
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Role Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Enter role name"
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  placeholder="Enter description"
+                  required
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
-                  className="w-full bg-gray-500 text-white py-2 rounded"
                   onClick={() => setShowModal(false)}
+                  className="px-5 py-2 rounded-full border bg-gray-200 hover:bg-gray-300 text-gray-700"
                 >
-                  Cancel
+                  Close
                 </button>
+
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-2 rounded"
+                  className="px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow"
                 >
                   {editingId ? "Update" : "Save"}
                 </button>
@@ -301,6 +342,7 @@ export default function Roles() {
           </div>
         </div>
       )}
+
 
       {/* DELETE CONFIRM MODAL */}
       {showDeleteModal && (
