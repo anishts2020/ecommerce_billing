@@ -149,7 +149,7 @@ export default function Layout() {
                   Purchase Invoice List
                 </Link>
                 <Link to="/inventory-transactions" className={submenuClass}>
-                  Inventory
+                  Inventory Transaction
                 </Link>
               </div>
             )}

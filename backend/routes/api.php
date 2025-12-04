@@ -205,9 +205,12 @@ Route::apiResource('reference', ReferenceController::class);
 | COUPONS (Your choice: KEEP ALL)
 |--------------------------------------------------------------------------
 */
-
-Route::get('/coupons', [CouponMasterController::class, 'index']);
-Route::get('/coupons-list', [CouponMasterController::class, 'listAll']);
+Route::get('/coupons', [CouponMasterController::class, 'index']);          
+Route::post('/coupons', [CouponMasterController::class, 'store']);          
+Route::get('/coupons/{couponMaster}', [CouponMasterController::class, 'show']); 
+Route::put('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::patch('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::delete('/coupons/{couponMaster}', [CouponMasterController::class, 'destroy']);
 
 Route::apiResource('coupon', CouponMasterController::class);
 
@@ -219,6 +222,8 @@ Route::put('/coupon-categories/{id}', [CouponCategoryController::class, 'update'
 Route::delete('/coupon-categories/{id}', [CouponCategoryController::class, 'destroy']);
 
 Route::apiResource('coupon-users', CouponUserController::class);
+
+
 
 /*
 |--------------------------------------------------------------------------

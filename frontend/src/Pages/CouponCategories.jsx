@@ -99,40 +99,34 @@ export default function CouponCategory() {
   const [form, setForm] = useState({ coupon_id: "", category_id: "" });
   const [editData, setEditData] = useState(null);
   const [alert, setAlert] = useState({ isOpen: false, title: "", message: "", type: "", onConfirm: () => {}, onClose: () => {} });
+  const [searchTerm, setSearchTerm] = useState(""); // <-- search term
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const totalPages = Math.ceil(list.length / itemsPerPage);
+  const filteredList = list.filter((item) => {
+    const code = item?.coupon_code?.toLowerCase() || "";
+    const category = item?.product_category_name?.toLowerCase() || "";
+    const search = searchTerm.toLowerCase();
+  
+    return code.includes(search) || category.includes(search);
+  });
+  
+
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = list.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredList.slice(indexOfFirstItem, indexOfLastItem);
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  // Fetch product categories
-  useEffect(() => {
-    axios.get("http://localhost:8000/api/product-categories")
-      .then(res => setCategories(res.data))
-      .catch(err => console.error(err));
-  }, []);
-
-  // Fetch coupons
-  useEffect(() => {
-    axios.get("http://localhost:8000/api/coupons")
-      .then(res => setCoupons(res.data.data))
-      .catch(err => console.error(err));
-  }, []);
-
-  // Fetch list
-  const loadList = () => {
-    axios.get("http://localhost:8000/api/coupon-categories")
-      .then(res => setList(res.data.data))
-      .catch(err => console.error(err));
-  };
+  // Fetch data
+  useEffect(() => { axios.get("http://localhost:8000/api/product-categories").then(res => setCategories(res.data)).catch(err => console.error(err)); }, []);
+  useEffect(() => { axios.get("http://localhost:8000/api/coupons").then(res => setCoupons(res.data.data)).catch(err => console.error(err)); }, []);
+  const loadList = () => { axios.get("http://localhost:8000/api/coupon-categories").then(res => setList(res.data.data)).catch(err => console.error(err)); };
   useEffect(() => { loadList(); }, []);
 
   // Add mapping
@@ -141,59 +135,23 @@ export default function CouponCategory() {
     try {
       await axios.post("http://localhost:8000/api/coupon-categories", form);
       setForm({ coupon_id: "", category_id: "" });
-      setAlert({
-        isOpen: true,
-        title: "Success",
-        message: "Mapping added successfully",
-        type: "success",
-        onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); },
-        onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); }
-      });
+      setAlert({ isOpen: true, title: "Success", message: "Added successfully", type: "success", onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); }, onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); } });
     } catch (err) {
-      setAlert({
-        isOpen: true,
-        title: "Error",
-        message: err.response?.data?.message || "Failed to add mapping",
-        type: "error",
-        onConfirm: () => setAlert({ ...alert, isOpen: false }),
-        onClose: () => setAlert({ ...alert, isOpen: false })
-      });
+      setAlert({ isOpen: true, title: "Error", message: err.response?.data?.message || "Failed to add mapping", type: "error", onConfirm: () => setAlert({ ...alert, isOpen: false }), onClose: () => setAlert({ ...alert, isOpen: false }) });
     }
   };
 
   // Delete mapping
   const handleDeleteConfirmation = (id) => {
-    setAlert({
-      isOpen: true,
-      title: "Confirm Deletion",
-      message: "Are you sure you want to delete?",
-      type: "confirm",
-      onConfirm: () => handleDelete(id),
-      onClose: () => setAlert({ ...alert, isOpen: false })
-    });
+    setAlert({ isOpen: true, title: "Confirm Deletion", message: "Are you sure you want to delete?", type: "confirm", onConfirm: () => handleDelete(id), onClose: () => setAlert({ ...alert, isOpen: false }) });
   };
-
   const handleDelete = async (id) => {
     setAlert({ ...alert, isOpen: false });
     try {
       await axios.delete(`http://localhost:8000/api/coupon-categories/${id}`);
-      setAlert({
-        isOpen: true,
-        title: "Deleted",
-        message: "Removed successfully",
-        type: "success",
-        onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); },
-        onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); }
-      });
+      setAlert({ isOpen: true, title: "Deleted", message: "Removed successfully", type: "success", onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); }, onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); } });
     } catch (err) {
-      setAlert({
-        isOpen: true,
-        title: "Error",
-        message: "Failed to delete",
-        type: "error",
-        onConfirm: () => setAlert({ ...alert, isOpen: false }),
-        onClose: () => setAlert({ ...alert, isOpen: false })
-      });
+      setAlert({ isOpen: true, title: "Error", message: "Failed to delete", type: "error", onConfirm: () => setAlert({ ...alert, isOpen: false }), onClose: () => setAlert({ ...alert, isOpen: false }) });
     }
   };
 
@@ -202,23 +160,9 @@ export default function CouponCategory() {
     try {
       await axios.put(`http://localhost:8000/api/coupon-categories/${editData.id}`, editData);
       setEditData(null);
-      setAlert({
-        isOpen: true,
-        title: "Updated",
-        message: "Updated successfully",
-        type: "success",
-        onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); },
-        onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); }
-      });
+      setAlert({ isOpen: true, title: "Updated", message: "Updated successfully", type: "success", onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); }, onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); } });
     } catch (err) {
-      setAlert({
-        isOpen: true,
-        title: "Error",
-        message: err.response?.data?.message || "Failed to update",
-        type: "error",
-        onConfirm: () => setAlert({ ...alert, isOpen: false }),
-        onClose: () => setAlert({ ...alert, isOpen: false })
-      });
+      setAlert({ isOpen: true, title: "Error", message: err.response?.data?.message || "Failed to update", type: "error", onConfirm: () => setAlert({ ...alert, isOpen: false }), onClose: () => setAlert({ ...alert, isOpen: false }) });
     }
   };
 
@@ -236,33 +180,17 @@ export default function CouponCategory() {
           <div className="flex flex-wrap gap-5 w-full">
             <div className="flex-1 min-w-[48%]">
               <label className="block text-sm font-semibold text-gray-700 mb-1">Select Coupon</label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                value={form.coupon_id}
-                onChange={(e) => setForm({ ...form, coupon_id: e.target.value })}
-              >
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value={form.coupon_id} onChange={(e) => setForm({ ...form, coupon_id: e.target.value })}>
                 <option value="">Choose Coupon</option>
-                {coupons.map((c) => (
-                  <option key={c.coupon_master_id} value={c.coupon_master_id}>
-                    {c.coupon_code}
-                  </option>
-                ))}
+                {coupons.map((c) => (<option key={c.coupon_master_id} value={c.coupon_master_id}>{c.coupon_code}</option>))}
               </select>
             </div>
 
             <div className="flex-1 min-w-[48%]">
               <label className="block text-sm font-semibold text-gray-700 mb-1">Select Product Category</label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                value={form.category_id}
-                onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-              >
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}>
                 <option value="">Choose Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.product_category_id} value={cat.product_category_id}>
-                    {cat.product_category_name}
-                  </option>
-                ))}
+                {categories.map((cat) => (<option key={cat.product_category_id} value={cat.product_category_id}>{cat.product_category_name}</option>))}
               </select>
             </div>
           </div>
@@ -273,8 +201,19 @@ export default function CouponCategory() {
         </form>
       </div>
 
+      {/* Search */}
+      <div className="mb-4 flex justify-end">
+        <input
+          type="text"
+          placeholder="Search by coupon or category..."
+          className="border border-gray-300 rounded-lg px-3 py-2 w-1/3 text-sm"
+          value={searchTerm}
+          onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+        />
+      </div>
+
       {/* Table */}
-      <div className="overflow-x-auto mt-8 rounded-xl shadow-xl bg-white">
+      <div className="overflow-x-auto mt-2 rounded-xl shadow-xl bg-white">
         <table className="min-w-full text-left">
           <thead>
             <tr className="bg-blue-600 text-white text-sm uppercase tracking-wider">
@@ -302,37 +241,11 @@ export default function CouponCategory() {
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-3 mt-5">
-        <button
-          className={`px-4 py-1 border rounded-lg ${
-            currentPage === 1 ? "text-gray-400 border-gray-300 cursor-not-allowed" : "cursor-pointer"
-          }`}
-          onClick={() => goToPage(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Prev
-        </button>
-
+        <button className={`px-4 py-1 border rounded-lg ${currentPage === 1 ? "text-gray-400 border-gray-300 cursor-not-allowed" : "cursor-pointer"}`} onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
         {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => goToPage(i + 1)}
-            className={`px-4 py-1 border rounded-lg ${
-              currentPage === i + 1 ? "bg-blue-600 text-white border-blue-600" : "border-gray-400"
-            }`}
-          >
-            {i + 1}
-          </button>
+          <button key={i} onClick={() => goToPage(i + 1)} className={`px-4 py-1 border rounded-lg ${currentPage === i + 1 ? "bg-blue-600 text-white border-blue-600" : "border-gray-400"}`}>{i + 1}</button>
         ))}
-
-        <button
-          className={`px-4 py-1 border rounded-lg ${
-            currentPage === totalPages ? "text-gray-400 border-gray-300 cursor-not-allowed" : "cursor-pointer"
-          }`}
-          onClick={() => goToPage(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+        <button className={`px-4 py-1 border rounded-lg ${currentPage === totalPages ? "text-gray-400 border-gray-300 cursor-not-allowed" : "cursor-pointer"}`} onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
       </div>
 
       {/* Edit Modal */}
@@ -344,25 +257,13 @@ export default function CouponCategory() {
               <h2 className="text-xl font-bold mb-4 text-center">Update Mapping</h2>
 
               <label className="block text-sm font-semibold mb-1">Coupon</label>
-              <select
-                className="w-full border rounded-lg px-3 py-2 mb-3"
-                value={editData.coupon_id}
-                onChange={(e) => setEditData({ ...editData, coupon_id: e.target.value })}
-              >
-                {coupons.map((c) => (
-                  <option key={c.coupon_master_id} value={c.coupon_master_id}>{c.coupon_code}</option>
-                ))}
+              <select className="w-full border rounded-lg px-3 py-2 mb-3" value={editData.coupon_id} onChange={(e) => setEditData({ ...editData, coupon_id: e.target.value })}>
+                {coupons.map((c) => (<option key={c.coupon_master_id} value={c.coupon_master_id}>{c.coupon_code}</option>))}
               </select>
 
               <label className="block text-sm font-semibold mb-1">Category</label>
-              <select
-                className="w-full border rounded-lg px-3 py-2"
-                value={editData.category_id}
-                onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}
-              >
-                {categories.map((cat) => (
-                  <option key={cat.product_category_id} value={cat.product_category_id}>{cat.product_category_name}</option>
-                ))}
+              <select className="w-full border rounded-lg px-3 py-2" value={editData.category_id} onChange={(e) => setEditData({ ...editData, category_id: e.target.value })}>
+                {categories.map((cat) => (<option key={cat.product_category_id} value={cat.product_category_id}>{cat.product_category_name}</option>))}
               </select>
 
               <div className="flex justify-end gap-3 mt-5">
@@ -375,14 +276,7 @@ export default function CouponCategory() {
       )}
 
       {/* Custom Alert */}
-      <CustomAlert
-        isOpen={alert.isOpen}
-        title={alert.title}
-        message={alert.message}
-        type={alert.type}
-        onConfirm={alert.onConfirm}
-        onClose={alert.onClose}
-      />
+      <CustomAlert isOpen={alert.isOpen} title={alert.title} message={alert.message} type={alert.type} onConfirm={alert.onConfirm} onClose={alert.onClose} />
     </div>
   );
 }

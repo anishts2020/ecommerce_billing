@@ -11,7 +11,11 @@ class InventoryTransactionsController extends Controller
     // LIST ALL TRANSACTIONS
     public function index()
     {
-        $transactions = InventoryTransactions::with(['product', 'transactionType', 'reference'])->get();
+        $transactions = InventoryTransactions::with(['product', 'transactionType', 'reference'])
+        ->whereHas('product')
+        ->whereHas('transactionType')
+        ->whereHas('reference')
+        ->get();
 
         $transactions = $transactions->map(function($tr) {
             return [

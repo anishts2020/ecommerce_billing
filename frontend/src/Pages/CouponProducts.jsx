@@ -153,8 +153,14 @@ export default function CouponProducts() {
     }
   };
 
+  // SHOW ONLY VALID RECORDS
+  const validCouponProducts = couponProducts.filter(
+    (item) => item.coupon !== null && item.product !== null
+  );
+
   // ====================== FILTER ======================
-  const filtered = couponProducts.filter(
+  // Filtering + ensure both relations exist
+  const filtered = validCouponProducts.filter(
     (item) =>
       item.coupon?.coupon_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.product?.product_name?.toLowerCase().includes(searchTerm.toLowerCase())
