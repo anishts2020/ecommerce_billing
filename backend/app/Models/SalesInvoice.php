@@ -15,6 +15,7 @@ class SalesInvoice extends Model
         'invoice_no',
         'invoice_date',
         'customer_id',
+        
         'cashier_id',
         'grand_total',
         'discount',
@@ -27,11 +28,15 @@ class SalesInvoice extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'customer_id','id');
     }
 
     public function items()
     {
         return $this->hasMany(SalesInvoiceItem::class, 'sales_invoice_id');
     }
+    public function stitching()
+{
+    return $this->hasMany(SalesInvoiceStichingItem::class, 'sales_invoice_id', 'sales_invoice_id');
+}
 }

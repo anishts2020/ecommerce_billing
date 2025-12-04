@@ -22,24 +22,16 @@ function SalesInvoiceItems() {
 
     // Total item cost = Σ (quantity × unit_price)
     const totalItemAmount = items.reduce(
-        (sum, item) =>
-            sum +
-            (parseFloat(item.unit_price || 0) *
-                parseFloat(item.quantity || 0)),
-        0
-    );
+    (sum, item) => sum + parseFloat(item.grand_total || 0),
+    0
+);
 
     // Total discount = Σ (discount_amount)
-    const totalDiscount = items.reduce(
-        (sum, item) => sum + parseFloat(item.discount_amount || 0),
-        0
-    );
+    const totalDiscount = parseFloat(invoice?.discount || 0);
+
 
     // Total tax = Σ (tax_percent)
-    const totalTax = items.reduce(
-        (sum, item) => sum + parseFloat(item.tax_percent || 0),
-        0
-    );
+    const totalTax = parseFloat(invoice?.tax || 0);
 
     // Final Total = itemTotal - discount + tax
     const totalGrandTotal = (
@@ -55,14 +47,16 @@ function SalesInvoiceItems() {
             <h2 className="text-2xl font-bold flex items-center">
                 <span className="mr-3 text-indigo-600">🧾</span>
                 Invoice Items (ID: {id})
-                {invoice?.customer_name && (
-                    <span className="ml-3 text-gray-600 text-lg">
-                        — Customer:{" "}
-                        <span className="font-semibold">
-                            {invoice.customer_name}
-                        </span>
-                    </span>
-                )}
+                {invoice?.customer?.customer_name && (
+    <span className="ml-3 text-gray-600 text-lg">
+        — Customer:{" "}
+        <span className="font-semibold">
+            {invoice.customer.customer_name}
+        </span>
+    </span>
+)}
+
+               
             </h2>
 
             {items.length === 0 ? (
@@ -97,69 +91,106 @@ function SalesInvoiceItems() {
                             </tr>
                         </thead>
 
-                       <tbody className="bg-white divide-y divide-gray-200">
-                            {items.map((item, index) => (
-                                <tr
-                                    key={item.sales_invoice_item_id}
-                                    className={`transition duration-150 ease-in-out ${index % 2 === 0
-                                            ? "bg-white"
-                                            : "bg-gray-50"
-                                        } hover:bg-indigo-50`}
-                                >
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {item.product?.product_name ||
-                                            item.product_name ||
-                                            "N/A"}
-                                    </td>
+                      <tbody className="bg-white divide-y divide-gray-200">
+    {items.map((item, index) => {
 
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
-                                        {parseFloat(item.quantity).toFixed(2)}
-                                    </td>
+        const itemCount = items.length;
 
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
-                                        ₹
-                                        {parseFloat(
-                                            item.unit_price || 0
-                                        ).toFixed(2)}
-                                    </td>
+        // invoice discount & tax from main invoice table
+        const invoiceDiscount = parseFloat(invoice?.discount || 0);
+        const invoiceTax = parseFloat(invoice?.tax || 0);
 
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-500">
-                                        -₹
-                                        {parseFloat(
-                                            item.discount_amount || 0
-                                        ).toFixed(2)}
-                                    </td>
+        // simple divide rule (as you said)
+        const perItemDiscount = itemCount > 0 ? invoiceDiscount / itemCount : 0;
+        const perItemTax = itemCount > 0 ? invoiceTax / itemCount : 0;
 
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-blue-600">
-                                        {parseFloat(
-                                            item.tax_percent || 0
-                                        ).toFixed(2)}
-                                        %
-                                    </td>
+        // row grand total = item total - discount + tax
+        const rowGrandTotal =
+            item.quantity * item.unit_price - perItemDiscount + perItemTax;
 
-                                    <td className="px-6 py-4 whitespace-nowrap text-base font-semibold text-right text-green-700">
-                                        ₹
-                                        {parseFloat(
-                                            item.grand_total || 0
-                                        ).toFixed(2)}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
+        return (
+            <tr
+                key={item.sales_invoice_item_id}
+                className={`transition duration-150 ease-in-out ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                } hover:bg-indigo-50`}
+            >
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {item.product?.product_name ||
+                        item.product_name ||
+                        "N/A"}
+                </td>
 
-                        <tfoot className="bg-indigo-50 border-t-2 border-indigo-200">
-                            <tr>
-                                <td
-                                    colSpan="5"
-                                    className="px-6 py-4 text-right text-lg font-bold text-gray-800"
-                                >
-                                    Total Amount:
-                                </td>
-                                <td className="px-6 py-4 text-right text-xl font-extrabold text-indigo-700">
-                                    ₹{totalGrandTotal}
-                                </td>
-                            </tr>
-                        </tfoot>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    {parseFloat(item.quantity).toFixed(2)}
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                    ₹{parseFloat(item.unit_price || 0).toFixed(2)}
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-500">
+                    -₹{perItemDiscount.toFixed(2)}
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-blue-600">
+                    ₹{perItemTax.toFixed(2)}
+                </td>
+
+                <td className="px-6 py-4 whitespace-nowrap text-base font-semibold text-right text-green-700">
+                    ₹{rowGrandTotal.toFixed(2)}
+                </td>
+            </tr>
+        );
+    })}
+</tbody>
+
+
+                       <tfoot className="bg-indigo-50 border-t-2 border-indigo-200">
+    <tr>
+        <td colSpan="5" className="px-6 py-3 text-right font-semibold text-gray-700">
+            Items Total:
+        </td>
+        <td className="px-6 py-3 text-right text-indigo-700 font-bold">
+            ₹{totalItemAmount.toFixed(2)}
+        </td>
+    </tr>
+
+    <tr>
+        <td colSpan="5" className="px-6 py-3 text-right font-semibold text-gray-700">
+            Discount:
+        </td>
+        <td className="px-6 py-3 text-right text-red-600 font-bold">
+            -₹{totalDiscount.toFixed(2)}
+        </td>
+    </tr>
+
+    <tr>
+        <td colSpan="5" className="px-6 py-3 text-right font-semibold text-gray-700">
+            Tax:
+        </td>
+        <td className="px-6 py-3 text-right text-blue-600 font-bold">
+            ₹{totalTax.toFixed(2)}
+        </td>
+    </tr>
+
+    <tr>
+      
+        {/* <td className="px-6 py-3 text-right text-purple-600 font-bold">
+            ₹{stitchingTotal.toFixed(2)}
+        </td> */}
+    </tr>
+
+    <tr>
+        <td colSpan="5" className="px-6 py-4 text-right text-xl font-extrabold text-gray-900">
+            Net Total:
+        </td>
+        <td className="px-6 py-4 text-right text-2xl font-extrabold text-green-700">
+            ₹{totalGrandTotal}
+        </td>
+    </tr>
+</tfoot>
+
                     </table>
                 </div>
             )}
