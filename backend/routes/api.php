@@ -40,6 +40,11 @@ use App\Http\Controllers\Api\ReferenceController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\Api\CouponMasterController;
+
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 
 /*
@@ -223,3 +228,51 @@ Route::get('/purchase-report', function (Request $request) {
 
     return $query->get();
 });
+
+
+Route::get('/salesreport', function (Request $request) {
+
+    $query = DB::table('sales_invoices as s')
+        ->leftJoin('customers as c', 'c.id', '=', 's.customer_id') // customer PK is `id`
+        ->leftJoin('sales_invoice_items as si', 'si.sales_invoice_id', '=', 's.sales_invoice_id')
+        ->leftJoin('products as p', 'p.product_id', '=', 'si.product_id')
+        ->select(
+            's.sales_invoice_id',
+            's.invoice_no',
+            's.invoice_date',
+            'c.customer_name',
+            DB::raw('GROUP_CONCAT(p.product_name SEPARATOR ", ") as product_names'),
+            's.grand_total as total_grand'
+        )
+        ->groupBy(
+            's.sales_invoice_id',
+            's.invoice_no',
+            's.invoice_date',
+            'c.customer_name',
+            's.grand_total'
+        );
+
+    // Optional date filters
+    if ($request->from) {
+        $query->whereDate('s.invoice_date', '>=', $request->from);
+    }
+
+    if ($request->to) {
+        $query->whereDate('s.invoice_date', '<=', $request->to);
+    }
+
+    return $query->get();
+});
+/*
+|--------------------------------------------------------------------------
+Coupon Master
+|--------------------------------------------------------------------------
+*/
+Route::get('/coupons', [CouponMasterController::class, 'index']);          
+Route::post('/coupons', [CouponMasterController::class, 'store']);          
+Route::get('/coupons/{couponMaster}', [CouponMasterController::class, 'show']); 
+Route::put('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::patch('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::delete('/coupons/{couponMaster}', [CouponMasterController::class, 'destroy']); 
+
+
