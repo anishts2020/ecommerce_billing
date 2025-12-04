@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
+use App\Http\Controllers\Api\CouponMasterController;
 
 
 use Illuminate\Support\Facades\DB;
@@ -227,3 +228,16 @@ Route::get('/salesreport', function (Request $request) {
 
     return $query->get();
 });
+/*
+|--------------------------------------------------------------------------
+Coupon Master
+|--------------------------------------------------------------------------
+*/
+Route::get('/coupons', [CouponMasterController::class, 'index']);          
+Route::post('/coupons', [CouponMasterController::class, 'store']);          
+Route::get('/coupons/{couponMaster}', [CouponMasterController::class, 'show']); 
+Route::put('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::patch('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
+Route::delete('/coupons/{couponMaster}', [CouponMasterController::class, 'destroy']); 
+
+
