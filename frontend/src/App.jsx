@@ -48,6 +48,10 @@ import SalesReport from "./Pages/SalesReport"
 
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
+import SalesChart from "./Pages/SalesChart";
+import MonthlyCategoryPieChart from "./Pages/MonthlyCategoryPieChart";
+import ProfitLineChart from "./Pages/ProfitLineChart";
+import PurchaseChart from "./Pages/PurchaseChart";
 import CouponMaster from "./Pages/CouponMaster";
 
 import PurchaseReport from "./Pages/PurchaseReport";
@@ -104,7 +108,10 @@ export default function App() {
           <Route path="/createroles" element={<Roles />} />
           <Route path="/createuserroles" element={<UserRoles />} />
           <Route path="/createuser" element={<CreateUser />} />
-
+          <Route path="/saleschart" element={<SalesChart/>} />
+          <Route path="/productcategorychart" element={<MonthlyCategoryPieChart/>} />
+          <Route path="/productprofitbymonth" element={<ProfitLineChart/>} />
+          <Route path="/purchaseChart" element={<PurchaseChart/>} />
           {/* PURCHASE */}
           <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
           <Route path="/purchase_list" element={<PurchaseinvoiceList />} />

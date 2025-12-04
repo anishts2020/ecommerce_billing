@@ -19,6 +19,14 @@ export default function Layout() {
 
   const submenuClass = "block px-3 py-2 rounded-md transition-all duration-200 hover:bg-white/20 hover:translate-x-1";
 
+  // const convertToMonthName = (monthStr) => {
+  //   const [year, month] = monthStr.split("-");
+  //   return new Date(year, month - 1).toLocaleString("en-US", { month: "long" });
+  // };
+
+
+
+
   return (
     <div className="flex h-screen overflow-hidden">
 
@@ -132,6 +140,18 @@ export default function Layout() {
 
           <div>
             <button
+              onClick={() => toggleMenu("charts")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Charts
+            </button>
+
+            {openMenu === "charts" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/purchaseChart" className={submenuClass}>Purchase chart</Link>
+                <Link to="/saleschart" className={submenuClass}>Sales chart</Link>
+                <Link to="/productcategorychart" className={submenuClass}>Product category chart</Link>
+                <Link to="/productprofitbymonth" className={submenuClass}>Profit & Sales</Link>
               onClick={() => toggleMenu("coupons and discount")}
               className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
             >
@@ -201,3 +221,4 @@ export default function Layout() {
     </div>
   );
 }
+
