@@ -33,7 +33,7 @@ use App\Http\Controllers\Api\PurchaseInvoiceController;
 use App\Http\Controllers\Api\PurchaseInvoiceItemController;
 
 use App\Http\Controllers\Api\SalesInvoiceController;
-
+use App\Http\Controllers\Api\TotalRevenueController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
@@ -218,6 +218,11 @@ Route::apiResource('sales-invoices', SalesInvoiceController::class);
 Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getItems']);
 Route::get('/sales/monthly-summary', [SalesInvoiceController::class, 'monthlySummary']);
 Route::get('/sales/monthly-summary/{year}', [SalesInvoiceController::class, 'monthlySummaryByYear']);
+
+Route::get('/total-revenue-today', [TotalRevenueController::class, 'revenueToday']);
+
+
+
 
 /*
 |--------------------------------------------------------------------------
