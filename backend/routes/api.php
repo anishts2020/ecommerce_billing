@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\SalesInvoiceController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
+use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use Illuminate\Support\Facades\DB;
@@ -237,6 +238,10 @@ Route::post('/reference', [ReferenceController::class, 'store']);
 
 /*
 |--------------------------------------------------------------------------
+Top Selling Product
+|--------------------------------------------------------------------------
+*/
+Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
 | STICHING TYPES
 |--------------------------------------------------------------------------
 */
