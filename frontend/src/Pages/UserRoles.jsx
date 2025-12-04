@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 function UserRoles() {
   const [userRoles, setUserRoles] = useState([]);
@@ -20,7 +21,11 @@ function UserRoles() {
   const paginatedData = filtered.slice(indexOfFirst, indexOfLast);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
-
+  const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages) {
+    setCurrentPage(page);
+  }
+};
   const [formData, setFormData] = useState({ user_id: "", role_id: "" });
   const [editingId, setEditingId] = useState(null);
 
@@ -141,7 +146,7 @@ function UserRoles() {
   const confirmDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/user-role/${id}`);
-      openAlert("success", "Deleted", "Record deleted successfully");
+      openAlert("success", "Deleted", "User Role deleted successfully");
       fetchAll();
     } catch (err) {
       openAlert("error", "Failed", "Failed to delete record");
@@ -150,106 +155,132 @@ function UserRoles() {
 
   return (
     <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+      <div className="w-full max-w-4xl bg-auto rounded-lg shadow-lg p-6">
 
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">User Roles</h2>
+        {/* HEADER SECTION (Updated UI like Roles.jsx) */}
+        <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-lg mb-6">
 
-          {/* Search Bar */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border p-2 rounded w-64"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          {/* Title */}
+          <h1 className="text-3xl font-extrabold text-indigo-700">👥 User Roles</h1>
+
+          {/* Search + Add Button */}
+          <div className="flex items-center gap-4">
+
+            {/* Search Bar */}
+            <input
+              type="text"
+              placeholder="Search user or role..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="border p-2 w-64 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+
+            {/* Add Button */}
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={() => openFormModal()}
+            >
+              Assign Role
+            </button>
+          </div>
         </div>
 
-        <div className="flex justify-center mb-4">
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            onClick={() => openFormModal()}
-          >
-            Assign Role
-          </button>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse border">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2">SI No</th>
-                <th className="border p-2">User</th>
-                <th className="border p-2">Role</th>
-                <th className="border p-2">Actions</th>
+        {/* USER ROLES TABLE  */}
+        <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md">          <table className="min-w-full text-sm">
+            <thead className="bg-indigo-600 text-white">
+              <tr>
+                <th className="px-6 py-3 text-left font-semibold tracking-wide">SI No</th>
+                <th className="px-6 py-3 text-left font-semibold tracking-wide">User</th>
+                <th className="px-6 py-3 text-left font-semibold tracking-wide">Role</th>
+                <th className="px-6 py-3 text-center font-semibold tracking-wide">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {paginatedData.map((item, index) => (
-                <tr key={item.id} className="text-center hover:bg-gray-50">
-                  <td className="border p-2">
-                    {(currentPage - 1) * pageSize + (index + 1)}
-                  </td>
-                  <td className="border p-2">{item.user?.name}</td>
-                  <td className="border p-2">{item.role?.name}</td>
-                  <td className="border p-2 flex justify-center gap-2">
-                    <button
-                      onClick={() => openFormModal(item)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
 
-              {filtered.length === 0 && (
+            <tbody>
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
+                // Apply border-b to the row for horizontal separation
+                <tr key={item.id} className="hover:bg-gray-100 transition border-b border-gray-200">
+                    
+                    {/* Cells use a right border for vertical separation */}
+                    <td className="px-6 py-3 text-center border-r border-gray-200">
+                        {(currentPage - 1) * pageSize + index + 1}
+                    </td>
+
+                    <td className="px-6 py-3 border-r border-gray-200">{item.user?.name}</td>
+
+                    <td className="px-6 py-3 border-r border-gray-200">{item.role?.name}</td>
+
+                    {/* Last cell (Actions) does not need a right border */}
+                    <td className="px-6 py-3 flex gap-2 justify-center">
+
+                      {/* EDIT BUTTON */}
+                      <button
+                        className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition duration-150"
+                        title="Edit"
+                        onClick={() => openFormModal(item)}
+                      >
+                        <FaEdit className="w-5 h-5" />
+                      </button>
+
+                      {/* DELETE BUTTON */}
+                      <button
+                        className="text-red-600 hover:bg-red-100 p-2 rounded-full transition duration-150"
+                        title="Delete"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        <FaTrash className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
-                  <td colSpan={4} className="text-center p-4 text-gray-500">
-                    No matching records found.
+                  <td colSpan="4" className="text-center py-3 text-gray-500 border">
+                    No user roles found
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-
+        
         {/* PAGINATION */}
-        <div className="flex justify-center items-center gap-3 mt-4">
+        {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-4">
           <button
+            onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-            className="px-3 py-1 border rounded disabled:opacity-50"
-          >
+            className={`px-3 py-1 border rounded disabled:opacity-50`}
+            >
             Prev
-          </button>
+            </button>
 
           {[...Array(totalPages)].map((_, i) => (
             <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 border rounded ${
+                key={i}
+                onClick={() => goToPage(i + 1)}
+                className={`px-3 py-1 rounded-lg ${
                 currentPage === i + 1 ? "bg-blue-600 text-white" : ""
-              }`}
+                }`}
             >
-              {i + 1}
+                {i + 1}
             </button>
-          ))}
+            ))}
 
           <button
+            onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-            className="px-3 py-1 border rounded disabled:opacity-50"
-          >
+            className={`px-3 py-1 border rounded disabled:opacity-50`}
+            >
             Next
-          </button>
+            </button>
         </div>
+        )}
       </div>
 
       {/* FORM MODAL */}

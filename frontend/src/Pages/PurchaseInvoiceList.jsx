@@ -94,12 +94,12 @@ function PurchaseInvoiceList() {
                         <table className="min-w-full text-left">
                             <thead>
                                 <tr className="bg-indigo-600 text-white text-sm uppercase tracking-wider">
-                                    <th className="py-3 px-6 text-left">Invoice No</th>
+                                    <th className="py-3 px-6 text-left">Purchase No</th>
                                     <th className="py-3 px-6 text-left">Vendor Name</th>
                                     <th className="py-3 px-6 text-left">Grand Total</th>
                                     <th className="py-3 px-6 text-left">Net Total</th>
                                     <th className="py-3 px-6 text-left">Payment Mode</th>
-                                    <th className="py-3 px-6 text-left">Invoice Date</th>
+                                    <th className="py-3 px-6 text-left">Purchase Date</th>
                                     <th className="py-3 px-6 text-left">Items</th>
                                 </tr>
                             </thead>
