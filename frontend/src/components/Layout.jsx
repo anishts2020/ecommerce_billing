@@ -49,6 +49,7 @@ export default function Layout() {
               <div className="ml-5 mt-1 space-y-1">
                 <Link to="/createuser" className={submenuClass}>Users</Link>
                 <Link to="/createroles" className={submenuClass}>Roles</Link>
+                <Link to="/createuserroles" className={submenuClass}>User Roles</Link>
               </div>
             )}
           </div>
@@ -129,6 +130,20 @@ export default function Layout() {
             )}
           </div>
 
+          <div>
+            <button
+              onClick={() => toggleMenu("coupons and discount")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupons & Discounts
+            </button>
+
+            {openMenu === "coupons and discount" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-products" className={submenuClass}>Coupon Products</Link>
+              </div>
+            )}
+          </div>
           {/* REPORT */}
           
           {/* SYSTEM */}

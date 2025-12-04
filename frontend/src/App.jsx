@@ -53,6 +53,8 @@ import CouponMaster from "./Pages/CouponMaster";
 import PurchaseReport from "./Pages/PurchaseReport";
 
 
+/* Coupons & Discounts */
+import CouponProducts from "./Pages/CouponProducts";
 
 export default function App() {
   return (
@@ -120,6 +122,9 @@ export default function App() {
              {/* REPORT */}
           <Route path="/purchasereport" element={<PurchaseReport />} />
           
+
+          {/* Coupens & Discounts */}
+          <Route path="/coupon-products" element={<CouponProducts />} />
 
         </Route>
 
