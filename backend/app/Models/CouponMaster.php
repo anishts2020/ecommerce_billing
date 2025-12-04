@@ -19,6 +19,7 @@ class CouponMaster extends Model
         'coupon_code',
         'description',
         'discount_type',           // 0/1 (or 1/2) — depends on your meaning
+        'discount_type',         
         'discount_value',
         'minimum_order_amount',
         'maximum_discount_amount',
@@ -39,6 +40,7 @@ class CouponMaster extends Model
         'valid_from' => 'date',
         'valid_to' => 'date',
         'is_active' => 'boolean', // Laravel will convert 0/1 to false/true
+        'is_active' => 'boolean',
     ];
 
     // Optional: helper accessors

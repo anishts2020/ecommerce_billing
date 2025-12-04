@@ -44,17 +44,19 @@ function SalesinvoiceList() {
                 <th className="py-3 px-6 text-left">Net Total</th>
                 <th className="py-3 px-6 text-left">Payment Mode</th>
                 <th className="py-3 px-6 text-left">Invoice Date</th>
+                <th className="py-3 px-6 text-left">Extra Alteration</th>
                 <th className="py-3 px-6 text-left">Items</th>
               </tr>
             </thead>
 
             <tbody className="text-sm divide-y divide-gray-200">
               {invoices
-                .filter((inv) =>
-                  inv.customer?.customer_name
-                    ?.toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-                )
+  .filter(inv =>
+    String(inv.customer_name || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  )
+
                 .map((inv) => (
                   <tr
                     key={inv.sales_invoice_id}
@@ -89,6 +91,14 @@ function SalesinvoiceList() {
                     </td>
 
                     <td className="py-3 px-6">{inv.invoice_date}</td>
+                   <td className="py-3 px-6 text-center">
+  <button
+    onClick={() => navigate(`/sales-invoice/${inv.sales_invoice_id}/stitching-items`)}
+    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+  >
+    View Stitching
+  </button>
+</td>
 
                     {/* Items Button */}
                     <td className="py-3 px-6 font-bold text-gray-800">

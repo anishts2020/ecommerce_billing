@@ -99,6 +99,7 @@ class CouponMasterController extends Controller
             'data' => ['is_active' => (int) $couponMaster->is_active],
         ]);
     }
+ 
 
     /**
      * Validate incoming request
