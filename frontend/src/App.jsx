@@ -24,6 +24,10 @@ import SalesInvoiceItems from "./Pages/SalesInvoiceItems";
 import Stiching from "./Pages/Stiching";
 import SalesInvoiceStitchingList from "./Pages/SalesInvoiceStichingList"
 
+/* COUPON USER */
+import CouponUserView from "./Pages/CouponUserView";
+
+
 /* PRODUCTS */
 import Materials from "./Pages/Materials";
 import ProductCategories from "./Pages/ProductCategories";
@@ -50,6 +54,7 @@ import SalesReport from "./Pages/SalesReport"
 
 /* INVENTORY */
 import InventoryTransactions from "./Pages/InventoryTransaction";
+import CouponCategories  from "./Pages/CouponCategories";
 import SalesChart from "./Pages/SalesChart";
 import MonthlyCategoryPieChart from "./Pages/MonthlyCategoryPieChart";
 import ProfitLineChart from "./Pages/ProfitLineChart";
@@ -98,6 +103,9 @@ export default function App() {
            <Route path="/sales-invoice/:invoice_id/stitching-items" element={<SalesInvoiceStitchingList />} />
 
 
+          <Route path="/coupon-user" element={<CouponUserView />} />
+
+
           {/* PRODUCT MANAGEMENT */}
           <Route path="/product-categories" element={<ProductCategories />} />
           <Route path="/materials" element={<Materials />} />
@@ -128,6 +136,11 @@ export default function App() {
 
           {/* INVENTORY */}
           <Route path="/inventory-transactions" element={<InventoryTransactions />} />
+         
+         
+          {/* COUPONS AND DISCOUNTS */}
+          <Route path="/coupon-category" element={<CouponCategories />} />
+        
           {/* Coupons and Discount */}
           <Route path="/coupon-master" element={<CouponMaster />} />
 

@@ -24,6 +24,9 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sales, setSales] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [revenueData, setRevenueData] = useState([]);
 
   // Load user from localStorage
   // NEW STATES
@@ -85,6 +88,33 @@ export default function Dashboard() {
         });
     }
   }, [isModalOpen]);
+  // Fetch revenue on page load
+useEffect(() => {
+  fetchRevenue();
+}, []);
+
+const fetchRevenue = () => {
+  fetch("http://localhost:8000/api/total-revenue-today")
+    .then((res) => res.json())
+    .then((data) => {
+      setTotalRevenue(data.totalRevenueToday);
+      setRevenueData(data.productWiseRevenue);
+    })
+    .catch((err) => console.error(err));
+};
+
+    // Fetch revenue when modal opens
+  // useEffect(() => {
+  //   if (!showRevenueModal) return;
+
+  //   fetch("http://localhost:8000/api/total-revenue-today")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setTotalRevenue(data.totalRevenueToday);
+  //       setRevenueData(data.productWiseRevenue);
+  //     })
+  //     .catch((err) => console.error(err));
+  // }, [showRevenueModal]);
 
   if (!user) return <div>Loading...</div>;
 
@@ -285,6 +315,60 @@ export default function Dashboard() {
                 className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
                 onClick={() => setIsModalOpen(false)}
 
+         {/* Total revenue Today*/}
+         <div className={cardClass} onClick={() => setShowRevenueModal(true)}>
+  <UserCircleIcon className={iconClass} />
+  <div>
+    <h3 className="font-semibold text-lg">Total Revenue Today</h3>
+      <p className="text-sm text-gray-600">₹ {totalRevenue.toFixed(2)}</p>
+  </div>
+</div>
+
+{showRevenueModal && (
+ <div className="fixed inset-0  backdrop-blur-md flex items-center justify-center z-50">
+
+    <div className="bg-white p-8 rounded-xl shadow-xl w-[700px] max-h-[85vh] overflow-y-auto">
+
+      <h2 className="text-3xl font-bold mb-6 text-blue-600 text-center">
+        Total Revenue Today: ₹ {totalRevenue.toFixed(2)}
+      </h2>
+
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-blue-600 text-white text-center text-lg">
+            <th className="p-3 border">SL No</th>
+            <th className="p-3 border">Product Name</th>
+            <th className="p-3 border">Revenue (₹)</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {revenueData.map((item, index) => (
+            <tr key={index} className="text-center text-base">
+              <td className="border p-3">{index + 1}</td>
+              <td className="border p-3">{item.product_name}</td>
+              <td className="border p-3 text-green-700 font-semibold">
+                ₹ {item.revenue.toFixed(2)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+
+        
+      </table>
+
+      <div className="flex justify-center mt-6">
+        <button
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600"
+          onClick={() => setShowRevenueModal(false)}
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
           {/* Top Selling Product Card */}
           <div className={cardClass} onClick={() => setShowTopSellingModal(true)}>
@@ -304,6 +388,7 @@ export default function Dashboard() {
 
 
         </div>
+        
 
           {/* Low Stock Products */}
           <div

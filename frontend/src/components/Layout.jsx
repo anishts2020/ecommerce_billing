@@ -10,6 +10,7 @@ export default function Layout() {
     navigate("/login");
   };
 
+ // Track which menu is expanded
   // Track which menu is expanded
   const [openMenu, setOpenMenu] = useState(null);
   const [pageModalOpen, setPageModalOpen] = useState(false);
@@ -105,6 +106,23 @@ export default function Layout() {
             )}
           </div>
 
+          {/* COUPONS AND DISCOUNT */}
+          <div>
+            <button
+              onClick={() => toggleMenu("coupons")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupons and Discount
+            </button>
+
+            {openMenu === "coupons" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-master" className={submenuClass}>Coupon Master</Link>
+                <Link to="/coupon-user" className={submenuClass}>Coupon User</Link>
+              </div>
+            )}
+          </div>
+
           {/* PURCHASE */}
           <div>
             <button
@@ -136,6 +154,21 @@ export default function Layout() {
               <div className="ml-5 mt-1 space-y-1">
                 <Link to="/salesinvoice_list" className={submenuClass}>Invoice List</Link>
                 <Link to="/sales-invoice" className={submenuClass}>Add Invoice</Link>
+              </div>
+            )}
+          </div>
+          {/* CASH AND DISCOUNTS*/}
+          <div>
+            <button
+              onClick={() => toggleMenu("purchase")}
+              className="w-full text-left font-semibold px-3 py-2 hover:bg-white/10 rounded"
+            >
+              Coupon and Discounts
+            </button>
+
+            {openMenu === "purchase" && (
+              <div className="ml-5 mt-1 space-y-1">
+                <Link to="/coupon-category" className={submenuClass}>Coupon Categories</Link>
               </div>
             )}
           </div>

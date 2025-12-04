@@ -33,10 +33,13 @@ use App\Http\Controllers\Api\PurchaseInvoiceController;
 use App\Http\Controllers\Api\PurchaseInvoiceItemController;
 
 use App\Http\Controllers\Api\SalesInvoiceController;
-
+use App\Http\Controllers\Api\TotalRevenueController;
 use App\Http\Controllers\Api\InventoryTransactionsController;
 use App\Http\Controllers\Api\TransactionTypeController;
 use App\Http\Controllers\Api\ReferenceController;
+use App\Http\Controllers\Api\CouponMasterController;
+use App\Http\Controllers\Api\CouponCategoryController;
+use App\Http\Controllers\Api\CouponUserController;
 use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
@@ -108,6 +111,8 @@ Route::get('/roles', [RoleController::class, 'index']);
 Route::post('/roles', [RoleController::class, 'store']);
 Route::put('/roles/{id}', [RoleController::class, 'update']);
 Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+
+
 /*
 
 /*
@@ -128,7 +133,6 @@ Route::delete('/user-role/{id}', [UserRoleController::class, 'destroy']);
 |--------------------------------------------------------------------------
 */
 Route::apiResource('product-categories', ProductCategoriesController::class);
-//Route::get('/categories', [ProductCategoriesController::class, 'index']); // alias for React
 
 
 /*
@@ -142,6 +146,7 @@ Route::post('/product-types/store', [ProductTypeController::class, 'store']);
 Route::get('/product-types/{id}', [ProductTypeController::class, 'show']);
 Route::put('/product-types/{id}', [ProductTypeController::class, 'update']);
 Route::delete('/product-types/{id}', [ProductTypeController::class, 'destroy']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -157,9 +162,7 @@ Route::get('/sizes', [ProductSizeController::class, 'index']); // alias
 | COLORS
 |--------------------------------------------------------------------------
 */
-// COLORS
 Route::apiResource('colors', App\Http\Controllers\Api\ColorController::class);
-
 
 
 /*
@@ -226,6 +229,11 @@ Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getIte
 Route::get('/sales/monthly-summary', [SalesInvoiceController::class, 'monthlySummary']);
 Route::get('/sales/monthly-summary/{year}', [SalesInvoiceController::class, 'monthlySummaryByYear']);
 
+Route::get('/total-revenue-today', [TotalRevenueController::class, 'revenueToday']);
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | INVENTORY TRANSACTIONS
@@ -243,6 +251,48 @@ Route::post('/transaction-type', [TransactionTypeController::class, 'store']);
 Route::get('/reference', [ReferenceController::class, 'index']);
 Route::post('/reference', [ReferenceController::class, 'store']);
 
+/*
+|--------------------------------------------------------------------------
+| COUPONS AND DISCOUNTS
+|--------------------------------------------------------------------------
+*/
+Route::get('/coupons', [CouponMasterController::class, 'index']);
+
+Route::get('/coupon-categories', [CouponCategoryController::class, 'index']);
+Route::post('/coupon-categories', [CouponCategoryController::class, 'store']);
+Route::put('/coupon-categories/{id}', [CouponCategoryController::class, 'update']);
+Route::delete('/coupon-categories/{id}', [CouponCategoryController::class, 'destroy']);
+
+
+
+/*
+|--------------------------------------------------------------------------
+| COUPONS MASTER
+|--------------------------------------------------------------------------
+*/
+Route::get('/coupons-list', [CouponMasterController::class, 'listAll']);
+
+
+/*
+|--------------------------------------------------------------------------
+| COUPON USERS  ( FIXED – NO DUPLICATES, CORRECT PK )
+|--------------------------------------------------------------------------
+*/
+
+// List all coupon user mappings
+Route::get('/coupon-users', [CouponUserController::class, 'index']);
+
+// Create new mapping
+Route::post('/coupon-users', [CouponUserController::class, 'store']);
+
+// Get single coupon user (edit)
+Route::get('/coupon-users/{coupon_user_id}', [CouponUserController::class, 'show']);
+
+// Update coupon user
+Route::put('/coupon-users/{coupon_user_id}', [CouponUserController::class, 'update']);
+
+// Delete coupon user
+Route::delete('/coupon-users/{coupon_user_id}', [CouponUserController::class, 'destroy']);
 /*
 |--------------------------------------------------------------------------
 Top Selling Product
