@@ -17,7 +17,7 @@ export default function CouponProducts() {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // New state for AlertModal
+  // Alert Modal State
   const [alertModal, setAlertModal] = useState({
     isOpen: false,
     type: "",
@@ -26,18 +26,23 @@ export default function CouponProducts() {
     confirmAction: null,
   });
 
-  // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // ====================== MODAL HANDLERS ======================
   const openAlert = (type, title, message, confirmAction = null) => {
     setAlertModal({ isOpen: true, type, title, message, confirmAction });
   };
 
-  const closeAlert = () => {
-    setAlertModal({ isOpen: false, type: "", title: "", message: "", confirmAction: null });
-  };
+  const closeAlert = () =>
+    setAlertModal({
+      isOpen: false,
+      type: "",
+      title: "",
+      message: "",
+      confirmAction: null,
+    });
 
   // ====================== LOAD DATA ======================
   useEffect(() => {
@@ -52,7 +57,9 @@ export default function CouponProducts() {
         axios.get("http://localhost:8000/api/coupon-products"),
       ]);
 
-      const couponData = Array.isArray(couponRes.data.data) ? couponRes.data.data : [];
+      const couponData = Array.isArray(couponRes.data.data)
+        ? couponRes.data.data
+        : [];
 
       setCoupons(couponData);
       setProducts(Array.isArray(productRes.data) ? productRes.data : []);
@@ -64,9 +71,8 @@ export default function CouponProducts() {
   };
 
   // ====================== HANDLE CHANGE ======================
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   // ====================== OPEN MODALS ======================
   const openAdd = () => {
@@ -99,7 +105,11 @@ export default function CouponProducts() {
     );
 
     if (duplicate) {
-      openAlert("error", "Duplicate Entry", "Coupon is already assigned for this product");
+      openAlert(
+        "error",
+        "Duplicate Entry",
+        "Coupon is already assigned for this product"
+      );
       return;
     }
 
@@ -114,13 +124,21 @@ export default function CouponProducts() {
           `http://localhost:8000/api/coupon-products/${editId}`,
           payload
         );
-        openAlert("success", "Update Success", "Product Coupon updated successfully.");
+        openAlert(
+          "success",
+          "Updation Successful",
+          "Product Coupon updated successfully."
+        );
       } else {
         await axios.post(
           "http://localhost:8000/api/coupon-products",
           payload
         );
-        openAlert("success", "Save Success", "Coupon assigned successfully.");
+        openAlert(
+          "success",
+          "Saved Successfully",
+          "Coupon assigned successfully."
+        );
       }
 
       fetchAll();
@@ -137,72 +155,75 @@ export default function CouponProducts() {
       "delete-confirm",
       "Are you sure?",
       "This product coupon will be permanently deleted?",
-      () => handleDelete(id) // Pass the actual delete function to execute on confirmation
+      () => handleDelete(id)
     );
   };
 
   const handleDelete = async (id) => {
-    closeAlert(); // Close the confirmation modal
+    closeAlert();
     try {
-      await axios.delete(`http://localhost:8000/api/coupon-products/${id}`);
+      await axios.delete(
+        `http://localhost:8000/api/coupon-products/${id}`
+      );
       fetchAll();
-      openAlert("success", "Deletion Success", "Product Coupon deleted successfully.");
+      openAlert(
+        "success",
+        "Deletion Successful",
+        "Product Coupon deleted successfully."
+      );
     } catch (err) {
       console.error(err);
       openAlert("error", "API Error", "Error deleting entry.");
     }
   };
 
-  // SHOW ONLY VALID RECORDS
+  // ====================== FILTER ======================
   const validCouponProducts = couponProducts.filter(
     (item) => item.coupon !== null && item.product !== null
   );
 
-  // ====================== FILTER ======================
-  // Filtering + ensure both relations exist
   const filtered = validCouponProducts.filter(
     (item) =>
-      item.coupon?.coupon_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.product?.product_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      item.coupon?.coupon_code
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      item.product?.product_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
-  // ====================== PAGINATION LOGIC ======================
-const indexOfLastItem = currentPage * itemsPerPage;
-const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  // ====================== PAGINATION ======================
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
-const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
 
-const goToPage = (page) => {
-  if (page >= 1 && page <= totalPages) {
-    setCurrentPage(page);
-  }
-};
+  // ====================== UI ======================
   return (
     <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
       <div className="w-full max-w-4xl bg-auto rounded-lg shadow-lg p-6">
 
-        {/* HEADER SECTION (Adapted UI) */}
+        {/* Header */}
         <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-lg mb-6">
+          <h1 className="text-3xl font-extrabold text-indigo-700">
+            🏷 Coupon Products
+          </h1>
 
-          {/* Title */}
-          <h1 className="text-3xl font-extrabold text-indigo-700">🏷️ Coupon Products</h1>
-
-          {/* Search + Add Button */}
           <div className="flex items-center gap-4">
-
-            {/* Search Bar */}
             <input
               type="text"
               placeholder="Search coupon or product..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="border p-2 w-64 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="border p-2 w-64 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-400"
             />
 
-            {/* Add Button */}
             <button
-              className="bg-indigo-600 text-white px-4 py-2 rounded-xl shadow hover:bg-indigo-700 transition duration-150"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-xl shadow hover:bg-indigo-700"
               onClick={openAdd}
             >
               Add Coupon Product
@@ -211,7 +232,7 @@ const goToPage = (page) => {
         </div>
 
         {/* Table */}
-        <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md">
+        <div className="mt-4 overflow-hidden rounded-2xl border bg-white shadow-md">
           <table className="min-w-full text-sm">
             <thead className="bg-indigo-600 text-white">
               <tr>
@@ -221,35 +242,49 @@ const goToPage = (page) => {
                 <th className="px-6 py-3 text-left">Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {filtered.length > 0 ? (
                 currentItems.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-100 transition border-b border-gray-200">
-                    <td className="px-6 py-3 text-center border-r border-gray-200">
-                    {indexOfFirstItem + index + 1}
+                  <tr
+                    key={item.id}
+                    className="hover:bg-gray-100 border-b transition"
+                  >
+                    <td className="px-6 py-3 text-center">
+                      {indexOfFirstItem + index + 1}
                     </td>
-                    {/* Use nullish coalescing for cleaner display when relationship is null */}
-                    <td className="px-6 py-3 border-r border-gray-200">{item.coupon?.coupon_code ?? "N/A"}</td>
-                    <td className="px-6 py-3 border-r border-gray-200">{item.product?.product_name ?? "N/A"}</td>
+
+                    <td className="px-6 py-3">
+                      {item.coupon?.coupon_code ?? "N/A"}
+                    </td>
+
+                    <td className="px-6 py-3">
+                      {item.product?.product_name ?? "N/A"}
+                    </td>
+
                     <td className="px-6 py-3 flex gap-2 justify-center">
                       <button
                         onClick={() => openEdit(item)}
-                        className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition duration-150"
+                        className="text-indigo-600 hover:bg-indigo-100 p-2 rounded-full"
                       >
-                        <FaEdit className="w-5 h-5" />
+                        <FaEdit />
                       </button>
+
                       <button
                         onClick={() => confirmDelete(item.id)}
-                        className="text-red-600 hover:bg-red-100 p-2 rounded-full transition duration-150"
+                        className="text-red-600 hover:bg-red-100 p-2 rounded-full"
                       >
-                        <FaTrash className="w-5 h-5" />
+                        <FaTrash />
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="px-6 py-6 text-center text-gray-500">
+                  <td
+                    colSpan="4"
+                    className="text-center py-6 text-gray-500"
+                  >
                     No data found
                   </td>
                 </tr>
@@ -260,88 +295,89 @@ const goToPage = (page) => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-4">
+          <div className="flex justify-center items-center gap-2 mt-4">
             <button
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 border rounded disabled:opacity-50`}
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border rounded disabled:opacity-50"
             >
-            Prev
+              Prev
             </button>
 
             {[...Array(totalPages)].map((_, i) => (
-            <button
+              <button
                 key={i}
                 onClick={() => goToPage(i + 1)}
                 className={`px-3 py-1 rounded-lg ${
-                currentPage === i + 1 ? "bg-blue-600 text-white" : ""
+                  currentPage === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "border"
                 }`}
-            >
+              >
                 {i + 1}
-            </button>
+              </button>
             ))}
 
             <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 border rounded disabled:opacity-50`}
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50"
             >
-            Next
+              Next
             </button>
-        </div>
+          </div>
         )}
-        {/* Main Add/Edit Modal */}
+
+        {/* ADD / EDIT Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex justify-center items-center z-40">
+          <div className="fixed inset-0 backdrop-blur-md bg-black/20 bg-opacity-30 flex justify-center items-center z-40">
             <div className="bg-white p-6 rounded-xl shadow-2xl w-96">
               <h2 className="text-xl font-semibold mb-4 text-indigo-700">
                 {editId ? "Edit Coupon Product" : "Add Coupon Product"}
               </h2>
 
-              {/* Coupon Select Field */}
-              <label className="block mb-2 text-gray-700">Coupon</label>
+              {/* Coupon Select */}
+              <label className="block mb-2">Coupon</label>
               <select
                 name="coupon_id"
                 value={formData.coupon_id}
                 onChange={handleChange}
-                className="w-full border p-2 rounded-lg mb-4 focus:ring-indigo-500 focus:border-indigo-500"
+                className="border p-2 rounded w-full mb-4"
               >
                 <option value="">Select coupon</option>
-                {Array.isArray(coupons) &&
-                  coupons.map((c) => (
-                    <option key={c.coupon_master_id} value={c.coupon_master_id}>
-                      {c.coupon_code}
-                    </option>
-                  ))}
+                {coupons.map((c) => (
+                  <option key={c.coupon_master_id} value={c.coupon_master_id}>
+                    {c.coupon_code}
+                  </option>
+                ))}
               </select>
 
-              {/* Product Select Field */}
-              <label className="block mb-2 text-gray-700">Product</label>
+              {/* Product Select */}
+              <label className="block mb-2">Product</label>
               <select
                 name="product_id"
                 value={formData.product_id}
                 onChange={handleChange}
-                className="w-full border p-2 rounded-lg mb-6 focus:ring-indigo-500 focus:border-indigo-500"
+                className="border p-2 rounded w-full mb-4"
               >
                 <option value="">Select product</option>
-                {Array.isArray(products) &&
-                  products.map((p) => (
-                    <option key={p.product_id} value={p.product_id}>
-                      {p.product_name}
-                    </option>
-                  ))}
+                {products.map((p) => (
+                  <option key={p.product_id} value={p.product_id}>
+                    {p.product_name}
+                  </option>
+                ))}
               </select>
 
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition"
+                  className="px-4 py-2 bg-gray-400 text-white rounded"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded"
                 >
                   {editId ? "Update" : "Save"}
                 </button>
@@ -350,7 +386,7 @@ const goToPage = (page) => {
           </div>
         )}
 
-        {/* Integrated Alert/Confirmation Modal */}
+        {/* Alert / Confirm Modal */}
         <AlertModal
           isOpen={alertModal.isOpen}
           type={alertModal.type}

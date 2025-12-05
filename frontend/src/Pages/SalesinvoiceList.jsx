@@ -14,9 +14,16 @@ function SalesinvoiceList() {
       .catch((err) => console.error(err));
   }, []);
 
+  // 🔍 Filter by customer->customer_name
+  const filteredInvoices = invoices.filter((inv) => {
+    const name = inv.customer?.customer_name || "";
+    return name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
+
         {/* Header */}
         <div className="flex justify-between items-center mb-6 p-4 bg-white rounded-xl shadow-lg">
           <h1 className="text-3xl font-extrabold text-indigo-700">
@@ -50,75 +57,71 @@ function SalesinvoiceList() {
             </thead>
 
             <tbody className="text-sm divide-y divide-gray-200">
-              {invoices
-  .filter(inv =>
-    String(inv.customer_name || "")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  )
+              {filteredInvoices.map((inv) => (
+                <tr
+                  key={inv.sales_invoice_id}
+                  className="hover:bg-indigo-50 transition"
+                >
+                  <td className="py-3 px-6 font-semibold text-gray-800">
+                    {inv.invoice_no}
+                  </td>
 
-                .map((inv) => (
-                  <tr
-                    key={inv.sales_invoice_id}
-                    className="hover:bg-indigo-50 transition"
-                  >
-                    <td className="py-3 px-6 font-semibold text-gray-800">
-                      {inv.invoice_no}
-                    </td>
+                  <td className="py-3 px-6">
+                    {inv.customer?.customer_name || "N/A"}
+                  </td>
 
-                    <td className="py-3 px-6">
-                      {inv.customer?.customer_name || "N/A"}
-                    </td>
+                  <td className="py-3 px-6 font-bold text-gray-800">
+                    ₹{inv.grand_total}
+                  </td>
 
-                    <td className="py-3 px-6 font-bold text-gray-800">
-                      ₹{inv.grand_total}
-                    </td>
+                  <td className="py-3 px-6 font-bold text-green-600">
+                    ₹{inv.net_total}
+                  </td>
 
-                    <td className="py-3 px-6 font-bold text-green-600">
-                      ₹{inv.net_total}
-                    </td>
+                  <td className="py-3 px-6">
+                    {inv.payment_mode === 0 && (
+                      <span className="text-gray-700 font-medium">Cash</span>
+                    )}
+                    {inv.payment_mode === 1 && (
+                      <span className="text-blue-600 font-medium">UPI</span>
+                    )}
+                    {inv.payment_mode === 2 && (
+                      <span className="text-purple-600 font-medium">Card</span>
+                    )}
+                  </td>
 
-                    <td className="py-3 px-6">
-                      {inv.payment_mode === 0 && (
-                        <span className="text-gray-700 font-medium">Cash</span>
-                      )}
-                      {inv.payment_mode === 1 && (
-                        <span className="text-blue-600 font-medium">UPI</span>
-                      )}
-                      {inv.payment_mode === 2 && (
-                        <span className="text-purple-600 font-medium">Card</span>
-                      )}
-                    </td>
+                  <td className="py-3 px-6">{inv.invoice_date}</td>
 
-                    <td className="py-3 px-6">{inv.invoice_date}</td>
-                   <td className="py-3 px-6 text-center">
-  <button
-    onClick={() => navigate(`/sales-invoice/${inv.sales_invoice_id}/stitching-items`)}
-    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-  >
-    View Stitching
-  </button>
-</td>
+                  {/* Extra Alteration */}
+                  <td className="py-3 px-6 text-center">
+                    <button
+                      onClick={() =>
+                        navigate(`/sales-invoice/${inv.sales_invoice_id}/stitching-items`)
+                      }
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                      View Stitching
+                    </button>
+                  </td>
 
-                    {/* Items Button */}
-                    <td className="py-3 px-6 font-bold text-gray-800">
-                      <button
-                        onClick={() =>
-                          navigate(`/sales-invoice-items/${inv.sales_invoice_id}`)
-                        }
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow 
-                                   hover:bg-green-700 transition duration-200"
-                      >
-                        <span>📦</span> Items
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                  {/* Items */}
+                  <td className="py-3 px-6 font-bold text-gray-800">
+                    <button
+                      onClick={() =>
+                        navigate(`/sales-invoice-items/${inv.sales_invoice_id}`)
+                      }
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow 
+                                 hover:bg-green-700 transition duration-200"
+                    >
+                      <span>📦</span> Items
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
-      
     </div>
   );
 }
