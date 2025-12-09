@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 // SVG Icons
 const EditIcon = (props) => (
@@ -112,7 +112,7 @@ export default function Vendors() {
 
   const fetchVendors = async (page = 1, searchTerm = "") => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/vendors", { params: { page, search: searchTerm, per_page: perPage } });
+      const res = await api.get("/vendors", { params: { page, search: searchTerm, per_page: perPage } });
       setVendors(res.data.data);
       setCurrentPage(res.data.current_page);
       setLastPage(res.data.last_page);
@@ -126,7 +126,7 @@ export default function Vendors() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/api/vendors", formData);
+      await api.post("/vendors", formData);
       setAlertState({ isOpen: true, title: "Success", message: "Vendor added successfully!", type: "success" });
       setFormData({ vendor_name: "", email: "", phone: "", address: "", state: "", city: "", pincode: "", gst_number: "" });
       fetchVendors();
@@ -146,7 +146,7 @@ export default function Vendors() {
       type: "confirm",
       actionToRun: async () => {
         try {
-          await axios.delete(`http://127.0.0.1:8000/api/vendors/${vendor_id}`);
+          await api.delete(`/vendors/${vendor_id}`);
           fetchVendors();
           setAlertState({ isOpen: true, title: "Deleted", message: "Vendor deleted successfully!", type: "success" });
         } catch {
@@ -160,7 +160,7 @@ export default function Vendors() {
   const updateVendor = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://127.0.0.1:8000/api/vendors/${editData.vendor_id}`, editData);
+      await api.put(`/vendors/${editData.vendor_id}`, editData);
       setAlertState({ isOpen: true, title: "Success", message: "Vendor updated successfully!", type: "success" });
       setEditModal(false);
       fetchVendors();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 // Importing FaEdit and FaTrash for action buttons
 import { FaEdit, FaTrash } from "react-icons/fa"; 
+import api from "../Api";
 
 // === ICON COMPONENTS (Keeping the utility icons for AlertModal) ===
 
@@ -146,8 +146,8 @@ export default function ProductTypes() {
 
   // Fetch product types
   const fetchTypes = () => {
-    axios
-      .get("http://localhost:8000/api/product-types")
+    api
+      .get("/product-types")
       .then((res) => setTypes(res.data))
       .catch(() =>
         setAlertState({
@@ -176,8 +176,8 @@ export default function ProductTypes() {
           is_active: existingType ? existingType.is_active : true, 
         };
 
-        axios
-          .put(`http://localhost:8000/api/product-types/${selectedId}`, updateData)
+        api
+          .put(`/product-types/${selectedId}`, updateData)
           .then(() => {
             fetchTypes();
             setOpenModal(false);
@@ -206,8 +206,8 @@ export default function ProductTypes() {
             is_active: true, 
         };
 
-        axios
-          .post("http://localhost:8000/api/product-types", addData)
+        api
+          .post("/product-types", addData)
           .then(() => {
             fetchTypes();
             setOpenModal(false);
@@ -236,8 +236,8 @@ export default function ProductTypes() {
   // DELETE 
   // ---------------------------------------------------------
   const deleteProductType = (id) => {
-    axios
-        .delete(`http://localhost:8000/api/product-types/${id}`)
+    api
+        .delete(`/product-types/${id}`)
         .then(() => {
             fetchTypes();
             setAlertState({

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { FaTag, FaTrash, FaEdit } from "react-icons/fa";
+import api from "../Api";
 
 // --- START: Icon Components for Alerts ---
 const CheckCircleIcon = (props) => (
@@ -124,16 +124,16 @@ export default function CouponCategory() {
   };
 
   // Fetch data
-  useEffect(() => { axios.get("http://localhost:8000/api/product-categories").then(res => setCategories(res.data)).catch(err => console.error(err)); }, []);
-  useEffect(() => { axios.get("http://localhost:8000/api/coupons").then(res => setCoupons(res.data.data)).catch(err => console.error(err)); }, []);
-  const loadList = () => { axios.get("http://localhost:8000/api/coupon-categories").then(res => setList(res.data.data)).catch(err => console.error(err)); };
+  useEffect(() => { api.get("/product-categories").then(res => setCategories(res.data)).catch(err => console.error(err)); }, []);
+  useEffect(() => { api.get("/coupons").then(res => setCoupons(res.data.data)).catch(err => console.error(err)); }, []);
+  const loadList = () => { api.get("/coupon-categories").then(res => setList(res.data.data)).catch(err => console.error(err)); };
   useEffect(() => { loadList(); }, []);
 
   // Add mapping
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8000/api/coupon-categories", form);
+      await api.post("/coupon-categories", form);
       setForm({ coupon_id: "", category_id: "" });
       setAlert({ isOpen: true, title: "Success", message: "Added successfully", type: "success", onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); }, onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); } });
     } catch (err) {
@@ -148,7 +148,7 @@ export default function CouponCategory() {
   const handleDelete = async (id) => {
     setAlert({ ...alert, isOpen: false });
     try {
-      await axios.delete(`http://localhost:8000/api/coupon-categories/${id}`);
+      await api.delete(`/coupon-categories/${id}`);
       setAlert({ isOpen: true, title: "Deleted", message: "Removed successfully", type: "success", onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); }, onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); } });
     } catch (err) {
       setAlert({ isOpen: true, title: "Error", message: "Failed to delete", type: "error", onConfirm: () => setAlert({ ...alert, isOpen: false }), onClose: () => setAlert({ ...alert, isOpen: false }) });
@@ -158,7 +158,7 @@ export default function CouponCategory() {
   // Update
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8000/api/coupon-categories/${editData.id}`, editData);
+      await api.put(`/coupon-categories/${editData.id}`, editData);
       setEditData(null);
       setAlert({ isOpen: true, title: "Updated", message: "Updated successfully", type: "success", onConfirm: () => { setAlert({ ...alert, isOpen: false }); loadList(); }, onClose: () => { setAlert({ ...alert, isOpen: false }); loadList(); } });
     } catch (err) {

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // Removed: import Swal from "sweetalert2"; // No longer needed
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import api from "../Api";
 
 // --- START: Icon Components (for CustomAlert) ---
 const CheckCircleIcon = (props) => (
@@ -134,7 +134,7 @@ function Employee() {
    const navigate = useNavigate();
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/employees");
+      const res = await api.get("/employees");
       setEmployees(res.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -180,7 +180,7 @@ function Employee() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8000/api/employees", {
+      await api.post("/employees", {
         employee_code,
         employee_name,
         phone,
@@ -252,7 +252,7 @@ function Employee() {
     setAlert({ ...alert, isOpen: false });
 
     try {
-      await axios.delete(`http://localhost:8000/api/employees/${id}`);
+      await api.delete(`/employees/${id}`);
       
       // Show Success Alert
       setAlert({
@@ -288,7 +288,7 @@ function Employee() {
     e.preventDefault();
 
     try {
-      await axios.put(`http://localhost:8000/api/employees/${editingId}`, {
+      await api.put(`/employees/${editingId}`, {
         employee_code,
         employee_name,
         phone,

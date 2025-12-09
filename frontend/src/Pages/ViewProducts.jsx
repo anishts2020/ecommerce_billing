@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Barcode from "react-barcode";
 import { useNavigate } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa"; 
+import api from "../Api";
+import { BASE_URL } from "../Api";
 
 /* =========================
    SVG ICONS
@@ -143,28 +144,28 @@ const ViewProducts = () => {
 
   // fetch helpers
   const fetchProducts = () =>
-    axios.get("http://localhost:8000/api/products")
+    api.get("/products")
       .then((res) => setProducts(Array.isArray(res.data) ? res.data : res.data.data || []))
       .catch(() => setAlertState({ isOpen: true, title: "Error", message: "Failed to load products", type: "error" }));
 
       const fetchCategories = () =>
-      axios
-        .get("http://localhost:8000/api/product-categories")
+      api
+        .get("/product-categories")
         .then((res) =>
           setCategories(Array.isArray(res.data) ? res.data : res.data.data || [])
         )
         .catch(() => setCategories([]));
         const fetchTypes = () =>
-        axios
-          .get("http://localhost:8000/api/product-types")
+        api
+          .get("/product-types")
           .then((res) =>
             setTypes(Array.isArray(res.data) ? res.data : res.data.data || [])
           )
           .catch(() => setTypes([]));
-        const fetchColors = () => axios.get("http://localhost:8000/api/colors").then((res) => setColors(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setColors([]));
-  const fetchSizes = () => axios.get("http://localhost:8000/api/sizes").then((res) => setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setSizes([]));
-  const fetchVendors = () => axios.get("http://localhost:8000/api/vendors").then((res) => setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setVendors([]));
-  const fetchMaterials = () => axios.get("http://localhost:8000/api/materials").then((res) => setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setMaterials([]));
+        const fetchColors = () => api.get("/colors").then((res) => setColors(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setColors([]));
+  const fetchSizes = () => api.get("/sizes").then((res) => setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setSizes([]));
+  const fetchVendors = () => api.get("/vendors").then((res) => setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setVendors([]));
+  const fetchMaterials = () => api.get("/materials").then((res) => setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])).catch(()=>setMaterials([]));
 
   useEffect(() => {
     fetchProducts();
@@ -240,8 +241,8 @@ const ViewProducts = () => {
       // Laravel requires _method=PUT for FormData PUT requests
       formData.append("_method", "PUT");
   
-      await axios.post(
-        `http://localhost:8000/api/products/${editData.product_id}`,
+      await api.post(
+        `/products/${editData.product_id}`,
         formData,
         {
           headers: {
@@ -284,7 +285,7 @@ const ViewProducts = () => {
       message: "This product will be permanently deleted!",
       actionToRun: async () => {
         try {
-          await axios.delete(`http://localhost:8000/api/products/${id}`);
+          await api.delete(`/products/${id}`);
           setAlertState({ isOpen: true, type: "success", title: "Deleted!", message: "Product deleted successfully." });
           fetchProducts();
         } catch {
@@ -384,7 +385,7 @@ const ViewProducts = () => {
       formData.set("tax_percent", addForm.tax_percent ? Number(addForm.tax_percent) : 0);
   
       // API request with multipart form data
-      await axios.post("http://localhost:8000/api/products/store", formData, {
+      await api.post("/products/store", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   
@@ -543,7 +544,7 @@ const itemsPerPage = 10;
             <td className="py-3 px-4 text-center text-sm text-gray-800">
               {p.product_image ? (
                 <img
-                  src={`http://localhost:8000/product_images/${p.product_image}`}
+                  src={`${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`}
                   alt="Product"
                   className="w-14 h-14 object-cover rounded-lg shadow mx-auto"
                 />
@@ -832,7 +833,7 @@ const itemsPerPage = 10;
   {/* 2️⃣ Show saved image ONLY IF preview doesn't exist */}
   {!editData.previewImage && editData.product_image_url && (
     <img
-      src={`http://localhost:8000/product_images/${editData.product_image_url}`}
+      src={`${BASE_URL.replace("/api", "")}/product_images/${editData.product_image_url}`}
       alt="Saved Product"
       className="mt-2 w-32 h-32 object-cover rounded border"
     />

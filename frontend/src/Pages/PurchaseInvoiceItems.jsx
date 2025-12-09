@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../Api";
 
 function PurchaseInvoiceItems() {
     const { id } = useParams();
@@ -14,8 +14,8 @@ function PurchaseInvoiceItems() {
         setError(null);
 
         // Fetch purchase invoice + items
-        axios
-            .get(`http://localhost:8000/api/purchase-invoices/${id}`)
+        api
+            .get(`/purchase-invoices/${id}`)
             .then((res) => {
                 setInvoice(res.data);
                 setItems(res.data.items || []);

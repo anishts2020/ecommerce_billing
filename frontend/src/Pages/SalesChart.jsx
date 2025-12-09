@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Bar } from "react-chartjs-2";
+import api from "../Api";
 
 import {
     Chart as ChartJS,
@@ -52,8 +52,8 @@ export default function SalesChart() {
 
     // ⭐ Fetch Chart Data by Year
     useEffect(() => {
-        axios
-            .get(`http://localhost:8000/api/sales/monthly-summary/${selectedYear}`)
+        api
+            .get(`/sales/monthly-summary/${selectedYear}`)
             .then((res) => {
                 const data = res.data;
 

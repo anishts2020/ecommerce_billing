@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Chart } from "react-google-charts";
+import api from "../Api";
 
 export default function MonthlyCategoryPieChart() {
     const [chartData, setChartData] = useState([["Category", "Total Sold"]]);
     const [selectedSlice, setSelectedSlice] = useState(null);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/monthly-category-sales")
+        api.get("/monthly-category-sales")
             .then((res) => {
                 const rows = res.data.map((item) => [
                     item.category,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../Api";
 
 // ===== ICONS =====
 const EditIcon = (props) => (
@@ -101,7 +101,7 @@ export default function ProductSizePage() {
   // ===== Fetch Sizes =====
   const fetchSizes = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/product-sizes");
+      const response = await api.get("/product-sizes");
       setSizes(response.data);
     } catch (error) {
       setAlertState({ isOpen: true, title: "Error", message: "Failed to fetch sizes", type: "error" });
@@ -114,7 +114,7 @@ export default function ProductSizePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/api/product-sizes", form);
+      await api.post("/product-sizes", form);
       setAlertState({ isOpen: true, title: "Success", message: "Size added successfully!", type: "success" });
       setForm({ size_name: "", description: "", is_active: true });
       fetchSizes();
@@ -132,7 +132,7 @@ export default function ProductSizePage() {
       type: "confirm",
       actionToRun: async () => {
         try {
-          await axios.delete(`http://127.0.0.1:8000/api/product-sizes/${id}`);
+          await api.delete(`/product-sizes/${id}`);
           setAlertState({ isOpen: true, title: "Deleted", message: "Size deleted successfully!", type: "success" });
           fetchSizes();
         } catch {
@@ -147,7 +147,7 @@ export default function ProductSizePage() {
   const updateSize = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://127.0.0.1:8000/api/product-sizes/${editData.size_id}`, editData);
+      await api.put(`/product-sizes/${editData.size_id}`, editData);
       setEditModal(false);
       setAlertState({ isOpen: true, title: "Success", message: "Size updated successfully!", type: "success" });
       fetchSizes();

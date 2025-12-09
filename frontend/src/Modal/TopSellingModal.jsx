@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../Api";
 
 export default function TopSellingModal({ onClose }) {
   const [topProducts, setTopProducts] = useState([]);
@@ -11,8 +11,8 @@ export default function TopSellingModal({ onClose }) {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get(
-          "http://localhost:8000/api/top-selling-products"
+        const res = await api.get(
+          "/top-selling-products"
         );
 
         if (Array.isArray(res.data)) {

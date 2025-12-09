@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 // 1. Importing FaEdit and FaTrash for action buttons
 import { FaEdit, FaTrash } from "react-icons/fa"; 
+import api from "../Api";
 
 // === ICON COMPONENTS (Keeping the utility icons for AlertModal) ===
 
@@ -150,8 +150,8 @@ export default function ProductCategories() {
 
   // ---------------------------------------------------------
   const fetchCategories = () => {
-    axios
-      .get("http://localhost:8000/api/product-categories")
+    api
+      .get("/product-categories")
       .then((res) => setCategories(res.data))
       .catch(() =>
         setAlertState({
@@ -172,8 +172,8 @@ export default function ProductCategories() {
     const data = { product_category_name, description };
 
     if (selectedId) {
-      axios
-        .put(`http://localhost:8000/api/product-categories/${selectedId}`, data)
+      api
+        .put(`/product-categories/${selectedId}`, data)
         .then(() => {
           fetchCategories();
           setOpenModal(false);
@@ -197,8 +197,8 @@ export default function ProductCategories() {
           })
         );
     } else {
-      axios
-        .post("http://localhost:8000/api/product-categories", data)
+      api
+        .post("/product-categories", data)
         .then(() => {
           fetchCategories();
           setOpenModal(false);
@@ -234,8 +234,8 @@ export default function ProductCategories() {
   // ---------------------------------------------------------
   const deleteCategory = async (id) => {
     try {
-      await axios.delete(
-        `http://localhost:8000/api/product-categories/${id}`
+      await api.delete(
+        `/product-categories/${id}`
       );
       fetchCategories();
 

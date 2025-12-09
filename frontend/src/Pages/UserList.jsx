@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import AlertModal from "./AlertModal";
+import api from "../Api";
 
 function UserList({ reload }) {
   const [users, setUsers] = useState([]);
@@ -15,7 +15,7 @@ function UserList({ reload }) {
   // Fetch Users
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/users");
+      const res = await api.get("/users");
       setUsers(res.data.users || []);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -45,7 +45,7 @@ function UserList({ reload }) {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/users/${deleteId}`);
+      await api.delete(`/users/${deleteId}`);
       setDeleteId(null);
       fetchUsers();
     } catch (error) {

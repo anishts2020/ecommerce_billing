@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import AlertModal from "./AlertModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 
 function CreateUser() {
@@ -44,7 +44,7 @@ function CreateUser() {
   // Fetch users
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/users");
+      const res = await api.get("/users");
       setUsers(res.data);
     } catch (err) {
       console.error(err);
@@ -91,7 +91,7 @@ function CreateUser() {
     }
 
     try {
-      await axios.post("http://localhost:8000/api/users", {
+      await api.post("/users", {
         name: form.user_name,
         email: form.user_email,
         password: form.user_pass,
@@ -123,7 +123,7 @@ function CreateUser() {
 
   const deleteUser = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/users/${deleteId}`);
+      await api.delete(`/users/${deleteId}`);
       setUsers(users.filter((u) => u.id !== deleteId));
       showAlert("success", "Deleted", "User deleted successfully!");
     } catch {
@@ -146,8 +146,8 @@ function CreateUser() {
   const updateUser = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put(
-        `http://localhost:8000/api/users/${editingUser}`,
+      const res = await api.put(
+        `/users/${editingUser}`,
         editForm
       );
       setUsers(users.map((u) => (u.id === editingUser ? res.data : u)));

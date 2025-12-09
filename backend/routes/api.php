@@ -136,14 +136,14 @@ Route::apiResource('vendors', VendorController::class);
 |--------------------------------------------------------------------------
 */
 
+// barcode lookup
+Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
+
 Route::get('/products', [ProductsController::class, 'index']);
 Route::post('/products/store', [ProductsController::class, 'store']);
 Route::get('/products/{id}', [ProductsController::class, 'show']);
 Route::put('/products/{id}', [ProductsController::class, 'update']);
 Route::delete('/products/{id}', [ProductsController::class, 'destroy']);
-
-// barcode lookup
-Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
 /*
 |--------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import TopSellingModal from "../Modal/TopSellingModal";
+import api from "../Api";
 
 import {
   BuildingStorefrontIcon,
@@ -46,15 +46,24 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/products");
-        const data = await res.json();
+        // API Call
+        const res = await api.get("/products");
+
+        // Axios returns JSON automatically in res.data
+        const data = res.data;
+
+        // Handle array or { data: [...] }
         const list = Array.isArray(data) ? data : data.data || [];
-        const low = list.filter((p) => Number(p.quantity_on_hand) <= 2);
+
+        const low = list.filter(
+          (p) => Number(p.quantity_on_hand) <= 2
+        );
 
         setProducts(list);
         setLowStock(low);
+
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load products:", err);
       }
     };
 
@@ -63,8 +72,8 @@ export default function Dashboard() {
 
   // Total sales
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/total-sales-today")
+    api
+      .get("/total-sales-today")
       .then((res) => setTotalAmount(res.data.totalAmount || 0))
       .catch(() => setTotalAmount(0));
   }, []);
@@ -72,8 +81,8 @@ export default function Dashboard() {
   // Load sales list when modal opens
   useEffect(() => {
     if (isModalOpen) {
-      axios
-        .get("http://localhost:8000/api/total-sales-today")
+      api
+        .get("/total-sales-today")
         .then((res) => setSales(res.data.sales || []))
         .catch(() => setSales([]));
     }
@@ -81,13 +90,20 @@ export default function Dashboard() {
 
   // Load revenue
   useEffect(() => {
-    fetch("http://localhost:8000/api/total-revenue-today")
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchRevenue = async () => {
+      try {
+        const res = await api.get("/total-revenue-today");
+        const data = res.data;
+
         setTotalRevenue(data.totalRevenueToday);
         setRevenueData(data.productWiseRevenue);
-      })
-      .catch((err) => console.error(err));
+
+      } catch (err) {
+        console.error("Failed to fetch revenue:", err);
+      }
+    };
+
+    fetchRevenue();
   }, []);
 
   if (!user) return <div className="p-4">Loading...</div>;
@@ -110,14 +126,7 @@ export default function Dashboard() {
       <h2 className="text-2xl font-bold mb-6">Welcome, {user.username}</h2>
 
       {/* ================= ROW 1 ================= */}
-      <div className="grid grid-cols-4 gap-4 mt-6">
-        <div className={cardClass} onClick={() => navigate("/vendors")}>
-          <BuildingStorefrontIcon className={iconClass} />
-          <div>
-            <h3 className="font-semibold text-lg">Vendors</h3>
-            <p className="text-sm text-gray-600">Manage vendor details</p>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 gap-4 mt-6">
 
         <div className={cardClass} onClick={() => navigate("/sales-invoice")}>
           <ChartBarIcon className={iconClass} />
@@ -134,58 +143,12 @@ export default function Dashboard() {
             <p className="text-sm text-gray-600">Manage purchase details</p>
           </div>
         </div>
-
-        <div className={cardClass} onClick={() => navigate("/view-products")}>
-          <CubeIcon className={iconClass} />
-          <div>
-            <h3 className="font-semibold text-lg">Products</h3>
-            <p className="text-sm text-gray-600">Manage product details</p>
-          </div>
-        </div>
       </div>
+
+    
 
       {/* ================= ROW 2 ================= */}
-      <div className="grid grid-cols-4 gap-4 mt-6">
-        
-
-        <div
-          className={cardClass}
-          onClick={() => navigate("/product-categories")}
-        >
-          <Squares2X2Icon className={iconClass} />
-          <div>
-            <h3 className="font-semibold text-lg">Product Category</h3>
-            <p className="text-sm text-gray-600">Manage product category</p>
-          </div>
-        </div>
-
-        <div className={cardClass} onClick={() => navigate("/materials")}>
-          <ClipboardDocumentListIcon className={iconClass} />
-          <div>
-            <h3 className="font-semibold text-lg">Materials</h3>
-            <p className="text-sm text-gray-600">Manage material details</p>
-          </div>
-        </div>
-
-        <div className={cardClass} onClick={() => navigate("/customers")}>
-          <UsersIcon className={iconClass} />
-          <div>
-            <h3 className="font-semibold text-lg">Customers</h3>
-            <p className="text-sm text-gray-600">Manage customer details</p>
-          </div>
-        </div>
-        <div className={cardClass} onClick={() => navigate("/employees")}>
-          <UserGroupIcon className={iconClass} />
-          <div>
-            <h3 className="font-semibold text-lg">Employees</h3>
-            <p className="text-sm text-gray-600">Manage employees</p>
-          </div>
-        </div>
-
-      </div>
-
-      {/* ================= ROW 3 ================= */}
-      <div className="grid grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-2 gap-4 mt-6">
 
         {/* Total Sales Card */}
         <div className={cardClass} onClick={() => setIsModalOpen(true)}>
@@ -202,6 +165,14 @@ export default function Dashboard() {
             <p className="text-sm text-gray-600">₹ {totalRevenue}</p>
           </div>
         </div>
+       
+      </div>
+
+
+      {/* ================= ROW 3 ================= */}
+      <div className="grid grid-cols-2 gap-4 mt-6">
+
+       
         <div className={cardClass} onClick={() => setShowTopSellingModal(true)}>
           <ChartBarIcon className={iconClass} />
           <div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 export default function CouponProducts() {
   const [couponProducts, setCouponProducts] = useState([]);
@@ -52,9 +52,9 @@ export default function CouponProducts() {
   const fetchAll = async () => {
     try {
       const [couponRes, productRes, cpRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/coupon"),
-        axios.get("http://localhost:8000/api/products"),
-        axios.get("http://localhost:8000/api/coupon-products"),
+        api.get("/coupon"),
+        api.get("/products"),
+        api.get("/coupon-products"),
       ]);
 
       const couponData = Array.isArray(couponRes.data.data)
@@ -120,8 +120,8 @@ export default function CouponProducts() {
       };
 
       if (editId) {
-        await axios.put(
-          `http://localhost:8000/api/coupon-products/${editId}`,
+        await api.put(
+          `/coupon-products/${editId}`,
           payload
         );
         openAlert(
@@ -130,8 +130,8 @@ export default function CouponProducts() {
           "Product Coupon updated successfully."
         );
       } else {
-        await axios.post(
-          "http://localhost:8000/api/coupon-products",
+        await api.post(
+          "/coupon-products",
           payload
         );
         openAlert(
@@ -162,8 +162,8 @@ export default function CouponProducts() {
   const handleDelete = async (id) => {
     closeAlert();
     try {
-      await axios.delete(
-        `http://localhost:8000/api/coupon-products/${id}`
+      await api.delete(
+        `/coupon-products/${id}`
       );
       fetchAll();
       openAlert(

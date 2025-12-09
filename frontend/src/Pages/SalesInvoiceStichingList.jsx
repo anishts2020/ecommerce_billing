@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../Api";
 
 function SalesInvoiceStitchingList() {
   const { invoice_id } = useParams();
   const navigate = useNavigate();
   const [rows, setRows] = useState([]);
-  const API_BASE = "http://127.0.0.1:8000/api";
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE}/sales-invoices/${invoice_id}/stitching-items`)
+    api
+      .get(`/sales-invoices/${invoice_id}/stitching-items`)
       .then((res) => setRows(res.data))
       .catch((err) => console.error("Stitching load error:", err));
   }, [invoice_id]);

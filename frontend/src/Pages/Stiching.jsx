@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import api from "../Api";
 
 //
 // ------------------------------------------------------------
@@ -112,12 +112,12 @@ function StichingTypes() {
     onClose: () => setAlert((a) => ({ ...a, isOpen: false })),
   });
 
-  const API_URL = "http://localhost:8000/api/stiching-types";
+  const API_URL = "/stiching-types";
 
   // FETCH
   const fetchTypes = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await api.get(API_URL);
       setTypes(res.data);
     } catch (err) {
       setAlert({
@@ -169,9 +169,9 @@ function StichingTypes() {
 
     try {
       if (editingId) {
-        await axios.put(`${API_URL}/${editingId}`, data);
+        await api.put(`${API_URL}/${editingId}`, data);
       } else {
-        await axios.post(API_URL, data);
+        await api.post(API_URL, data);
       }
 
       closeModal();
@@ -212,7 +212,7 @@ function StichingTypes() {
     setAlert((a) => ({ ...a, isOpen: false }));
 
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await api.delete(`${API_URL}/${id}`);
 
       setAlert({
         isOpen: true,

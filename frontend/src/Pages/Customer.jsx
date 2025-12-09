@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import api from "../Api";
 
 //
 // ------------------------------------------------------------
@@ -139,7 +139,7 @@ function Customer() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/customers");
+      const res = await api.get("/customers");
       setCustomers(res.data);
     } catch (err) {
       setAlert({
@@ -174,13 +174,13 @@ function Customer() {
     e.preventDefault();
 
     const url = editingId
-      ? `http://localhost:8000/api/customers/${editingId}`
-      : "http://localhost:8000/api/customers";
+      ? `/customers/${editingId}`
+      : "/customers";
 
     try {
       editingId
-        ? await axios.put(url, formData)
-        : await axios.post(url, formData);
+        ? await api.put(url, formData)
+        : await api.post(url, formData);
 
       closeModal();
 
@@ -219,7 +219,7 @@ function Customer() {
     setAlert(a => ({ ...a, isOpen: false }));
 
     try {
-      await axios.delete(`http://localhost:8000/api/customers/${id}`);
+      await api.delete(`/customers/${id}`);
 
       setAlert({
         isOpen: true,
