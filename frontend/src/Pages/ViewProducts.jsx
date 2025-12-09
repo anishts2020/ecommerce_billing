@@ -186,6 +186,10 @@ const ViewProducts = () => {
      - handleUpdate sends PUT to update product
      ========================= */
   const handleEdit = (p) => {
+    const imageUrl = p.image_url 
+      ? p.image_url 
+      : `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`;
+
     setEditData({
       product_id: (p.product_id || "").toString(),
       product_code: p.product_code || "",
@@ -205,10 +209,11 @@ const ViewProducts = () => {
       selling_price: p.selling_price || "",
       tax_percent: p.tax_percent || "",
 
-      product_image_url: p.product_image, // ← store saved filename
+      product_image_url: imageUrl,  // FULL CORRECT URL HERE
       previewImage: null,
       product_image: null,
     });
+
     setShowEditModal(true);
   };
 
@@ -544,7 +549,8 @@ const itemsPerPage = 10;
             <td className="py-3 px-4 text-center text-sm text-gray-800">
               {p.product_image ? (
                 <img
-                  src={`${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`}
+                  //src={`${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`}
+                  src={p.image_url}
                   alt="Product"
                   className="w-14 h-14 object-cover rounded-lg shadow mx-auto"
                 />
@@ -833,7 +839,7 @@ const itemsPerPage = 10;
   {/* 2️⃣ Show saved image ONLY IF preview doesn't exist */}
   {!editData.previewImage && editData.product_image_url && (
     <img
-      src={`${BASE_URL.replace("/api", "")}/product_images/${editData.product_image_url}`}
+      src={editData.product_image_url}
       alt="Saved Product"
       className="mt-2 w-32 h-32 object-cover rounded border"
     />
