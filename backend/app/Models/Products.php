@@ -17,6 +17,15 @@ class Products extends Model
         'cost_price','selling_price','tax_percent','is_published','is_active','product_image',
     ];
 
+    protected $appends = ['image_url'];
+    public function getImageUrlAttribute()
+    {
+        if (!$this->product_image) {
+            return null;
+        }
+        return url('product_images/' . $this->product_image);
+    }
+
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'category_id', 'product_category_id');
