@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../Api";
 
 function PurchaseInvoiceList() {
     const [invoices, setInvoices] = useState([]);
@@ -13,8 +13,8 @@ function PurchaseInvoiceList() {
         setLoading(true);
         setError(null);
 
-        axios
-            .get("http://localhost:8000/api/purchase-invoices")
+        api
+            .get("/purchase-invoices")
             .then((res) => {
                 // Helpful debug log — check shape in console
                 console.log("API invoices payload:", res.data);

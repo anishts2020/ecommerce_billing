@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 /* --------------------- SVG Icons --------------------- */
 const AlertTriangleIcon = (props) => (
@@ -100,7 +100,7 @@ export default function Colors() {
   const fetchColors = async (page = 1, search = "") => {
     setLoading(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/colors", { params: { page, search } });
+      const res = await api.get("/colors", { params: { page, search } });
       setColors(res.data.data || []);
       setCurrentPage(res.data.current_page || 1);
       setLastPage(res.data.last_page || 1);
@@ -128,12 +128,12 @@ export default function Colors() {
     if (!selectedColor.value || !selectedColor.code) { openAlert("Missing Fields", "Color name and code are required.", "error"); return; }
     try {
       if (selectedColor.id) {
-        await axios.put(`http://127.0.0.1:8000/api/colors/${selectedColor.id}`, {
+        await api.put(`/colors/${selectedColor.id}`, {
           color_name: selectedColor.value, color_code: selectedColor.code
         });
         openAlert("Updated!", "Color updated successfully.", "success");
       } else {
-        await axios.post("http://127.0.0.1:8000/api/colors", {
+        await api.post("/colors", {
           color_name: selectedColor.value, color_code: selectedColor.code, is_active: 1
         });
         openAlert("Saved!", "Color added successfully.", "success");
@@ -148,7 +148,7 @@ export default function Colors() {
   const handleDeleteConfirmed = async () => {
     if (!deleteConfirm.id) return;
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/colors/${deleteConfirm.id}`);
+      await api.delete(`/colors/${deleteConfirm.id}`);
       openAlert("Deleted!", "Color deleted successfully.", "success");
       fetchColors(currentPage, searchTerm);
     } catch (err) {

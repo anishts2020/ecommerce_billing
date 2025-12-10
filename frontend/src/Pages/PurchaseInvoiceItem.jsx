@@ -1,7 +1,7 @@
 // src/Pages/PurchaseInvoiceItems.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Select from "react-select";
+import api from "../Api";
 
 /* ---------- Custom Alert Component (from Materials.jsx) ---------- */
 const CheckCircleIcon = (props) => (
@@ -98,7 +98,7 @@ export default function PurchaseInvoiceItems() {
 
   // Load products
   useEffect(() => {
-    axios.get("http://localhost:8000/api/products")
+    api.get("/products")
       .then((res) => {
         const data = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
         setProducts(data);
@@ -108,7 +108,7 @@ export default function PurchaseInvoiceItems() {
 
   // Load vendors
   useEffect(() => {
-    axios.get("http://localhost:8000/api/vendors")
+    api.get("/vendors")
       .then((res) => {
         const data = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
         setVendors(data);
@@ -198,7 +198,7 @@ export default function PurchaseInvoiceItems() {
     };
 
     try {
-      await axios.post("http://localhost:8000/api/purchase-invoices", payload, {
+      await api.post("/purchase-invoices", payload, {
         headers: { "Content-Type": "application/json" },
       });
 

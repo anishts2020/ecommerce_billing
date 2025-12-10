@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 export default function InventoryTransaction() {
   const [products, setProducts] = useState([]);
@@ -44,9 +44,9 @@ export default function InventoryTransaction() {
   const fetchDropdownData = async () => {
     try {
       const [prodRes, typeRes, refRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/products"),
-        axios.get("http://localhost:8000/api/transaction-type"),
-        axios.get("http://localhost:8000/api/reference"),
+        api.get("/products"),
+        api.get("/transaction-type"),
+        api.get("/reference"),
       ]);
       setProducts(prodRes.data);
       setTransactionTypes(typeRes.data);
@@ -63,8 +63,8 @@ export default function InventoryTransaction() {
 
   const fetchTransactions = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:8000/api/inventory-transactions"
+      const res = await api.get(
+        "/inventory-transactions"
       );
       setTransactions(res.data);
     } catch {
@@ -111,8 +111,8 @@ export default function InventoryTransaction() {
       };
 
       if (editingId) {
-        await axios.put(
-          `http://localhost:8000/api/inventory-transactions/${editingId}`,
+        await api.put(
+          `/inventory-transactions/${editingId}`,
           payload
         );
         setAlert({
@@ -122,8 +122,8 @@ export default function InventoryTransaction() {
           message: "Transaction Updated Successfully",
         });
       } else {
-        await axios.post(
-          "http://localhost:8000/api/inventory-transactions",
+        await api.post(
+          "/inventory-transactions",
           payload
         );
         setAlert({
@@ -183,8 +183,8 @@ export default function InventoryTransaction() {
       title: "Are you sure?",
       message: "This inventory transaction will be permanently deleted",
       onConfirm: async () => {
-        await axios.delete(
-          `http://localhost:8000/api/inventory-transactions/${id}`
+        await api.delete(
+          `/inventory-transactions/${id}`
         );
         setAlert({ isOpen: false });
         fetchTransactions();

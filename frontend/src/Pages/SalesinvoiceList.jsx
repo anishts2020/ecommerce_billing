@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../Api";
 
 function SalesinvoiceList() {
   const [invoices, setInvoices] = useState([]);
@@ -8,8 +8,8 @@ function SalesinvoiceList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/sales-invoices")
+    api
+      .get("/sales-invoices")
       .then((res) => setInvoices(res.data))
       .catch((err) => console.error(err));
   }, []);

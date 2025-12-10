@@ -1,7 +1,7 @@
 // src/Pages/PurchaseInvoice.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Select from "react-select";
+import api from "../Api";
 
 /* ---------- Icons ---------- */
 const CheckCircleIcon = (props) => (
@@ -112,7 +112,7 @@ export default function PurchaseInvoice() {
 
   /* ---------- Fetch Products ---------- */
   useEffect(() => {
-    axios.get("http://localhost:8000/api/products")
+    api.get("/products")
       .then(res => {
         const data = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
         setProducts(data);
@@ -122,7 +122,7 @@ export default function PurchaseInvoice() {
 
   /* ---------- Fetch Vendors ---------- */
   useEffect(() => {
-    axios.get("http://localhost:8000/api/vendors")
+    api.get("/vendors")
       .then(res => {
         const data = Array.isArray(res.data) ? res.data : res.data?.data ?? [];
         setVendors(data);
@@ -213,7 +213,7 @@ export default function PurchaseInvoice() {
     };
 
     try {
-      await axios.post("http://localhost:8000/api/purchase-invoices", payload, {
+      await api.post("/purchase-invoices", payload, {
         headers: { "Content-Type": "application/json" },
       });
 

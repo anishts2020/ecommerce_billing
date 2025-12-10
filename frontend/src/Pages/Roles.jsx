@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 export default function Roles() {
   const [form, setForm] = useState({ name: "", description: "" });
@@ -27,7 +27,7 @@ export default function Roles() {
   // Fetch roles
   const fetchRoles = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/roles");
+      const res = await api.get("/roles");
       setRoles(res.data);
     } catch (error) {
       console.error("Error fetching roles", error);
@@ -61,7 +61,7 @@ export default function Roles() {
 
     try {
       if (editingId) {
-        await axios.put(`http://localhost:8000/api/roles/${editingId}`, form);
+        await api.put(`/roles/${editingId}`, form);
 
         setModal({
           open: true,
@@ -70,7 +70,7 @@ export default function Roles() {
           message: "Role updated successfully!",
         });
       } else {
-        await axios.post("http://localhost:8000/api/roles", form);
+        await api.post("/roles", form);
 
         setModal({
           open: true,
@@ -101,7 +101,7 @@ export default function Roles() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/roles/${deleteId}`);
+      await api.delete(`/roles/${deleteId}`);
       setShowDeleteModal(false);
 
       setModal({

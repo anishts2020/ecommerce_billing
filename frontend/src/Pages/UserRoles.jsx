@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import AlertModal from "../Modal/AlertModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 function UserRoles() {
   const [userRoles, setUserRoles] = useState([]);
@@ -54,9 +54,9 @@ function UserRoles() {
   const fetchAll = async () => {
     try {
       const [urRes, uRes, rRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/user-role"),
-        axios.get("http://localhost:8000/api/users"),
-        axios.get("http://localhost:8000/api/roles"),
+        api.get("/user-role"),
+        api.get("/users"),
+        api.get("/roles"),
       ]);
       const validData = urRes.data.filter(
         (item) => item.user !== null && item.role !== null
@@ -119,13 +119,13 @@ function UserRoles() {
 
     try {
       if (editingId) {
-        await axios.put(
-          `http://localhost:8000/api/user-role/${editingId}`,
+        await api.put(
+          `/user-role/${editingId}`,
           formData
         );
         openAlert("success", "Success", "User role updated successfully");
       } else {
-        await axios.post("http://localhost:8000/api/user-role", formData);
+        await api.post("/user-role", formData);
         openAlert("success", "Success", "Role assigned successfully!");
       }
 
@@ -149,7 +149,7 @@ function UserRoles() {
 
   const confirmDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/user-role/${id}`);
+      await api.delete(`/user-role/${id}`);
       openAlert("success", "Deleted", "User Role deleted successfully");
       fetchAll();
     } catch (err) {

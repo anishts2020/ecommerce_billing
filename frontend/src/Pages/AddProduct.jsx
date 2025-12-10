@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../Api";
 
 /* ----------------------------------------------------------
    SVG ICONS
@@ -136,27 +136,27 @@ const AddProduct = () => {
   const [materials, setMaterials] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/categories").then((res) =>
+    api.get("/categories").then((res) =>
       setCategories(Array.isArray(res.data) ? res.data : res.data.data || [])
     );
 
-    axios.get("http://localhost:8000/api/types").then((res) =>
+    api.get("/types").then((res) =>
       setTypes(Array.isArray(res.data) ? res.data : res.data.data || [])
     );
 
-    axios.get("http://localhost:8000/api/colors").then((res) =>
+    api.get("/colors").then((res) =>
       setColors(Array.isArray(res.data) ? res.data : res.data.data || [])
     );
 
-    axios.get("http://localhost:8000/api/sizes").then((res) =>
+    api.get("/sizes").then((res) =>
       setSizes(Array.isArray(res.data) ? res.data : res.data.data || [])
     );
 
-    axios.get("http://localhost:8000/api/materials").then((res) =>
+    api.get("/materials").then((res) =>
       setMaterials(Array.isArray(res.data) ? res.data : res.data.data || [])
     );
 
-    axios.get("http://localhost:8000/api/vendors").then((res) =>
+    api.get("/vendors").then((res) =>
       setVendors(Array.isArray(res.data) ? res.data : res.data.data || [])
     );
   }, []);
@@ -197,8 +197,8 @@ const AddProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios
-      .post("http://localhost:8000/api/products/store", formData)
+    api
+      .post("/products/store", formData)
       .then(() => {
         openAlert("Product Added Successfully!", "What would you like to do next?");
       })

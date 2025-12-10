@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Chart } from "react-google-charts";
+import api from "../Api";
 
 export default function DualAxisLineChart() {
     const [chartData, setChartData] = useState([
@@ -8,7 +8,7 @@ export default function DualAxisLineChart() {
     ]);
 
     useEffect(() => {
-        axios.get("http://localhost:8000/api/sales-profit-line")
+        api.get("/sales-profit-line")
             .then((res) => {
                 const rows = res.data.map(item => [
                     "Day " + item.day,

@@ -1,7 +1,7 @@
 // src/Pages/Materials.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 // ICONS (kept as svg for alert modal)
 const AlertTriangleIcon = (props) => (
@@ -146,7 +146,7 @@ export default function Materials() {
   // fetch
   const fetchMaterials = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/materials");
+      const res = await api.get("/materials");
       setMaterials(normalize(res.data));
     } catch (err) {
       setAlertState({ isOpen: true, title: "Load failed", message: err.response?.data?.message || err.message, type: "error" });
@@ -182,7 +182,7 @@ export default function Materials() {
     }
 
     try {
-      await axios.post("http://127.0.0.1:8000/api/materials", {
+      await api.post("/materials", {
         material_name: name,
         description: (formData.description || "").trim(),
       });
@@ -209,7 +209,7 @@ export default function Materials() {
       type: "delete-confirm",
       actionToRun: async () => {
         try {
-          await axios.delete(`http://127.0.0.1:8000/api/materials/${id}`);
+          await api.delete(`/materials/${id}`);
           await fetchMaterials();
           setAlertState({ isOpen: true, title: "Deleted", message: "Material deleted successfully.", type: "success" });
         } catch (err) {
@@ -247,7 +247,7 @@ export default function Materials() {
     }
 
     try {
-      await axios.put(`http://127.0.0.1:8000/api/materials/${editData.id}`, {
+      await api.put(`/materials/${editData.id}`, {
         material_name: name,
         description: (editData.description || "").trim(),
       });

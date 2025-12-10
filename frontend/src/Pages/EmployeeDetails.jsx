@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../Api";
 
 function EmployeeDetails() {
     const [employees, setEmployees] = useState([]);
@@ -13,7 +13,7 @@ function EmployeeDetails() {
 
     const fetchEmployees = async () => {
         try {
-            const res = await axios.get("http://127.0.0.1:8000/api/employees");
+            const res = await api.get("/employees");
             setEmployees(res.data);
             setError("");
         } catch (err) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../Api";
 
 function PurchaseReport() {
   const [reports, setReports] = useState([]);
@@ -20,7 +20,7 @@ function PurchaseReport() {
       if (fromDate) params.from = fromDate;
       if (toDate) params.to = toDate;
 
-      const res = await axios.get("http://localhost:8000/api/purchase-report", { params });
+      const res = await api.get("/purchase-report", { params });
       setReports(res.data);
       setCurrentPage(1); // reset when filtering
     } catch (err) {

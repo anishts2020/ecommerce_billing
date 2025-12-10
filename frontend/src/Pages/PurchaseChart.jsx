@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
-import axios from "axios";
 import { Bar } from "react-chartjs-2";
+import api from "../Api";
 import {
     Chart as ChartJS,
     BarElement,
@@ -43,8 +43,8 @@ export default function PurchaseChart() {
             setLoading(true);
 
             // ✅ FIXED: You forgot backticks `
-            const res = await axios.get(
-                `http://localhost:8000/api/purchase-chart-data?year=${selectedYear}`
+            const res = await api.get(
+                `/purchase-chart-data?year=${selectedYear}`
             );
 
             if (!Array.isArray(res.data)) {

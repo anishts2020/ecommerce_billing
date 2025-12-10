@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
+import api from "../Api";
 
 // Inline SVG Icons for professional look
 const EditIcon = (props) => (
@@ -179,7 +179,7 @@ function SalaryDetails() {
     // Fetch salary history
     const fetchSalary = useCallback(() => {
         // Mocking API call
-        axios.get(`http://127.0.0.1:8000/api/salary-payments/${id}`)
+        api.get(`/salary-payments/${id}`)
             .then(res => setSalary(res.data.data))
             .catch(() => setError("No salary records found for this employee."));
     }, [id]);
@@ -191,7 +191,7 @@ function SalaryDetails() {
     // Fetch employee details
     useEffect(() => {
         // Mocking API call
-        axios.get(`http://127.0.0.1:8000/api/employees/${id}`)
+        api.get(`/employees/${id}`)
             .then(res => setEmployee(res.data))
             .catch(err => console.error("Could not fetch employee details:", err));
     }, [id]);
@@ -242,8 +242,8 @@ function SalaryDetails() {
         e.preventDefault();
 
         const url = editingId
-            ? `http://127.0.0.1:8000/api/salary-payments/${editingId}`
-            : "http://127.0.0.1:8000/api/salary-payments";
+            ? `/salary-payments/${editingId}`
+            : "/salary-payments";
 
         const method = editingId ? "put" : "post";
 
@@ -260,7 +260,7 @@ function SalaryDetails() {
             remarks: formData.remarks
         };
 
-        axios[method](url, dataToSend)
+        api[method](url, dataToSend)
             .then(res => {
                 if (res.data.status) {
                     // Refresh the data list
@@ -316,7 +316,7 @@ function SalaryDetails() {
         // Close the confirmation alert
         closeAlert();
 
-        axios.delete(`http://127.0.0.1:8000/api/salary-payments/${salaryId}`)
+        api.delete(`/salary-payments/${salaryId}`)
             .then(res => {
                 if (res.data.status) {
                     // Update UI state directly

@@ -1,7 +1,7 @@
 // src/Pages/CouponUserView.jsx
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 /* ---------- ICONS (SVG alert / confirm / success / error) ---------- */
 const AlertTriangleIcon = (props) => (
@@ -163,7 +163,7 @@ export default function CouponUserView() {
 
   const fetchCouponUsers = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/coupon-users");
+      const res = await api.get("/coupon-users");
       setCouponUsers(Array.isArray(res.data) ? res.data : res.data.data || []);
     } catch (err) {
       setAlertState({
@@ -177,10 +177,10 @@ export default function CouponUserView() {
   };
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/coupons")
+    api.get("/coupons")
       .then((res) => setCoupons(Array.isArray(res.data) ? res.data : res.data.data || []))
       .catch(() => {});
-    axios.get("http://127.0.0.1:8000/api/users")
+    api.get("/users")
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : res.data.data || []))
       .catch(() => {});
 
@@ -191,7 +191,7 @@ export default function CouponUserView() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://127.0.0.1:8000/api/coupon-users", form);
+      await api.post("/coupon-users", form);
       await fetchCouponUsers();
       setForm({ coupon_master_id: "", user_id: "", usage_count: "" });
       setIsAddModalOpen(false);
@@ -216,7 +216,7 @@ export default function CouponUserView() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://127.0.0.1:8000/api/coupon-users/${editId}`, form);
+      await api.put(`/coupon-users/${editId}`, form);
       await fetchCouponUsers();
       setIsEditModalOpen(false);
       setAlertState({ isOpen: true, title: "Updated", message: "Coupon user updated successfully.", type: "success", actionToRun: null });
@@ -234,7 +234,7 @@ export default function CouponUserView() {
       type: "delete-confirm",
       actionToRun: async () => {
         try {
-          await axios.delete(`http://127.0.0.1:8000/api/coupon-users/${id}`);
+          await api.delete(`/coupon-users/${id}`);
           await fetchCouponUsers();
           // Show success alert (this will remain visible until user closes it)
           setAlertState({ isOpen: true, title: "Deleted", message: "Coupon user deleted successfully.", type: "success", actionToRun: null });

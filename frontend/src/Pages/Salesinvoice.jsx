@@ -1,7 +1,7 @@
 // src/pages/SalesInvoice.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {useNavigate} from "react-router-dom"
+import api from "../Api";
 
 /* -------------------------
    SVG ICONS (for alerts)
@@ -96,7 +96,6 @@ const CustomAlert = ({ isOpen, title, message, type, onConfirm, onClose }) => {
    Main SalesInvoice component
    ------------------------- */
 function SalesInvoice() {
-  const API_BASE = "http://127.0.0.1:8000/api";
 
   // products scanned
   const [barcode, setBarcode] = useState("");
@@ -148,8 +147,8 @@ function SalesInvoice() {
 
   // fetch stitching types
   useEffect(() => {
-    axios
-      .get(`${API_BASE}/stiching-types`)
+    api
+      .get(`/stiching-types`)
       .then((res) => {
         const data = Array.isArray(res.data)
           ? res.data.map((r) => ({ ...r, rate: toNumber(r.rate) }))
@@ -172,7 +171,7 @@ function SalesInvoice() {
   const handleScan = async (e) => {
     if (e.key === "Enter") {
       try {
-        const res = await axios.get(`${API_BASE}/products/barcode/${barcode}`);
+        const res = await api.get(`/products/barcode/${barcode}`);
         const product = res.data;
 
         setItems((prev) => [
@@ -299,8 +298,8 @@ const netTotal = Number(
   const handlePhoneCheck = (phone) => {
     if (!phone || phone.length < 10) return;
     setLoading(true);
-    axios
-      .get(`${API_BASE}/customer/check-phone/${phone}`)
+    api
+      .get(`/customer/check-phone/${phone}`)
       .then((res) => {
         if (res.data.exists) {
           const c = res.data.data;
@@ -389,7 +388,7 @@ console.log("STITCHING:", stitchingPayload);
 console.log("FINAL PAYLOAD:", payload);
 
     try {
-      await axios.post(`${API_BASE}/sales-invoices`, payload);
+      await api.post(`/sales-invoices`, payload);
 
       setAlert({
         isOpen: true,
@@ -420,8 +419,8 @@ console.log("FINAL PAYLOAD:", payload);
   // ===== handle customer save then save invoice =====
  const handleCustomerSave = () => {
   const request = existingId
-    ? axios.put(`${API_BASE}/customers/${existingId}`, formData)
-    : axios.post(`${API_BASE}/customers`, formData);
+    ? api.put(`/customers/${existingId}`, formData)
+    : api.post(`/customers`, formData);
 
   request
     .then((res) => {

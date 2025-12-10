@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../Api";
 
 function CustomerDetailsForm() {
     const [formData, setFormData] = useState({
@@ -26,8 +26,8 @@ function CustomerDetailsForm() {
 
         setLoading(true);
 
-        axios
-            .get(`http://127.0.0.1:8000/api/customer/check-phone/${phone}`)
+        api
+            .get(`/customer/check-phone/${phone}`)
             .then((res) => {
                 if (res.data.exists) {
                     const c = res.data.data;
@@ -62,13 +62,13 @@ function CustomerDetailsForm() {
 
     const handleSave = () => {
         if (existingId) {
-            axios
-                .put(`http://127.0.0.1:8000/api/customer/${existingId}`, formData)
+            api
+                .put(`/customer/${existingId}`, formData)
                 .then(() => alert("Customer updated successfully!"))
                 .catch(() => alert("Update failed!"));
         } else {
-            axios
-                .post("http://127.0.0.1:8000/api/customer", formData)
+            api
+                .post("/customer", formData)
                 .then(() => alert("Customer added successfully!"))
                 .catch(() => alert("Create failed!"));
         }

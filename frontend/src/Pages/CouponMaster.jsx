@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import api from "../Api";
 
 /* ---------- axios base ---------- */
-axios.defaults.baseURL = "http://localhost:8000/api";
 
 /* ---------- Icons ---------- */
 const AlertTriangleIcon = (props) => (
@@ -130,7 +129,7 @@ export default function CouponsMaster() {
   /* ---------- Fetch Coupons ---------- */
   const fetchCoupons = async () => {
     try {
-      const res = await axios.get("/coupons");
+      const res = await api.get("/coupons");
       const data = res.data;
       setCoupons(data.data || data); // Laravel paginator or raw array
     } catch (e) {
@@ -164,8 +163,8 @@ export default function CouponsMaster() {
     setLoading(true);
     try {
       const payload = toApiPayload(form);
-      if (selectedId) await axios.put(`/coupons/${selectedId}`, payload);
-      else await axios.post(`/coupons`, payload);
+      if (selectedId) await api.put(`/coupons/${selectedId}`, payload);
+      else await api.post(`/coupons`, payload);
       setAlertState({ isOpen: true, title: selectedId ? "Updated" : "Created", message: `Coupon ${selectedId ? "updated" : "created"} successfully.`, type: "success" });
       setOpenModal(false); setForm(initialForm); fetchCoupons();
     } catch (err) {
@@ -178,7 +177,7 @@ export default function CouponsMaster() {
   /* ---------- Delete ---------- */
   const deleteCoupon = async (id) => {
     try {
-      await axios.delete(`/coupons/${id}`);
+      await api.delete(`/coupons/${id}`);
       setAlertState({ isOpen: true, title: "Deleted", message: "Coupon deleted.", type: "success" });
       fetchCoupons();
     } catch (e) {
@@ -204,7 +203,7 @@ export default function CouponsMaster() {
 
     try {
       // call API to toggle. If your backend expects explicit payload you can send it; here we're hitting a patch endpoint
-      await axios.patch(`/coupons/${id}/toggle-status`);
+      await api.patch(`/coupons/${id}/toggle-status`);
       setAlertState({ isOpen: true, title: "Updated", message: "Status updated.", type: "success" });
       // refetch or keep optimistic state - here we keep optimistic state but you can call fetchCoupons() instead
     } catch (err) {
