@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import api, { BASE_URL } from "../api/api";
 import ProductCard from "../components/ProductCard";
 import Layout from "../components/Layout";
+import useCart from "../hooks/useCart.js";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const { addItem } = useCart();
 
   useEffect(() => {
     api
@@ -16,10 +17,11 @@ export default function Home() {
           : res.data.data || [];
 
         const formatted = list.map((p) => ({
-          id: p.id,
+          id: p.product_id ?? p.id ?? p.product_code,
           name: p.product_name,
           price: p.selling_price,
           image: `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`,
+          stock: Number(p.min_stock_level),
         }));
 
         setProducts(formatted);
@@ -30,7 +32,7 @@ export default function Home() {
   }, []);
 
   const addToCart = (product) => {
-    setCart((prev) => [...prev, product]);
+    addItem(product);
   };
 
   return (
