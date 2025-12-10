@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import api, { BASE_URL } from "../api/api";
 import ProductCard from "../components/ProductCard";
 import Layout from "../components/Layout";
+import useCart from "../hooks/useCart.js";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const { addItem } = useCart();
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   useEffect(() => {
     api
@@ -16,7 +18,7 @@ export default function Home() {
           : res.data.data || [];
 
         const formatted = list.map((p) => ({
-          id: p.id,
+          id: p.product_id ?? p.id ?? p.product_code,
           name: p.product_name,
           price: p.selling_price,
           image: `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`,
@@ -30,7 +32,9 @@ export default function Home() {
   }, []);
 
   const addToCart = (product) => {
-    setCart((prev) => [...prev, product]);
+    addItem(product);
+    setToast({ show: true, message: `${product.name} added to cart`, type: "success" });
+    setTimeout(() => setToast((s) => ({ ...s, show: false })), 1500);
   };
 
   return (
@@ -52,6 +56,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.message}</div>
     </Layout>
   );
 }
