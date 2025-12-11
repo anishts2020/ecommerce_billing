@@ -49,6 +49,14 @@ use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
 
+use App\Http\Controllers\Api\EcommerceLoginController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\OrderController;
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -61,6 +69,52 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Ecommerce Login
+|--------------------------------------------------------------------------
+*/
+
+// ecommerce login
+Route::post('/ecommerce-login', [EcommerceLoginController::class, 'login']);
+
+// protected routes (requires sanctum)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/ecommerce-me', [EcommerceLoginController::class, 'me']);
+    Route::post('/ecommerce-logout', [EcommerceLoginController::class, 'logout']);
+});
+
+//CART
+
+Route::post('/order/single', [OrderController::class, 'buySingle']);
+
+Route::post('/order/checkout', [OrderController::class, 'checkout']);
+Route::post('/cart/update-qty', [CartController::class, 'updateQty']);
+
+
+
+Route::post('/cart/add', [CartController::class, 'addItem']);
+Route::get('/cart/{cart_id}', [CartController::class, 'getCart']);
+Route::post('/order/single', [OrderController::class, 'buySingle']);
+
+
+
+Route::delete('/cart/item/{id}', [CartItemController::class, 'destroy']);
+
+
+// ORDER
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/{id}', [OrderController::class, 'show']);
+Route::put('/orders/status/{id}', [OrderController::class, 'updateStatus']);
+Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------

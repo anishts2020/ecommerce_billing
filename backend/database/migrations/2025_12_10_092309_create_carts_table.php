@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stiching_types', function (Blueprint $table) {
-            $table->id('stiching_type_id');
-            $table->string('name');        // alteration, lining, etc.
-        $table->decimal('rate', 10, 2);
+        Schema::create('carts', function (Blueprint $table) {
+            $table->id('cart_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stiching_types');
+        Schema::dropIfExists('carts');
     }
 };
