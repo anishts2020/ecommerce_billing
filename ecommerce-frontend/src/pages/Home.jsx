@@ -7,6 +7,7 @@ import useCart from "../hooks/useCart.js";
 export default function Home() {
   const [products, setProducts] = useState([]);
   const { addItem } = useCart();
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
 
   useEffect(() => {
     api
@@ -21,7 +22,7 @@ export default function Home() {
           name: p.product_name,
           price: p.selling_price,
           image: `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`,
-          stock: Number(p.min_stock_level),
+          stock: Number(p.min_stock_level),  
         }));
 
         setProducts(formatted);
@@ -33,6 +34,8 @@ export default function Home() {
 
   const addToCart = (product) => {
     addItem(product);
+    setToast({ show: true, message: `${product.name} added to cart`, type: "success" });
+    setTimeout(() => setToast((s) => ({ ...s, show: false })), 1500);
   };
 
   return (
@@ -54,6 +57,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.message}</div>
     </Layout>
   );
 }
