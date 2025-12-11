@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\ProductController; // barcode lookup
+use App\Http\Controllers\Api\CartController;
 
 use App\Http\Controllers\Api\VendorController;
 
@@ -232,6 +233,17 @@ Route::apiResource('coupon-users', CouponUserController::class);
 */
 
 Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| CART
+|--------------------------------------------------------------------------
+*/
+Route::post('/cart/checkout', [CartController::class, 'checkout']);
+Route::get('/cart/latest', [CartController::class, 'latest']);
+Route::get('/cart/{id}', [CartController::class, 'show']);
+Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
+Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
 
 /*
 |--------------------------------------------------------------------------

@@ -27,7 +27,7 @@ export default function Home() {
           name: p.product_name,
           price: p.selling_price,
           image: `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`,
-          sold: p.total_sold ?? 0,
+          stock: Number(p.min_stock_level),  
         }));
 
         setProducts(formatted);

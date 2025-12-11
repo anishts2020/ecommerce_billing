@@ -3,54 +3,25 @@ import { Heart } from "lucide-react";
 
 export default function ProductCard({ product, onAddToCart, onWishlist }) {
   return (
-    <motion.div
-      className="group text-center"
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.03 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-    >
-      {/* Image Container */}
-      <div className="relative overflow-hidden w-full h-[300px] sm:h-[340px] md:h-[380px] flex items-center justify-center bg-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col">
+      <img
+        src={product.image}
+        alt={product.name}
+        className="w-full h-48 object-cover rounded mb-4"
+      />
 
-        {/* ❤️ Wishlist Icon (Always above all layers) */}
-        <motion.button
-          onClick={() => onWishlist(product)}
-          className="
-            absolute top-4 right-4 
-            p-2 rounded-full bg-white shadow-md
-            opacity-0 group-hover:opacity-100
-            transition-opacity duration-300
-            z-30
-          "
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <Heart className="w-5 h-5 text-black" />
-        </motion.button>
+      <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">{product.name}</h3>
+      <p className="text-indigo-600 dark:text-indigo-400 font-bold mb-4">₹{product.price}</p>
 
-        {/* Product Image */}
-        <motion.img
-          src={product.image}
-          alt={product.name}
-          className="max-w-full max-h-full object-contain z-0"
-          whileHover={{ scale: 1.08 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        />
-
-        {/* Add to Cart Overlay — put BELOW wishlist icon */}
-        <div className="absolute inset-0 bg-black/40 flex items-end justify-center 
-                        opacity-0 group-hover:opacity-100 
-                        transition-opacity duration-300 z-10">
-          <motion.button
-            onClick={() => onAddToCart(product)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mb-6 bg-black text-white px-10 py-3 text-sm tracking-widest uppercase shadow-lg"
-          >
-            Add to Cart
-          </motion.button>
-        </div>
+      <button
+        onClick={() => onAddToCart(product)}
+        className="mt-auto bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded"
+    <div className="bg-white rounded-xl shadow ring-1 ring-gray-100 hover:shadow-xl transition transform hover:-translate-y-0.5 p-4 flex flex-col">
+      <img
+        src={product.image}
+        alt={product.name}
+        className="w-full h-48 object-cover rounded-lg mb-4"
+      />
 
       </div>
 
