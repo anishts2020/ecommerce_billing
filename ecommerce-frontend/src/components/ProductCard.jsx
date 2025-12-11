@@ -1,4 +1,7 @@
-export default function ProductCard({ product, onAddToCart }) {
+import { motion } from "framer-motion";
+import { Heart } from "lucide-react";
+
+export default function ProductCard({ product, onAddToCart, onWishlist }) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col">
       <img
@@ -20,15 +23,15 @@ export default function ProductCard({ product, onAddToCart }) {
         className="w-full h-48 object-cover rounded-lg mb-4"
       />
 
-      <h3 className="font-semibold text-lg text-gray-800">{product.name}</h3>
-      <p className="text-indigo-600 font-bold mb-4">₹{product.price}</p>
+      </div>
 
-      <button
-        onClick={() => onAddToCart(product)}
-        className="mt-auto bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-2 rounded-lg shadow"
-      >
-        Add to Cart
-      </button>
-    </div>
+      {/* Text Section */}
+      <div className="py-4">
+        <h3 className="text-sm font-medium mb-1">{product.name}</h3>
+        <p className="text-sm font-semibold">
+          Rs. {Number(product.price).toLocaleString("en-IN")}
+        </p>
+      </div>
+    </motion.div>
   );
 }

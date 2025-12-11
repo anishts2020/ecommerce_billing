@@ -11,7 +11,19 @@ export default function Header() {
   const [wOpen, setWOpen] = useState(false);
   const btnRef = useRef(null);
   const panelRef = useRef(null);
-  const [toast, setToast] = useState({ show: false, message: "", type: "info" });
+  const [search, setSearch] = useState("");
+
+  const total = useMemo(
+    () =>
+      items.reduce(
+        (s, p) => s + (Number(p.price) || 0) * (p.qty || 1),
+        0
+      ),
+    [items]
+  );
+
+  const uniqueCount = items.length;
+  const itemLabel = uniqueCount === 1 ? "ITEM" : "ITEMS";
 
   const total = useMemo(
     () => items.reduce((s, p) => s + (Number(p.price) * (p.qty || 1)), 0),
@@ -96,13 +108,15 @@ export default function Header() {
     return () => clearTimeout(t);
   };
   return (
-    <header className="bg-white shadow">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        
-        {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-indigo-600">
-          MyShop
+    <header className=" top-0 z-50 bg-white border-b transition-colors">
+      {/* LOGO */}
+      <div className=" mx-auto h-[140px] py-6 flex justify-center border-b border-black">
+        <Link to="/" className="text-2xl tracking-[.3em]">
+          <span className="px-6 mt-4 py-2 border-2 border-black text-black inline-block">
+            BOUTIQUE
+          </span>
         </Link>
+      </div>
 
         {/* Right side menu */}
         <nav className="flex items-center space-x-6 relative">
@@ -194,8 +208,7 @@ export default function Header() {
           <div className={`toast ${toast.show ? 'show' : ''}`} style={{ background: toast.type === 'error' ? 'linear-gradient(135deg,#ef4444,#f59e0b)' : undefined }}>
             <span>{toast.message}</span>
           </div>
-
-        </nav>
+        </div>
       </div>
     </header>
   );
