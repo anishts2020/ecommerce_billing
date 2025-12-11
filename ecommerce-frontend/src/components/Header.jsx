@@ -1,101 +1,179 @@
 import { Link } from "react-router-dom";
-import useCart from "../hooks/useCart.js";
-import { useEffect, useRef, useState } from "react";
+import useCart from "../hooks/useCart";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { AnimatePresence, motion as Motion } from "framer-motion";
 
 export default function Header() {
   const { items, count, removeItem, addItem, setQty } = useCart();
+
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
   const panelRef = useRef(null);
-  const [toast, setToast] = useState({ show: false, message: "", type: "info" });
+  const [search, setSearch] = useState("");
+
+  const total = useMemo(
+    () =>
+      items.reduce(
+        (s, p) => s + (Number(p.price) || 0) * (p.qty || 1),
+        0
+      ),
+    [items]
+  );
+
+  const uniqueCount = items.length;
+  const itemLabel = uniqueCount === 1 ? "ITEM" : "ITEMS";
 
   useEffect(() => {
     const handler = (e) => {
-      if (!btnRef.current?.contains(e.target) && !panelRef.current?.contains(e.target)) {
+      if (
+        !btnRef.current?.contains(e.target) &&
+        !panelRef.current?.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-  const showToast = (message, type = "info") => {
-    setToast({ show: true, message, type });
-    const t = setTimeout(() => setToast((s) => ({ ...s, show: false })), 1600);
-    return () => clearTimeout(t);
-  };
+
+
+
   return (
-    <header className="bg-white shadow">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        
-        {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-indigo-600">
-          MyShop
+    <header className=" top-0 z-50 bg-white border-b transition-colors">
+      {/* LOGO */}
+      <div className=" mx-auto h-[140px] py-6 flex justify-center border-b border-black">
+        <Link to="/" className="text-2xl tracking-[.3em]">
+          <span className="px-6 mt-4 py-2 border-2 border-black text-black inline-block">
+            BOUTIQUE
+          </span>
         </Link>
+      </div>
 
-        {/* Right side menu */}
-        <nav className="flex items-center space-x-6 relative">
+      {/* NAV */}
+      <div className="max-w-6xl mx-auto px-4 h-[70px] mt-8">
+        <div className="flex items-center justify-between ">
+          {/* Menu */}
+          <nav className="hidden md:flex gap-6 text-sm text-gray-700">
+            {["HOME", "PAGES", "SHOP", "FEATURES", "BLOG", "CONTACT"].map(
+              (item) => (
+                <button
+                  key={item}
+                  className="transition-colors hover:text-yellow-400 cursor-pointer"
+                >
+                  {item}
+                </button>
+              )
+            )}
+          </nav>
 
-          <Link 
-            to="/login"
-            className="text-gray-700 hover:text-indigo-600 font-medium"
-          >
-            Login
-          </Link>
-
-          <Link
-            to="/register"
-            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
-          >
-            Register
-          </Link>
-
-          <button ref={btnRef} onClick={() => setOpen((o) => !o)} className="relative p-2 rounded hover:bg-gray-100" aria-label="Cart">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-gray-700">
-              <path d="M3 3h2l.4 2M7 13h10l2-8H6.4"/>
-              <circle cx="9" cy="19" r="2"/>
-              <circle cx="17" cy="19" r="2"/>
-            </svg>
-            <span key={count} className={`absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-indigo-600 text-white text-xs rounded-full flex items-center justify-center animate-bump`}>
-              {count}
-            </span>
-          </button>
-
-          {open && (
-            <div ref={panelRef} className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded shadow-lg transition-all duration-200 ease-out">
-              <div className="p-3 border-b font-semibold">Cart</div>
-              <div className="max-h-80 overflow-y-auto">
-                {items.length === 0 ? (
-                  <div className="p-4 text-sm text-gray-600">Your cart is empty</div>
-                ) : (
-                  items.map((p, idx) => (
-                    <div key={p.id ?? idx} className="flex items-center gap-3 p-3 border-b last:border-b-0">
-                      <img src={p.image} alt={p.name} className="w-12 h-12 object-cover rounded" />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-800">{p.name}</div>
-                        <div className="text-sm text-indigo-600">₹{p.price}</div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => { removeItem(p.id); showToast('Removed one'); }} className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50">-</button>
-                        <span className="min-w-[24px] text-center text-sm">{p.qty || 1}</span>
-                        <button onClick={() => { addItem(p); showToast('Added quantity'); }} className="px-2 py-1 border rounded text-gray-700 hover:bg-gray-50">+</button>
-                        <button onClick={() => { setQty(p.id, 0); showToast('Removed item', 'error'); }} className="ml-2 text-red-600 text-xs px-2 py-1 rounded hover:bg-red-50">Remove</button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="p-3 flex items-center justify-between">
-                <span className="text-sm text-gray-700">Items: {count}</span>
-                <span className="text-sm font-semibold">Total: ₹{items.reduce((s, p) => s + ((Number(p.price) || 0) * (p.qty || 1)), 0)}</span>
-              </div>
-            </div>
-          )}
-
-          <div className={`toast ${toast.show ? 'show' : ''}`} style={{ background: toast.type === 'error' ? 'linear-gradient(135deg,#ef4444,#f59e0b)' : undefined }}>
-            <span>{toast.message}</span>
+          {/* Search */}
+          <div className="flex-1 px-6">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search everything..."
+              className="w-full rounded-full px-4 py-2 text-sm bg-gray-100 text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            />
           </div>
 
-        </nav>
+          {/* Actions */}
+          <div className="flex items-center gap-5 relative">
+
+            {/* CART */}
+            <Motion.button
+              ref={btnRef}
+              onClick={() => setOpen((o) => !o)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.9 }}
+              className="relative text-gray-700"
+            >
+              🛒
+              <Motion.span
+                key={count}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500 }}
+                className="absolute -top-1 -right-2 bg-yellow-500 text-white text-[10px] rounded-full px-1.5"
+              >
+                {count}
+              </Motion.span>
+            </Motion.button>
+
+            <span className="text-sm text-gray-700">
+              ₹{total.toFixed(2)}
+            </span>
+
+            {/* CART PANEL */}
+            <AnimatePresence>
+              {open && (
+                <Motion.div
+                  ref={panelRef}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.25 }}
+                  className="absolute right-0 top-full mt-2 w-88 bg-white border border-gray-200 rounded shadow-xl"
+                >
+                  <div className="px-4 py-3 text-xs border-b text-gray-700">
+                    YOU HAVE (
+                    <span className="text-orange-500">
+                      {uniqueCount} {itemLabel}
+                    </span>
+                    ) IN YOUR CART
+                  </div>
+
+                  <div className="max-h-80 overflow-y-auto">
+                    {items.length === 0 ? (
+                      <div className="p-4 text-sm text-gray-500">
+                        Your cart is empty
+                      </div>
+                    ) : (
+                      items.map((p) => (
+                        <div
+                          key={p.id}
+                          className="px-4 py-3 border-b flex gap-3"
+                        >
+                          <img
+                            src={p.image}
+                            alt={p.name}
+                            className="w-14 h-14 object-cover rounded"
+                          />
+                          <div className="flex-1">
+                            <div className="text-sm text-black">
+                              {p.name}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {p.qty || 1} × ₹{p.price}
+                            </div>
+                            <div className="mt-2 flex gap-2">
+                              <button onClick={() => removeItem(p.id)}>-</button>
+                              <button onClick={() => addItem(p)}>+</button>
+                            </div>
+                          </div>
+                          <button onClick={() => setQty(p.id, 0)}>×</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="px-4 py-3 border-t">
+                    <div className="text-center text-sm text-gray-700">
+                      Subtotal ₹{total.toFixed(2)}
+                    </div>
+                    <div className="mt-3 space-y-3">
+                      <button className="w-full bg-black text-white py-3 text-sm">
+                        VIEW CART
+                      </button>
+                      <button className="w-full border border-black py-3 text-sm text-black">
+                        CHECKOUT
+                      </button>
+                    </div>
+                  </div>
+                </Motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </header>
   );
