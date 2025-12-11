@@ -48,7 +48,7 @@ use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
-
+use App\Http\Controllers\Api\ProductSearchController;
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -138,6 +138,9 @@ Route::apiResource('vendors', VendorController::class);
 
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
+
+// SEARCH MUST BE ABOVE /products/{id}
+Route::get('/products/search', [ProductSearchController::class, 'search']);
 
 Route::get('/products', [ProductsController::class, 'index']);
 Route::post('/products/store', [ProductsController::class, 'store']);
