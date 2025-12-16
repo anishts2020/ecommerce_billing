@@ -4,6 +4,9 @@ import './index.css'
 import App from './App.jsx'
 import CartProvider from './context/CartProvider.jsx'
 import "@fontsource/montserrat"; 
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
