@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductController; // barcode lookup
 use App\Http\Controllers\Api\CartController;
 
@@ -48,10 +49,13 @@ use App\Http\Controllers\Api\CouponCategoryController;
 use App\Http\Controllers\Api\CouponUserController;
 use App\Http\Controllers\Api\CouponProductsController;
 
+
 use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\ProductColorandSize;
+use App\Http\Controllers\Api\ProductSizeRateController;
 use App\Http\Controllers\Api\ProductVariantController;
 use App\Http\Controllers\Api\ProductOptionRateController;
 
@@ -204,6 +208,7 @@ Route::apiResource('vendors', VendorController::class);
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
+Route::apiResource('product-size-rate', ProductSizeRateController::class);
 /*
 |--------------------------------------------------------------------------
 OccationalProducts
@@ -366,6 +371,7 @@ Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
 
 Route::apiResource('stiching-types', StichingTypeController::class);
 
+
 /*
 |--------------------------------------------------------------------------
 | PURCHASE REPORT
@@ -426,3 +432,7 @@ Route::get('/salesreport', function (Request $request) {
 
     return $query->get();
 });
+
+Route::get('/product-details/{productCode}', [ProductColorandSize::class, 'getProductDetails']);
+
+

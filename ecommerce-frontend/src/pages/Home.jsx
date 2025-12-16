@@ -1,9 +1,47 @@
 // Home.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api, { BASE_URL } from "../api/api";
 import ProductCard from "../components/ProductCard";
 import TopSellersCard from "../components/TopSellersCard";
 import Layout from "../components/Layout";
+import { FiSearch } from "react-icons/fi";
+
+export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]); // ✅ FIX
+  const [query, setQuery] = useState("");              // ✅ FIX
+  const [loading, setLoading] = useState(false);       // ✅ FIX
+
+  const navigate = useNavigate();
+
+  /* SEARCH FILTER */
+  useEffect(() => {
+    if (!query.trim()) {
+      setProducts(allProducts);
+      return;
+    }
+
+    setLoading(true);
+
+    const debounce = setTimeout(() => {
+      const q = query.toLowerCase();
+
+      const filtered = allProducts.filter((p) =>
+        p.name
+          .toLowerCase()
+          .split(" ")
+          .some((word) => word.startsWith(q))
+      );
+
+      setProducts(filtered);
+      setLoading(false);
+    }, 300);
+
+    return () => clearTimeout(debounce);
+  }, [query, allProducts]);
+
+  /* FETCH PRODUCTS */
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -21,6 +59,22 @@ export default function Home() {
 
         // include both id and product_id so downstream code is unambiguous
         const formatted = list.map((p) => ({
+          product_code: p.product_code,
+          name: p.product_name,
+          price: p.selling_price,
+          description: p.product_description || "",
+
+          /* VARIANT CONTEXT */
+          color_id: p.color_id,
+          size_id: p.size_id,
+
+          image: p.product_image
+            ? `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`
+            : "/fallback-image.png",
+        }));
+
+        setAllProducts(formatted); // ✅ FIX
+        setProducts(formatted);    // ✅ FIX
           id: p.product_id,
           product_id: p.product_id,
           name: p.product_name,
@@ -38,9 +92,7 @@ export default function Home() {
 
         setTopSellers(top);
       })
-      .catch((err) => {
-        console.error("Failed to load products:", err);
-      });
+      .catch(console.error);
   }, []);
   const addToCart = async (product) => {
     try {
@@ -70,6 +122,9 @@ export default function Home() {
   
   
 
+  /* CLICK → PRODUCT PAGE */
+  const handleProductClick = (productCode, colorId, sizeId) => {
+    navigate(`/product/${productCode}?color=${colorId}&size=${sizeId}`);
   // Handle sort change
   const handleSortChange = (order) => {
     setSortOrder(order);
@@ -89,9 +144,27 @@ export default function Home() {
 
   return (
     <Layout>
+      {/* SEARCH BAR */}
+      <div className="max-w-3xl mx-auto px-4 mt-6">
+        <div className="relative">
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full border rounded-md pl-12 pr-4 py-3 text-base"
+          />
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 py-6">
         <h2 className="text-2xl font-bold mb-6">Products</h2>
 
+        {loading ? (
+          <p className="text-gray-500">Searching...</p>
+        ) : products.length === 0 ? (
+          <p className="text-gray-500">No products found</p>
         <button
           onClick={() => navigate("/cart")}
           className="px-5 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
@@ -104,6 +177,17 @@ export default function Home() {
         ) : (
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-6">
             {products.map((p) => (
+              <ProductCard
+                key={p.product_code}
+                product={p}
+                onClick={() =>
+                  handleProductClick(
+                    p.product_code,
+                    p.color_id,
+                    p.size_id
+                  )
+                }
+              />
               <ProductCard key={p.id} product={p} onAddToCart={addToCart} />
             ))}
           </div>
