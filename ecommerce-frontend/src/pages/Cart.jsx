@@ -1,144 +1,130 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/api";
 import Layout from "../components/Layout";
-import api, { BASE_URL } from "../api/api";
 
 export default function Cart() {
-  const [data, setData] = useState({ cart: null, items: [], total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [items, setItems] = useState([]);
+  const navigate = useNavigate();
+
+  const cartId = sessionStorage.getItem("cart_id");
+
+  const loadCart = () => {
+    if (!cartId) return;
+    api.get(`/cart/${cartId}`).then((res) => setItems(res.data));
+  };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const userId = user?.id || 1;
-    api
-      .get("/cart/latest", { params: { user_id: userId } })
-      .then((res) => setData(res.data))
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load cart");
-      })
-      .finally(() => setLoading(false));
+    loadCart();
   }, []);
 
-  const items = useMemo(() => data.items || [], [data.items]);
-  const total = useMemo(() => items.reduce((s, it) => s + Number(it.subtotal || 0), 0), [items]);
+  const handleRemove = async (cartItemId) => {
+    await api.delete(`/cart/item/${cartItemId}`);
+    loadCart();
+  };
 
-  const updateQty = async (cart_item_id, nextQty) => {
-    const item = items.find((i) => i.cart_item_id === cart_item_id);
-    const max = Number(item?.stock ?? Infinity);
-    if (Number.isFinite(max) && nextQty > max) {
-      alert(`Only ${max} in stock for ${item?.product_name || "this product"}`);
-      return;
-    }
+  // ⭐ CHANGE QUANTITY
+  const updateQuantity = async (item, newQty) => {
+    if (newQty < 1) return; // do not allow 0 qty
+
     try {
-      const res = await api.put(`/cart/items/${cart_item_id}`, { quantity: nextQty });
-      if (res.status === 422 && res.data?.message) {
-        alert(res.data.message);
-        return;
-      }
-      setData(res.data);
+      await api.post("/cart/update-qty", {
+        cart_item_id: item.cart_item_id,
+        quantity: newQty,
+      });
+
+      loadCart();
     } catch (err) {
-      console.error(err);
-      setError("Failed to update quantity");
+      console.error("Qty update failed:", err.response?.data || err);
     }
   };
 
-  const removeItem = async (cart_item_id) => {
-    try {
-      const res = await api.delete(`/cart/items/${cart_item_id}`);
-      setData(res.data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to remove item");
-    }
+  // ⭐ ORDER NOW (NO ORDER CREATION HERE)
+  const handleOrderNow = () => {
+    sessionStorage.setItem("is_single_buy", "false");
+    sessionStorage.setItem("cart_id_for_order", cartId);
+    navigate("/order-summary");
   };
 
-  const proceedToPay = () => {
-    alert(`Proceeding to payment. Total: ₹${Number(total).toFixed(2)}`);
-  };
+  const grandTotal = items.reduce((sum, item) => sum + Number(item.subtotal), 0);
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <h2 className="text-2xl font-bold mb-2">Shopping Bag</h2>
-        <div className="text-sm text-black mb-6">{items.length} items in your bag.</div>
+      <div className="max-w-4xl mx-auto p-6">
+        <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
 
-        {loading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div className="text-red-600">{error}</div>
-        ) : !data.cart ? (
-          <div className="text-gray-600">No cart found.</div>
+        {items.length === 0 ? (
+          <p className="text-gray-500 text-lg">No products in cart</p>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 bg-white rounded-2xl shadow-xl overflow-hidden">
-              <table className="min-w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left px-6 py-3 text-sm font-semibold">Product</th>
-                    <th className="text-left px-6 py-3 text-sm font-semibold">Price</th>
-                    <th className="text-left px-6 py-3 text-sm font-semibold">Quantity</th>
-                    <th className="text-left px-6 py-3 text-sm font-semibold">Total Price</th>
+          <>
+            <table className="w-full bg-white shadow rounded">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="p-3">Product</th>
+                  <th className="p-3 text-center">Quantity</th>
+                  <th className="p-3">Price</th>
+                  <th className="p-3">Subtotal</th>
+                  <th className="p-3 text-center">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.cart_item_id} className="border-b">
+                    <td className="p-3">{item.product?.product_name}</td>
+
+                    {/* ⭐ QUANTITY BUTTONS */}
+                    <td className="p-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => updateQuantity(item, item.quantity - 1)}
+                          className="px-2 py-1 bg-gray-300 rounded"
+                        >
+                          -
+                        </button>
+
+                        <span className="w-8 text-center">{item.quantity}</span>
+
+                        <button
+                          onClick={() => updateQuantity(item, item.quantity + 1)}
+                          className="px-2 py-1 bg-gray-300 rounded"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+
+                    <td className="p-3">₹{item.price}</td>
+                    <td className="p-3 font-bold">₹{item.subtotal}</td>
+
+                    <td className="p-3 flex justify-center">
+                      <button
+                        onClick={() => handleRemove(item.cart_item_id)}
+                        className="px-3 py-1 bg-red-600 text-white rounded"
+                      >
+                        Remove
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {items.map((it) => (
-                    <tr key={it.cart_item_id} className="border-t dark:border-gray-700">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={`${BASE_URL.replace("/api", "")}/product_images/${it.product_image}`}
-                            alt={it.product_name}
-                            className="w-20 h-20 object-cover rounded"
-                          />
-                          <div className="flex-1">
-                            <div className="uppercase font-bold text-gray-900 dark:text-black tracking-wide">{it.product_name}</div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              {it.color_name ? <span>Color • {it.color_name}</span> : null}
-                              {it.size_name ? <span className="ml-3">Size • {it.size_name}</span> : null}
-                            </div>
-                          </div>
-                          <button onClick={() => removeItem(it.cart_item_id)} className="text-gray-400 hover:text-black">×</button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">₹{Number(it.price).toFixed(2)}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <button onClick={() => updateQty(it.cart_item_id, Math.max(1, (it.quantity || 1) - 1))} className="px-2 py-1 border rounded">-</button>
-                          <span>{it.quantity}</span>
-                          <button onClick={() => updateQty(it.cart_item_id, (it.quantity || 1) + 1)} className="px-2 py-1 border rounded">+</button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-orange-500 font-semibold">₹{Number(it.subtotal).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="px-6 py-6 flex items-center justify-between border-t dark:border-gray-700">
-                <div className="text-lg font-semibold">Total: ₹{Number(total).toFixed(2)}</div>
-                <button onClick={proceedToPay} className="bg-black text-white px-6 py-3 rounded">Proceed To Checkout</button>
-              </div>
-            </div>
-            <div className="bg-white  rounded-2xl shadow-xl p-6">
-              <div className="space-y-3">
-                {items.map((it) => (
-                  <div key={`sum-${it.cart_item_id}`} className="flex justify-between text-sm">
-                    <span className="text-black">{it.product_name}</span>
-                    <span className="text-black">₹{Number(it.subtotal).toFixed(2)}</span>
-                  </div>
                 ))}
-                <div className="flex justify-between text-sm border-t pt-3">
-                  <span className="">Sales Tax</span>
-                  <span className="text-gray-500">included</span>
-                </div>
-                <div className="flex justify-between text-base font-semibold">
-                  <span>Total</span>
-                  <span>₹{Number(total).toFixed(2)}</span>
-                </div>
-                <button onClick={proceedToPay} className="w-full bg-black text-white py-3 rounded">PROCEED TO CHECKOUT</button>
+              </tbody>
+            </table>
+
+            {/* ⭐ GRAND TOTAL */}
+            <div className="mt-6 flex justify-between items-center">
+              <div className="text-xl font-bold">
+                Grand Total:{" "}
+                <span className="text-green-700">₹{grandTotal}</span>
               </div>
+
+              <button
+                onClick={handleOrderNow}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow"
+              >
+                Order Now
+              </button>
             </div>
-          </div>
+          </>
         )}
       </div>
     </Layout>
