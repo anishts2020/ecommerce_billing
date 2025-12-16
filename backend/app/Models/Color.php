@@ -16,4 +16,9 @@ class Color extends Model
         'color_code',
         'is_active'
     ];
+
+     public function productColorRates()
+    {
+        return $this->hasMany(ProductColorRate::class, 'color_id', 'color_id');
+    }
 }

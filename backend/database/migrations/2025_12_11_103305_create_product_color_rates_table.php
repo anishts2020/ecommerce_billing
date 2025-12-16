@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sales_invoice_stiching_items', function (Blueprint $table) {
-            $table->unsignedBigInteger('sales_invoice_item_id')->after('sales_invoice_id');
-        });
+      Schema::create('product_color_rate', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('product_id');
+    $table->unsignedBigInteger('color_id');
+    $table->timestamps();
+});
     }
 
     /**
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sales_invoice_stiching_items', function (Blueprint $table) {
-           $table->dropColumn('sales_invoice_item_id');
-        });
+        Schema::dropIfExists('product_color_rates');
     }
 };
