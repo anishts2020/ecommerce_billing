@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../Api";
+import api from "../../../ecommerce-frontend/src/api/api";
 
 // ===== ICONS =====
 const EditIcon = (props) => (
