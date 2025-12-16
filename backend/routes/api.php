@@ -27,6 +27,9 @@ use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\ProductController; // barcode lookup
 
+use App\Http\Controllers\Api\ProductImageController; //to MULTI-IMAGE upload
+
+
 use App\Http\Controllers\Api\VendorController;
 
 use App\Http\Controllers\Api\PurchaseInvoiceController;
@@ -53,6 +56,8 @@ use App\Http\Controllers\Api\EcommerceLoginController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CartItemController;
 use App\Http\Controllers\Api\OrderController;
+
+
 
 
 
@@ -176,6 +181,9 @@ Route::apiResource('colors', ColorController::class);
 
 Route::apiResource('materials', MaterialsController::class);
 
+
+
+
 /*
 |--------------------------------------------------------------------------
 | VENDORS
@@ -198,6 +206,19 @@ Route::post('/products/store', [ProductsController::class, 'store']);
 Route::get('/products/{id}', [ProductsController::class, 'show']);
 Route::put('/products/{id}', [ProductsController::class, 'update']);
 Route::delete('/products/{id}', [ProductsController::class, 'destroy']);
+
+
+// Image CRUD
+Route::get('/product/{id}/images', [ProductImageController::class, 'index']);
+Route::post('/product/images/upload', [ProductImageController::class, 'upload']);
+Route::post('/product/image/update/{id}', [ProductImageController::class, 'update']);
+Route::delete('/product/image/delete/{id}', [ProductImageController::class, 'destroy']);
+
+// MAIN image actions
+Route::post('/product/main-image/update/{id}', [ProductImageController::class, 'updateMain']);
+Route::delete('/product/main-image/delete/{id}', [ProductImageController::class, 'deleteMain']);
+
+
 
 /*
 |--------------------------------------------------------------------------

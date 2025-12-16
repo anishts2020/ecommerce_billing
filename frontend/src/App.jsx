@@ -38,6 +38,8 @@ import AddProduct from "./Pages/AddProduct";
 import ViewProducts from "./Pages/ViewProducts";
 import ProductTypes from "./Pages/ProductTypes";
 
+import AddProductImages from "./Pages/AddProductImages";
+
 /* USERS & ROLES */
 import Roles from "./Pages/Roles";
 import UserRoles from "./Pages/UserRoles";
@@ -116,6 +118,9 @@ export default function App() {
 
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/view-products" element={<ViewProducts />} />
+
+          <Route path="/add-product-images" element={<AddProductImages />} /> {/* MULTI IMAGE UPLOAD */}
+
 
           {/* USERS & ROLES */}
           <Route path="/createroles" element={<Roles />} />
