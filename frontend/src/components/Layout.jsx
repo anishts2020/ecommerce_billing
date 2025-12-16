@@ -101,6 +101,7 @@ export default function Layout() {
                 <Link to="/customers" className={submenuClass}>Customers</Link>
                 <Link to="/employees" className={submenuClass}>Employees</Link>
                 <Link to="/stiching" className={submenuClass}>Stiching</Link>
+                <Link to="/carousel" className={submenuClass}>Carousel</Link>
                 <Link to="/new-arrival" className={submenuClass}>
                   New Arrivals
                 </Link>

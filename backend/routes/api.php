@@ -54,6 +54,7 @@ use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\CarouselController;
 use App\Http\Controllers\Api\ProductColorandSize;
 use App\Http\Controllers\Api\ProductSizeRateController;
 use App\Http\Controllers\Api\ProductVariantController;
@@ -371,6 +372,12 @@ Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
 
 Route::apiResource('stiching-types', StichingTypeController::class);
 
+
+Route::post('/carousels', [CarouselController::class, 'store']);
+Route::get('/carousels', [CarouselController::class, 'index']);
+Route::delete('/carousels/{id}', [CarouselController::class, 'destroy']);
+Route::put('/carousels/{id}', [CarouselController::class, 'update']);
+Route::post('/carousels/{id}/swap', [CarouselController::class, 'swapOrder']);
 
 /*
 |--------------------------------------------------------------------------
