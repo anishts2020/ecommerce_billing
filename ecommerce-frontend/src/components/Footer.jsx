@@ -1,7 +1,7 @@
 export default function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-16 ">
+    <footer className="mt-16">
       {/* Top light section */}
       <div className="bg-gray-100">
         <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -15,11 +15,11 @@ export default function Footer() {
             </p>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span aria-hidden className="mt-0.5">🏠</span>
+                <span aria-hidden className="mt-[2px]">🏠</span>
                 <span>5701 Outlets at Tejon Pkwy, Tejon Ranch CA 93203 UK.</span>
               </li>
               <li className="flex items-start gap-2">
-                <span aria-hidden className="mt-0.5">📞</span>
+                <span aria-hidden className="mt-[2px]">📞</span>
                 <span>(+800) 6668 2268</span>
               </li>
               <li className="flex items-start gap-2">

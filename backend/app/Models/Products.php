@@ -14,7 +14,7 @@ class Products extends Model
         'product_code','sku','product_name','product_description',
         'category_id','type_id','material_id','color_id','size_id','vendor_id',
         'unit_of_measure','quantity_on_hand','min_stock_level',
-        'cost_price','selling_price','tax_percent','is_published','is_active','product_image',
+        'cost_price','selling_price','tax_percent','is_published','is_active','new_arrivals','featured_products','occational_products','top_sellers','product_image',
     ];
 
     protected $appends = ['image_url'];

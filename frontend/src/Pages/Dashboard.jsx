@@ -251,48 +251,68 @@ export default function Dashboard() {
       )}
 
       {/* ================= REVENUE MODAL ================= */}
-      {showRevenueModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-xl w-[700px] max-h-[85vh] overflow-y-auto">
+{showRevenueModal && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-xl w-[700px] max-h-[85vh] overflow-y-auto relative">
 
-            <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
-              Total Revenue Today: ₹ {totalRevenue}
-            </h2>
+      {/* TOP RIGHT CLOSE BUTTON */}
+      <button
+        className="absolute top-4 right-4 text-gray-600 hover:text-black-600 text-2xl"
+        onClick={() => setShowRevenueModal(false)}
+      >
+        ×
+      </button>
 
-            <table className="w-full border">
-              <thead className="bg-blue-600 text-white text-center">
-                <tr>
-                  <th className="p-3 border">SL No</th>
-                  <th className="p-3 border">Product Name</th>
-                  <th className="p-3 border">Revenue (₹)</th>
-                </tr>
-              </thead>
+      <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
+        Total Revenue Today: ₹ {totalRevenue}
+      </h2>
 
-              <tbody>
-                {revenueData.map((item, index) => (
-                  <tr key={index} className="text-center">
-                    <td className="border p-3">{index + 1}</td>
-                    <td className="border p-3">{item.product_name}</td>
-                    <td className="border p-3 text-green-700 font-bold">
-                      ₹ {item.revenue}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* ==== TABLE ALWAYS SHOWN ==== */}
+      <table className="w-full border">
+        <thead className="bg-blue-600 text-white text-center">
+          <tr>
+            <th className="p-3 border">SL No</th>
+            <th className="p-3 border">Product Name</th>
+            <th className="p-3 border">Revenue (₹)</th>
+          </tr>
+        </thead>
 
-            <div className="text-center mt-6">
-              <button
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg"
-                onClick={() => setShowRevenueModal(false)}
+        <tbody>
+          {revenueData.length === 0 ? (
+            <tr>
+              <td
+                className="border p-4 text-center text-text-gray-500"
+                colSpan={3}
               >
-                Close
-              </button>
-            </div>
+                No revenue today
+              </td>
+            </tr>
+          ) : (
+            revenueData.map((item, index) => (
+              <tr key={index} className="text-center">
+                <td className="border p-3">{index + 1}</td>
+                <td className="border p-3">{item.product_name}</td>
+                <td className="border p-3 text-green-700 font-bold">
+                  ₹ {item.revenue}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
 
-          </div>
-        </div>
-      )}
+      <div className="text-center mt-6">
+        <button
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+          onClick={() => setShowRevenueModal(false)}
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
       {/* ================= TOP SELLING MODAL ================= */}
       {showTopSellingModal && (

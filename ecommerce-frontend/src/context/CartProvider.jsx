@@ -7,6 +7,28 @@ export default function CartProvider({ children }) {
   const addItem = (product) => {
     setItems((prev) => {
       const idx = prev.findIndex((i) => i.id === product.id);
+
+      if (idx !== -1) {
+        const existing = prev[idx];
+
+        if (existing.qty >= existing.stock) {
+          alert(`Only ${existing.stock} items available in stock!`);
+          return prev;
+        }
+
+        return prev.map((i, j) =>
+          j === idx ? { ...i, qty: existing.qty + 1 } : i
+        );
+      }
+
+      if (product.stock <= 0) {
+        alert("This product is out of stock!");
+        return prev;
+      }
+
+  const addItem = (product) => {
+    setItems((prev) => {
+      const idx = prev.findIndex((i) => i.id === product.id);
       if (idx !== -1) {
         return prev.map((i, j) => (j === idx ? { ...i, qty: (i.qty || 1) + 1 } : i));
       }
@@ -18,6 +40,16 @@ export default function CartProvider({ children }) {
     setItems((prev) => {
       const idx = prev.findIndex((i) => i.id === id);
       if (idx === -1) return prev;
+
+      const item = prev[idx];
+
+      if ((item.qty || 1) > 1) {
+        return prev.map((i, j) =>
+          j === idx ? { ...i, qty: item.qty - 1 } : i
+        );
+      }
+
+      // If qty becomes 0, remove item silently
       const item = prev[idx];
       if ((item.qty || 1) > 1) {
         return prev.map((i, j) => (j === idx ? { ...i, qty: i.qty - 1 } : i));
@@ -26,6 +58,33 @@ export default function CartProvider({ children }) {
     });
   };
 
+  const setQty = (id, qty) => {
+    setItems((prev) => {
+      if (qty <= 0) return prev.filter((i) => i.id !== id);
+
+      return prev.map((i) =>
+        i.id === id ? { ...i, qty } : i
+      );
+    });
+  };
+
+  // ⭐ RENAME clearCart → clear
+  const clear = () => {
+    console.log("Cart Cleared!"); // Debug
+    setItems([]);
+  };
+
+  const count = useMemo(
+    () => items.reduce((s, i) => s + (i.qty || 1), 0),
+    [items]
+  );
+
+  // MUST export `clear`
+  const value = { items, addItem, removeItem, setQty, count, clear };
+
+  return (
+    <CartContext.Provider value={value}>{children}</CartContext.Provider>
+  );
   const setQty = (id, qty) => {
     setItems((prev) => {
       if (qty <= 0) return prev.filter((i) => i.id !== id);
@@ -39,3 +98,6 @@ export default function CartProvider({ children }) {
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
+
+
+

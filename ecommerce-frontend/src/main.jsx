@@ -7,11 +7,14 @@ import "@fontsource/montserrat";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
+import WishlistProvider from './context/WishlistProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <CartProvider>
-      <App />
-    </CartProvider>
+    <WishlistProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </WishlistProvider>
   </StrictMode>,
 )

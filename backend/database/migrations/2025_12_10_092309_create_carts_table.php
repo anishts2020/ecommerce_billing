@@ -6,14 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-   public function up(): void
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        Schema::create('coupon_categories_table', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('coupon_id');
-            $table->unsignedBigInteger('category_id');
+        Schema::create('carts', function (Blueprint $table) {
+            $table->id('cart_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
-
         });
     }
 
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('coupon_categories_table');
+        Schema::dropIfExists('carts');
     }
 };
