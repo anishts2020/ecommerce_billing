@@ -26,6 +26,12 @@ export default function CartProvider({ children }) {
         return prev;
       }
 
+  const addItem = (product) => {
+    setItems((prev) => {
+      const idx = prev.findIndex((i) => i.id === product.id);
+      if (idx !== -1) {
+        return prev.map((i, j) => (j === idx ? { ...i, qty: (i.qty || 1) + 1 } : i));
+      }
       return [...prev, { ...product, qty: 1 }];
     });
   };
@@ -43,6 +49,11 @@ export default function CartProvider({ children }) {
         );
       }
 
+      // If qty becomes 0, remove item silently
+      const item = prev[idx];
+      if ((item.qty || 1) > 1) {
+        return prev.map((i, j) => (j === idx ? { ...i, qty: i.qty - 1 } : i));
+      }
       return prev.filter((i) => i.id !== id);
     });
   };
@@ -74,6 +85,18 @@ export default function CartProvider({ children }) {
   return (
     <CartContext.Provider value={value}>{children}</CartContext.Provider>
   );
+  const setQty = (id, qty) => {
+    setItems((prev) => {
+      if (qty <= 0) return prev.filter((i) => i.id !== id);
+      return prev.map((i) => (i.id === id ? { ...i, qty } : i));
+    });
+  };
+
+  const count = useMemo(() => items.reduce((s, i) => s + (i.qty || 1), 0), [items]);
+
+  const value = { items, addItem, removeItem, setQty, count };
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 

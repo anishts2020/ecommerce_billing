@@ -25,8 +25,12 @@ use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductController; // barcode lookup
 use App\Http\Controllers\Api\CartController;
+
+use App\Http\Controllers\Api\ProductImageController; //to MULTI-IMAGE upload
+
 
 use App\Http\Controllers\Api\VendorController;
 
@@ -45,11 +49,26 @@ use App\Http\Controllers\Api\CouponCategoryController;
 use App\Http\Controllers\Api\CouponUserController;
 use App\Http\Controllers\Api\CouponProductsController;
 
+
 use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Api\CarouselController;
+use App\Http\Controllers\Api\ProductColorandSize;
+use App\Http\Controllers\Api\ProductSizeRateController;
+use App\Http\Controllers\Api\ProductVariantController;
+use App\Http\Controllers\Api\ProductOptionRateController;
+
+use App\Http\Controllers\Api\EcommerceLoginController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\OrderController;
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +82,52 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Ecommerce Login
+|--------------------------------------------------------------------------
+*/
+
+// ecommerce login
+Route::post('/ecommerce-login', [EcommerceLoginController::class, 'login']);
+
+// protected routes (requires sanctum)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/ecommerce-me', [EcommerceLoginController::class, 'me']);
+    Route::post('/ecommerce-logout', [EcommerceLoginController::class, 'logout']);
+});
+
+//CART
+
+Route::post('/order/single', [OrderController::class, 'buySingle']);
+
+Route::post('/order/checkout', [OrderController::class, 'checkout']);
+Route::post('/cart/update-qty', [CartController::class, 'updateQty']);
+
+
+
+Route::post('/cart/add', [CartController::class, 'addItem']);
+Route::get('/cart/{cart_id}', [CartController::class, 'getCart']);
+Route::post('/order/single', [OrderController::class, 'buySingle']);
+
+
+
+Route::delete('/cart/item/{id}', [CartItemController::class, 'destroy']);
+
+
+// ORDER
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/{id}', [OrderController::class, 'show']);
+Route::put('/orders/status/{id}', [OrderController::class, 'updateStatus']);
+Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +189,9 @@ Route::apiResource('colors', ColorController::class);
 
 Route::apiResource('materials', MaterialsController::class);
 
+
+
+
 /*
 |--------------------------------------------------------------------------
 | VENDORS
@@ -141,11 +209,34 @@ Route::apiResource('vendors', VendorController::class);
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
+Route::apiResource('product-size-rate', ProductSizeRateController::class);
+/*
+|--------------------------------------------------------------------------
+OccationalProducts
+|--------------------------------------------------------------------------
+*/
+Route::get('/products/occational', [ProductsController::class, 'getOccationalProducts']);
+Route::post('/products/occational', [ProductsController::class, 'storeOccationalProduct']);
+Route::delete('/products/occational', [ProductsController::class, 'removeOccationalProduct']);
+
 Route::get('/products', [ProductsController::class, 'index']);
 Route::post('/products/store', [ProductsController::class, 'store']);
 Route::get('/products/{id}', [ProductsController::class, 'show']);
 Route::put('/products/{id}', [ProductsController::class, 'update']);
 Route::delete('/products/{id}', [ProductsController::class, 'destroy']);
+
+
+// Image CRUD
+Route::get('/product/{id}/images', [ProductImageController::class, 'index']);
+Route::post('/product/images/upload', [ProductImageController::class, 'upload']);
+Route::post('/product/image/update/{id}', [ProductImageController::class, 'update']);
+Route::delete('/product/image/delete/{id}', [ProductImageController::class, 'destroy']);
+
+// MAIN image actions
+Route::post('/product/main-image/update/{id}', [ProductImageController::class, 'updateMain']);
+Route::delete('/product/main-image/delete/{id}', [ProductImageController::class, 'deleteMain']);
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -226,6 +317,33 @@ Route::delete('/coupon-categories/{id}', [CouponCategoryController::class, 'dest
 Route::apiResource('coupon-users', CouponUserController::class);
 
 
+
+/*
+|--------------------------------------------------------------------------
+| New Arrivals
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/set-new-arrival', [ProductsController::class, 'setNewArrival']);
+Route::post('/products/reset-new-arrival', [ProductsController::class, 'resetNewArrival']);
+
+/*
+|--------------------------------------------------------------------------
+Featured Products
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/set-featured', [ProductsController::class, 'setFeatured']);
+Route::post('/products/reset-featured', [ProductsController::class, 'resetFeatured']);
+
+
+/*
+|--------------------------------------------------------------------------
+| TOP SELLING
+|--------------------------------------------------------------------------
+*/
+Route::post('/products/set-top-seller', [ProductsController::class, 'setTopSeller']);
+Route::post('/products/reset-top-seller', [ProductsController::class, 'resetTopSeller']);
 
 /*
 |--------------------------------------------------------------------------
@@ -321,3 +439,7 @@ Route::get('/salesreport', function (Request $request) {
 
     return $query->get();
 });
+
+Route::get('/product-details/{productCode}', [ProductColorandSize::class, 'getProductDetails']);
+
+
