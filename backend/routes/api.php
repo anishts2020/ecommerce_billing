@@ -49,6 +49,8 @@ use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\ProductVariantController;
+use App\Http\Controllers\Api\ProductOptionRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -140,6 +142,15 @@ Route::apiResource('vendors', VendorController::class);
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
+/*
+|--------------------------------------------------------------------------
+OccationalProducts
+|--------------------------------------------------------------------------
+*/
+Route::get('/products/occational', [ProductsController::class, 'getOccationalProducts']);
+Route::post('/products/occational', [ProductsController::class, 'storeOccationalProduct']);
+Route::delete('/products/occational', [ProductsController::class, 'removeOccationalProduct']);
+
 Route::get('/products', [ProductsController::class, 'index']);
 Route::post('/products/store', [ProductsController::class, 'store']);
 Route::get('/products/{id}', [ProductsController::class, 'show']);
@@ -225,6 +236,33 @@ Route::delete('/coupon-categories/{id}', [CouponCategoryController::class, 'dest
 Route::apiResource('coupon-users', CouponUserController::class);
 
 
+
+/*
+|--------------------------------------------------------------------------
+| New Arrivals
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/set-new-arrival', [ProductsController::class, 'setNewArrival']);
+Route::post('/products/reset-new-arrival', [ProductsController::class, 'resetNewArrival']);
+
+/*
+|--------------------------------------------------------------------------
+Featured Products
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/set-featured', [ProductsController::class, 'setFeatured']);
+Route::post('/products/reset-featured', [ProductsController::class, 'resetFeatured']);
+
+
+/*
+|--------------------------------------------------------------------------
+| TOP SELLING
+|--------------------------------------------------------------------------
+*/
+Route::post('/products/set-top-seller', [ProductsController::class, 'setTopSeller']);
+Route::post('/products/reset-top-seller', [ProductsController::class, 'resetTopSeller']);
 
 /*
 |--------------------------------------------------------------------------

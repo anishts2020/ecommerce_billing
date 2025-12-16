@@ -17,4 +17,10 @@ class ProductSize extends Model
         'description',
         'is_active',
     ];
+
+        public function productSizeRates()
+    {
+        return $this->hasMany(ProductSizeRate::class, 'size_id', 'size_id');
+    }
+
 }
