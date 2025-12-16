@@ -24,14 +24,15 @@ use App\Http\Controllers\Api\ProductTypeController;
 use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
+
 use App\Http\Controllers\Api\ProductsController;
-use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\ProductController; // barcode lookup
+use App\Http\Controllers\Api\ProductController; // barcode & special logic
+
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CartItemController;
+use App\Http\Controllers\Api\OrderController;
 
-use App\Http\Controllers\Api\ProductImageController; //to MULTI-IMAGE upload
-
-
+use App\Http\Controllers\Api\ProductImageController;
 use App\Http\Controllers\Api\VendorController;
 
 use App\Http\Controllers\Api\PurchaseInvoiceController;
@@ -49,11 +50,11 @@ use App\Http\Controllers\Api\CouponCategoryController;
 use App\Http\Controllers\Api\CouponUserController;
 use App\Http\Controllers\Api\CouponProductsController;
 
-
 use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
+
 use App\Http\Controllers\Api\CarouselController;
 use App\Http\Controllers\Api\ProductColorandSize;
 use App\Http\Controllers\Api\ProductSizeRateController;
@@ -61,14 +62,6 @@ use App\Http\Controllers\Api\ProductVariantController;
 use App\Http\Controllers\Api\ProductOptionRateController;
 
 use App\Http\Controllers\Api\EcommerceLoginController;
-use App\Http\Controllers\Api\CartController;
-use App\Http\Controllers\Api\CartItemController;
-use App\Http\Controllers\Api\OrderController;
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -83,51 +76,36 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-
-
 /*
 |--------------------------------------------------------------------------
-| Ecommerce Login
+| ECOMMERCE AUTH
 |--------------------------------------------------------------------------
 */
 
-// ecommerce login
 Route::post('/ecommerce-login', [EcommerceLoginController::class, 'login']);
 
-// protected routes (requires sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ecommerce-me', [EcommerceLoginController::class, 'me']);
     Route::post('/ecommerce-logout', [EcommerceLoginController::class, 'logout']);
 });
 
-//CART
-
-Route::post('/order/single', [OrderController::class, 'buySingle']);
-
-Route::post('/order/checkout', [OrderController::class, 'checkout']);
-Route::post('/cart/update-qty', [CartController::class, 'updateQty']);
-
-
+/*
+|--------------------------------------------------------------------------
+| CART & ORDER
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/cart/add', [CartController::class, 'addItem']);
-Route::get('/cart/{cart_id}', [CartController::class, 'getCart']);
+Route::post('/cart/update-qty', [CartController::class, 'updateQty']);
+Route::get('/cart/latest', [CartController::class, 'latest']);
+Route::get('/cart/{id}', [CartController::class, 'show']);
+Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
+
 Route::post('/order/single', [OrderController::class, 'buySingle']);
+Route::post('/order/checkout', [OrderController::class, 'checkout']);
 
-
-
-Route::delete('/cart/item/{id}', [CartItemController::class, 'destroy']);
-
-
-// ORDER
-Route::post('/orders', [OrderController::class, 'store']);
-Route::get('/orders', [OrderController::class, 'index']);
-Route::get('/orders/{id}', [OrderController::class, 'show']);
+Route::apiResource('orders', OrderController::class);
 Route::put('/orders/status/{id}', [OrderController::class, 'updateStatus']);
-Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -158,39 +136,20 @@ Route::delete('/salary-payments/{id}', [SalaryPaymentController::class, 'destroy
 */
 
 Route::apiResource('users', UserController::class);
-
-Route::get('/roles', [RoleController::class, 'index']);
-Route::post('/roles', [RoleController::class, 'store']);
-Route::put('/roles/{id}', [RoleController::class, 'update']);
-Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
-
 Route::apiResource('user-role', UserRoleController::class);
+Route::apiResource('roles', RoleController::class);
 
 /*
 |--------------------------------------------------------------------------
-| PRODUCT CATEGORY / TYPE / SIZE / COLOR / MATERIALS
+| PRODUCT MASTER
 |--------------------------------------------------------------------------
 */
 
 Route::apiResource('product-categories', ProductCategoriesController::class);
-
-// (Your choice: Keep apiResource + custom routes)
 Route::apiResource('product-types', ProductTypeController::class);
-Route::get('/product-types', [ProductTypeController::class, 'index']);
-Route::post('/product-types/store', [ProductTypeController::class, 'store']);
-Route::get('/product-types/{id}', [ProductTypeController::class, 'show']);
-Route::put('/product-types/{id}', [ProductTypeController::class, 'update']);
-Route::delete('/product-types/{id}', [ProductTypeController::class, 'destroy']);
-
 Route::apiResource('product-sizes', ProductSizeController::class);
-Route::get('/sizes', [ProductSizeController::class, 'index']); // alias
-
 Route::apiResource('colors', ColorController::class);
-
 Route::apiResource('materials', MaterialsController::class);
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -209,70 +168,51 @@ Route::apiResource('vendors', VendorController::class);
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
-Route::apiResource('product-size-rate', ProductSizeRateController::class);
-/*
-|--------------------------------------------------------------------------
-OccationalProducts
-|--------------------------------------------------------------------------
-*/
 Route::get('/products/occational', [ProductsController::class, 'getOccationalProducts']);
 Route::post('/products/occational', [ProductsController::class, 'storeOccationalProduct']);
 Route::delete('/products/occational', [ProductsController::class, 'removeOccationalProduct']);
 
-Route::get('/products', [ProductsController::class, 'index']);
-Route::post('/products/store', [ProductsController::class, 'store']);
-Route::get('/products/{id}', [ProductsController::class, 'show']);
-Route::put('/products/{id}', [ProductsController::class, 'update']);
-Route::delete('/products/{id}', [ProductsController::class, 'destroy']);
+Route::apiResource('products', ProductsController::class);
 
+// product flags
+Route::post('/products/set-new-arrival', [ProductsController::class, 'setNewArrival']);
+Route::post('/products/reset-new-arrival', [ProductsController::class, 'resetNewArrival']);
 
-// Image CRUD
+Route::post('/products/set-featured', [ProductsController::class, 'setFeatured']);
+Route::post('/products/reset-featured', [ProductsController::class, 'resetFeatured']);
+
+Route::post('/products/set-top-seller', [ProductsController::class, 'setTopSeller']);
+Route::post('/products/reset-top-seller', [ProductsController::class, 'resetTopSeller']);
+
+/*
+|--------------------------------------------------------------------------
+| PRODUCT IMAGES
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/product/{id}/images', [ProductImageController::class, 'index']);
 Route::post('/product/images/upload', [ProductImageController::class, 'upload']);
 Route::post('/product/image/update/{id}', [ProductImageController::class, 'update']);
 Route::delete('/product/image/delete/{id}', [ProductImageController::class, 'destroy']);
 
-// MAIN image actions
 Route::post('/product/main-image/update/{id}', [ProductImageController::class, 'updateMain']);
 Route::delete('/product/main-image/delete/{id}', [ProductImageController::class, 'deleteMain']);
 
-
-
 /*
 |--------------------------------------------------------------------------
-| PURCHASE INVOICE
+| SALES & PURCHASE
 |--------------------------------------------------------------------------
 */
 
-Route::get('/purchase-invoices', [PurchaseInvoiceController::class, 'index']);
-Route::post('/purchase-invoices', [PurchaseInvoiceController::class, 'store']);
-Route::get('/purchase-invoices/{invoice}', [PurchaseInvoiceController::class, 'show']);
-Route::delete('/purchase-invoices/{invoice}', [PurchaseInvoiceController::class, 'destroy']);
-
-/*
-|--------------------------------------------------------------------------
-| SALES INVOICE
-|--------------------------------------------------------------------------
-|
-| Your choice: Keep BOTH custom routes and apiResource.
-|
-*/
-
-Route::get('/sales-invoices', [SalesInvoiceController::class, 'index']);
-Route::post('/sales-invoices', [SalesInvoiceController::class, 'store']);
-Route::get('/sales-invoices/stitching-items', [SalesInvoiceController::class, 'stitchingItems']);
-Route::get('/sales-invoices/{invoice_id}/stitching-items', [SalesInvoiceController::class, 'getStitchingForInvoice']);
-Route::get('/sales-invoices/{id}', [SalesInvoiceController::class, 'show']);
-
+Route::apiResource('purchase-invoices', PurchaseInvoiceController::class);
 Route::apiResource('sales-invoices', SalesInvoiceController::class);
 
-Route::get('/sales-invoices/{id}/items', [SalesInvoiceController::class, 'getItems']);
 Route::get('/sales/monthly-summary', [SalesInvoiceController::class, 'monthlySummary']);
 Route::get('/sales/monthly-summary/{year}', [SalesInvoiceController::class, 'monthlySummaryByYear']);
 
 /*
 |--------------------------------------------------------------------------
-| REVENUE / SALES REPORTS
+| REPORTS
 |--------------------------------------------------------------------------
 */
 
@@ -283,9 +223,11 @@ Route::get('/monthly-category-sales', [ReportController::class, 'monthlyCategory
 Route::get('/sales-profit-line', [ReportController::class, 'salesProfitLine']);
 Route::get('/purchase-chart-data', [PurchaseChartController::class, 'monthlyPurchaseChart']);
 
+Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
+
 /*
 |--------------------------------------------------------------------------
-| INVENTORY TRANSACTIONS
+| INVENTORY
 |--------------------------------------------------------------------------
 */
 
@@ -295,151 +237,31 @@ Route::apiResource('reference', ReferenceController::class);
 
 /*
 |--------------------------------------------------------------------------
-| COUPONS (Your choice: KEEP ALL)
+| COUPONS
 |--------------------------------------------------------------------------
 */
-Route::get('/coupons', [CouponMasterController::class, 'index']);          
-Route::post('/coupons', [CouponMasterController::class, 'store']);          
-Route::get('/coupons/{couponMaster}', [CouponMasterController::class, 'show']); 
-Route::put('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
-Route::patch('/coupons/{couponMaster}', [CouponMasterController::class, 'update']); 
-Route::delete('/coupons/{couponMaster}', [CouponMasterController::class, 'destroy']);
 
 Route::apiResource('coupon', CouponMasterController::class);
-
 Route::apiResource('coupon-products', CouponProductsController::class);
-
-Route::get('/coupon-categories', [CouponCategoryController::class, 'index']);
-Route::post('/coupon-categories', [CouponCategoryController::class, 'store']);
-Route::put('/coupon-categories/{id}', [CouponCategoryController::class, 'update']);
-Route::delete('/coupon-categories/{id}', [CouponCategoryController::class, 'destroy']);
-
 Route::apiResource('coupon-users', CouponUserController::class);
 
-
-
-/*
-|--------------------------------------------------------------------------
-| New Arrivals
-|--------------------------------------------------------------------------
-*/
-
-Route::post('/products/set-new-arrival', [ProductsController::class, 'setNewArrival']);
-Route::post('/products/reset-new-arrival', [ProductsController::class, 'resetNewArrival']);
+Route::apiResource('coupon-categories', CouponCategoryController::class);
 
 /*
 |--------------------------------------------------------------------------
-Featured Products
-|--------------------------------------------------------------------------
-*/
-
-Route::post('/products/set-featured', [ProductsController::class, 'setFeatured']);
-Route::post('/products/reset-featured', [ProductsController::class, 'resetFeatured']);
-
-
-/*
-|--------------------------------------------------------------------------
-| TOP SELLING
-|--------------------------------------------------------------------------
-*/
-Route::post('/products/set-top-seller', [ProductsController::class, 'setTopSeller']);
-Route::post('/products/reset-top-seller', [ProductsController::class, 'resetTopSeller']);
-
-/*
-|--------------------------------------------------------------------------
-| TOP SELLING PRODUCTS
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
-
-/*
-|--------------------------------------------------------------------------
-| CART
-|--------------------------------------------------------------------------
-*/
-Route::post('/cart/checkout', [CartController::class, 'checkout']);
-Route::get('/cart/latest', [CartController::class, 'latest']);
-Route::get('/cart/{id}', [CartController::class, 'show']);
-Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
-Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
-
-/*
-|--------------------------------------------------------------------------
-| STITCHING TYPES
+| STITCHING & CAROUSEL
 |--------------------------------------------------------------------------
 */
 
 Route::apiResource('stiching-types', StichingTypeController::class);
 
-
-Route::post('/carousels', [CarouselController::class, 'store']);
-Route::get('/carousels', [CarouselController::class, 'index']);
-Route::delete('/carousels/{id}', [CarouselController::class, 'destroy']);
-Route::put('/carousels/{id}', [CarouselController::class, 'update']);
+Route::apiResource('carousels', CarouselController::class);
 Route::post('/carousels/{id}/swap', [CarouselController::class, 'swapOrder']);
 
 /*
 |--------------------------------------------------------------------------
-| PURCHASE REPORT
+| EXTRA
 |--------------------------------------------------------------------------
 */
-
-Route::get('/purchase-report', function (Request $request) {
-    $query = DB::table('purchase_invoices as p')
-        ->leftJoin('vendors as v', 'v.vendor_id', '=', 'p.vendor_id')
-        ->leftJoin('purchase_invoice_items as pi', 'pi.purchase_id', '=', 'p.purchase_id')
-        ->leftJoin('products as pr', 'pr.product_id', '=', 'pi.product_id')
-        ->select(
-            'p.purchase_id',
-            'p.purchase_no',
-            'p.net_amount',
-            'v.vendor_name',
-            DB::raw('GROUP_CONCAT(DISTINCT pr.product_name ORDER BY pr.product_name SEPARATOR ", ") AS product_names')
-        )
-        ->groupBy('p.purchase_id', 'p.purchase_no', 'p.net_amount', 'v.vendor_name');
-
-    if ($request->from) {
-        $query->whereDate('p.purchase_date', '>=', $request->from);
-    }
-    if ($request->to) {
-        $query->whereDate('p.purchase_date', '<=', $request->to);
-    }
-
-    return $query->get();
-});
-
-/*
-|--------------------------------------------------------------------------
-| SALES REPORT
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/salesreport', function (Request $request) {
-    $query = DB::table('sales_invoices as s')
-        ->leftJoin('customers as c', 'c.id', '=', 's.customer_id')
-        ->leftJoin('sales_invoice_items as si', 'si.sales_invoice_id', '=', 's.sales_invoice_id')
-        ->leftJoin('products as p', 'p.product_id', '=', 'si.product_id')
-        ->select(
-            's.sales_invoice_id',
-            's.invoice_no',
-            's.invoice_date',
-            'c.customer_name',
-            DB::raw('GROUP_CONCAT(p.product_name SEPARATOR ", ") as product_names'),
-            's.grand_total as total_grand'
-        )
-        ->groupBy('s.sales_invoice_id', 's.invoice_no', 's.invoice_date', 'c.customer_name', 's.grand_total');
-
-    if ($request->from) {
-        $query->whereDate('s.invoice_date', '>=', $request->from);
-    }
-    if ($request->to) {
-        $query->whereDate('s.invoice_date', '<=', $request->to);
-    }
-
-    return $query->get();
-});
 
 Route::get('/product-details/{productCode}', [ProductColorandSize::class, 'getProductDetails']);
-
-

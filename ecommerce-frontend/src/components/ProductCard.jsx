@@ -1,62 +1,57 @@
-export default function ProductCard({ product, onClick }) {
-  return (
-    <div
-      className="bg-white rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col cursor-pointer"
-      onClick={onClick}
-    >
-      <img
-        src={product.image}
-        alt={product.name}
-        className="w-full h-48 object-cover rounded mb-4"
-      />
-
-      <h3 className="font-semibold text-lg text-gray-800">
-        {product.name}
-      </h3>
-
-      <p className="text-indigo-600 font-bold mb-4">
-        ₹{product.price}
-      </p>
-
-      <button className="mt-auto bg-indigo-600 text-white py-2 rounded">
-        View Details
-      </button>
-    </div>
-  );
-}
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 
-export default function ProductCard({ product, onAddToCart, onWishlist }) {
+export default function ProductCard({
+  product,
+  onClick,
+  onAddToCart,
+  onWishlist,
+}) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col">
-      <img
-        src={product.image}
-        alt={product.name}
-        className="w-full h-48 object-cover rounded mb-4"
-      />
-
-      <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">{product.name}</h3>
-      <p className="text-indigo-600 dark:text-indigo-400 font-bold mb-4">₹{product.price}</p>
-
-      <button
-        onClick={() => onAddToCart(product)}
-        className="mt-auto bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded"
-    <div className="bg-white rounded-xl shadow ring-1 ring-gray-100 hover:shadow-xl transition transform hover:-translate-y-0.5 p-4 flex flex-col">
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      className="bg-white rounded-xl shadow ring-1 ring-gray-100 hover:shadow-xl transition p-4 flex flex-col cursor-pointer"
+      onClick={onClick}
+    >
+      {/* IMAGE */}
       <img
         src={product.image}
         alt={product.name}
         className="w-full h-48 object-cover rounded-lg mb-4"
+        onError={(e) => (e.target.src = "/fallback-image.png")}
       />
 
+      {/* INFO */}
+      <div className="flex-1">
+        <h3 className="text-sm font-medium mb-1 text-gray-800">
+          {product.name}
+        </h3>
+        <p className="text-sm font-semibold text-indigo-600">
+          ₹{Number(product.price).toLocaleString("en-IN")}
+        </p>
       </div>
 
-      {/* Text Section */}
-      <div className="py-4">
-        <h3 className="text-sm font-medium mb-1">{product.name}</h3>
-        <p className="text-sm font-semibold">
-          Rs. {Number(product.price).toLocaleString("en-IN")}
-        </p>
+      {/* ACTIONS */}
+      <div className="flex items-center gap-2 mt-4">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart?.(product);
+          }}
+          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded text-sm"
+        >
+          Add to Cart
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onWishlist?.(product);
+          }}
+          className="p-2 border rounded hover:bg-gray-100"
+        >
+          <Heart size={16} />
+        </button>
       </div>
     </motion.div>
   );

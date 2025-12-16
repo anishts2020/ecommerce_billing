@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api, { BASE_URL } from "../api/api";
+import api, { ASSET_BASE_URL } from "../api/api";
 import Layout from "./Layout";
 import ProductCard from "./ProductCard";
 
@@ -19,7 +19,8 @@ export default function ProductSearch() {
     const debounce = setTimeout(() => {
       setLoading(true);
 
-      api.get(`/products/search?q=${query}`)
+      api
+        .get(`/products/search?q=${query}`)
         .then((res) => {
           const list = Array.isArray(res.data)
             ? res.data
@@ -28,7 +29,7 @@ export default function ProductSearch() {
           const filtered = list
             .filter((p) =>
               p.product_name
-                .toLowerCase()
+                ?.toLowerCase()
                 .split(" ")
                 .some((word) =>
                   word.startsWith(query.toLowerCase())
@@ -39,7 +40,7 @@ export default function ProductSearch() {
               name: p.product_name,
               price: p.selling_price || 0,
               image: p.product_image
-                ? `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`
+                ? `${ASSET_BASE_URL}/product_images/${p.product_image}`
                 : "/fallback-image.png",
             }));
 
@@ -75,11 +76,9 @@ export default function ProductSearch() {
             <ProductCard
               key={product.product_code}
               product={product}
-              onImageClick={() =>
+              onClick={() =>
                 navigate(`/product/${product.product_code}`)
               }
-              showAddToCart={false}
-              showViewDetails={true}
             />
           ))}
         </div>
