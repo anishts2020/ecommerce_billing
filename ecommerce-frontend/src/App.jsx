@@ -12,6 +12,7 @@ function App() {
  <Route path="/address" element={<AddressForm />} />
         {/* Add more routes here */}
         {/* <Route path="/products" element={<Products />} /> */}
+        <Route path="/cart" element={<Cart />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api, { BASE_URL } from "../api/api";
 import ProductCard from "../components/ProductCard";
+import TopSellersCard from "../components/TopSellersCard";
 import Layout from "../components/Layout";
 import ColorFilterSidebar from "./ColorFilterSidebar";
 
@@ -63,6 +64,12 @@ export default function Home() {
           color_code: p.color_code,
         }));
         setProducts(formatted);
+
+        const top = [...formatted]
+          .sort((a, b) => b.sold - a.sold)
+          .slice(0, 6);
+
+        setTopSellers(top);
       })
       .catch((err) => {
         console.error("Failed to load products:", err);
@@ -124,6 +131,10 @@ export default function Home() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className={`toast ${toast.show ? "show" : ""}`}>
+        {toast.message}
       </div>
     </Layout>
   );
