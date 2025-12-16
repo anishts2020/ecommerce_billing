@@ -1,4 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import OccasionalProductsPage from "./pages/OccasionalProductsPage.jsx";
+import NewArrivalPage from "./pages/NewArrivalPage";
+import TopSellersPage from "./pages/TopSellersPage";
+import FeaturedProductsPage from "./pages/FeaturedProductsPage";
+import ProductsPage from "./pages/ProductsPage.jsx";
 
 import Home from "./pages/Home";
 import ProductModal from "./pages/ProductModal";
@@ -16,6 +22,13 @@ function App() {
         {/* Home */}
         <Route path="/" element={<Home />} />
 
+        {/* Products Pages */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/new-arrivals" element={<NewArrivalPage />} />
+        <Route path="/top-sellers" element={<TopSellersPage />} />
+        <Route path="/occasional-products" element={<OccasionalProductsPage />} />
+        <Route path="/featured-products" element={<FeaturedProductsPage />} />
+        <Route path="/products" element={<ProductsPage/>} />
         {/* Add more routes here */}
         {/* <Route path="/products" element={<Products />} /> */}
         <Route path="/product/:productCode" element={<ProductModal />} />

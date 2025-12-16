@@ -1,79 +1,101 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const slides = [
-  {
-    id: 1,
-    title: "SELECTED PIQUE POLOSHIRT",
-    subtitle: "Free Shipping Worldwide",
-    image: "/img2.png", // make sure this is PNG with transparent background
-  },
-  {
-    id: 2,
-    title: "SUMMER TEE COLLECTION",
-    subtitle: "Limited Edition",
-    image: "/img2.png", // converted to PNG for transparency
-  },
-  {
-    id: 3,
-    title: "CLASSIC DENIM JACKET",
-    subtitle: "New Arrival",
-    image: "/img2.png",
-  },
-];
+import api, { ASSET_BASE_URL } from "../api/api";
 
 export default function Carousel() {
+  const [slides, setSlides] = useState([]);
   const [current, setCurrent] = useState(0);
 
-  const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % slides.length);
-  };
+  /* 🔄 Fetch carousel items */
+  useEffect(() => {
+    api
+      .get("/carousels")
+      .then((res) => {
+        const list = Array.isArray(res.data)
+          ? res.data
+          : res.data.data || [];
 
-  const prevSlide = () => {
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+        // Important: sort by order
+        const sorted = [...list].sort(
+          (a, b) => a.carousel_order - b.carousel_order
+        );
+
+        setSlides(sorted);
+      })
+      .catch(console.error);
+  }, []);
+
+  /* ⏱ Auto slide ONLY for images */
+  useEffect(() => {
+    if (!slides.length) return;
+
+    const slide = slides[current];
+
+    // Image → auto advance
+    if (slide.carousel_type === "image") {
+      const timer = setTimeout(() => {
+        setCurrent((p) => (p + 1) % slides.length);
+      }, 2500);
+
+      return () => clearTimeout(timer);
+    }
+
+    // Video → do nothing (wait for onEnded)
+  }, [current, slides]);
+
+  if (!slides.length) return null;
+
+  const slide = slides[current];
+  const src = `${ASSET_BASE_URL}/${slide.carousel_url}`;
 
   return (
-    <div className="relative w-full h-[500px] overflow-hidden border-b bg-[#f5f5f4]">
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={slides[current].id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          className="absolute inset-0 flex items-center justify-between"
-        >
-          {/* Text section */}
-          <div className="w-1/2 pl-16 z-10">
-            <h2 className="text-4xl font-bold">{slides[current].title}</h2>
-            <p className="mt-2 text-gray-600">{slides[current].subtitle}</p>
-          </div>
+    <div className="relative w-full h-[500px] overflow-hidden bg-[#f5f5f4]">
+      <AnimatePresence mode="wait">
+        {/* IMAGE */}
+        {slide.carousel_type === "image" && (
+          <motion.img
+            key={`img-${slide.id}`}
+            src={src}
+            className="absolute inset-0 w-full h-full object-contain"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+        )}
 
-          {/* Image section */}
-          <div className="w-1/2 h-full flex justify-end mr-[40px]">
-            <img
-              src={slides[current].image}
-              alt={slides[current].title}
-              className="h-full object-contain bg-transparent"
-            />
-          </div>
-        </motion.div>
+        {/* VIDEO */}
+        {slide.carousel_type === "video" && (
+          <motion.video
+            key={`vid-${slide.id}`}
+            src={src}
+            className="absolute inset-0 w-full h-full object-contain"
+            autoPlay
+            muted
+            playsInline
+            onEnded={() =>
+              setCurrent((p) => (p + 1) % slides.length)
+            }
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+        )}
       </AnimatePresence>
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white p-3 rounded-full z-20"
-      >
-        &#10094;
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white p-3 rounded-full z-20"
-      >
-        &#10095;
-      </button>
+      {/* Indicators */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`h-2 rounded-full transition-all ${
+              i === current ? "bg-black w-5" : "bg-black/30 w-2"
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }

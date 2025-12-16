@@ -9,7 +9,7 @@ export default function SectionHeading({ small, big, underline }) {
 
       <div className="flex justify-center mt-2">
         <img
-          src="/sell.webp"
+          src={underline}
           alt="decorative underline"
           className="w-32 opacity-80"
         />
