@@ -25,8 +25,7 @@ use App\Http\Controllers\Api\ProductSizeController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
-use App\Http\Controllers\Api\ProductController; // barcode lookup
-
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\VendorController;
 
 use App\Http\Controllers\Api\PurchaseInvoiceController;
@@ -44,11 +43,13 @@ use App\Http\Controllers\Api\CouponCategoryController;
 use App\Http\Controllers\Api\CouponUserController;
 use App\Http\Controllers\Api\CouponProductsController;
 
+
 use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
-
+use App\Http\Controllers\Api\ProductColorandSize;
+use App\Http\Controllers\Api\ProductSizeRateController;
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -139,6 +140,7 @@ Route::apiResource('vendors', VendorController::class);
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
+Route::apiResource('product-size-rate', ProductSizeRateController::class);
 Route::get('/products', [ProductsController::class, 'index']);
 Route::post('/products/store', [ProductsController::class, 'store']);
 Route::get('/products/{id}', [ProductsController::class, 'show']);
@@ -241,6 +243,7 @@ Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
 
 Route::apiResource('stiching-types', StichingTypeController::class);
 
+
 /*
 |--------------------------------------------------------------------------
 | PURCHASE REPORT
@@ -301,3 +304,7 @@ Route::get('/salesreport', function (Request $request) {
 
     return $query->get();
 });
+
+Route::get('/product-details/{productCode}', [ProductColorandSize::class, 'getProductDetails']);
+
+
