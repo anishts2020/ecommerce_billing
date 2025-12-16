@@ -66,6 +66,8 @@ import PurchaseReport from "./Pages/PurchaseReport";
 
 /* Coupons & Discounts */
 import CouponProducts from "./Pages/CouponProducts";
+import CreateCarousel from "./Pages/CreateCarousel";
+import CarouselList from "./Pages/CarouselList";
 
 export default function App() {
   return (
@@ -151,6 +153,8 @@ export default function App() {
           {/* Coupens & Discounts */}
           <Route path="/coupon-products" element={<CouponProducts />} />
 
+          <Route path="/carousel/create" element={<CreateCarousel/>} />
+          <Route path="/carousel" element={<CarouselList/>} />
         </Route>
 
         {/* DEFAULT */}
