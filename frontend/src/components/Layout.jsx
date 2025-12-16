@@ -32,6 +32,7 @@ export default function Layout() {
           w-64 h-full flex-shrink-0
           fixed md:static inset-y-0 left-0 z-30
           transform transition-transform duration-300 ease-in-out
+          overflow-y-auto
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
@@ -88,6 +89,7 @@ export default function Layout() {
 
             {openMenu === "masters" && (
               <div className="ml-5 mt-1 space-y-1">
+
                 <Link to="/view-products" className={submenuClass}>Products</Link>
                 <Link to="/add-product-images" className={submenuClass}>Add Product Images</Link>{/*MULTI IMAGE UPLOAD */}
                 <Link to="/product-categories" className={submenuClass}>Product Categories</Link>
@@ -99,6 +101,18 @@ export default function Layout() {
                 <Link to="/customers" className={submenuClass}>Customers</Link>
                 <Link to="/employees" className={submenuClass}>Employees</Link>
                 <Link to="/stiching" className={submenuClass}>Stiching</Link>
+                <Link to="/new-arrival" className={submenuClass}>
+                  New Arrivals
+                </Link>
+                <Link to="/featured-product" className={submenuClass}>
+                  Featured Product
+                </Link>
+                <Link to="/top-selling" className={submenuClass}>
+                   Top Selling
+                </Link>
+                <Link to="/occational-products" className={submenuClass}>
+                     Occational Product
+                </Link>
               </div>
             )}
           </div>
@@ -202,7 +216,7 @@ export default function Layout() {
               </div>
             )}
           </div>
-
+       
         </nav>
       </aside>
 

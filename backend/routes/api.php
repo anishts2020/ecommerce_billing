@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\MaterialsController;
 use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\ProductController; // barcode lookup
+use App\Http\Controllers\Api\CartController;
 
 use App\Http\Controllers\Api\ProductImageController; //to MULTI-IMAGE upload
 
@@ -51,6 +52,8 @@ use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\ProductVariantController;
+use App\Http\Controllers\Api\ProductOptionRateController;
 
 use App\Http\Controllers\Api\EcommerceLoginController;
 use App\Http\Controllers\Api\CartController;
@@ -201,6 +204,15 @@ Route::apiResource('vendors', VendorController::class);
 // barcode lookup
 Route::get('/products/barcode/{barcode}', [ProductController::class, 'getByBarcode']);
 
+/*
+|--------------------------------------------------------------------------
+OccationalProducts
+|--------------------------------------------------------------------------
+*/
+Route::get('/products/occational', [ProductsController::class, 'getOccationalProducts']);
+Route::post('/products/occational', [ProductsController::class, 'storeOccationalProduct']);
+Route::delete('/products/occational', [ProductsController::class, 'removeOccationalProduct']);
+
 Route::get('/products', [ProductsController::class, 'index']);
 Route::post('/products/store', [ProductsController::class, 'store']);
 Route::get('/products/{id}', [ProductsController::class, 'show']);
@@ -302,11 +314,49 @@ Route::apiResource('coupon-users', CouponUserController::class);
 
 /*
 |--------------------------------------------------------------------------
+| New Arrivals
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/set-new-arrival', [ProductsController::class, 'setNewArrival']);
+Route::post('/products/reset-new-arrival', [ProductsController::class, 'resetNewArrival']);
+
+/*
+|--------------------------------------------------------------------------
+Featured Products
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/products/set-featured', [ProductsController::class, 'setFeatured']);
+Route::post('/products/reset-featured', [ProductsController::class, 'resetFeatured']);
+
+
+/*
+|--------------------------------------------------------------------------
+| TOP SELLING
+|--------------------------------------------------------------------------
+*/
+Route::post('/products/set-top-seller', [ProductsController::class, 'setTopSeller']);
+Route::post('/products/reset-top-seller', [ProductsController::class, 'resetTopSeller']);
+
+/*
+|--------------------------------------------------------------------------
 | TOP SELLING PRODUCTS
 |--------------------------------------------------------------------------
 */
 
 Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| CART
+|--------------------------------------------------------------------------
+*/
+Route::post('/cart/checkout', [CartController::class, 'checkout']);
+Route::get('/cart/latest', [CartController::class, 'latest']);
+Route::get('/cart/{id}', [CartController::class, 'show']);
+Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
+Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
 
 /*
 |--------------------------------------------------------------------------

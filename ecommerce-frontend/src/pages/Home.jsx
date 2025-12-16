@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api, { BASE_URL } from "../api/api";
 import ProductCard from "../components/ProductCard";
+import TopSellersCard from "../components/TopSellersCard";
 import Layout from "../components/Layout";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +10,10 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
+  const [selectedColorIds, setSelectedColorIds] = useState([]);
+  const [sortOrder, setSortOrder] = useState(""); // added sort state
+
+  // Fetch all colors
   useEffect(() => {
     api.get("/products")
       .then((res) => {
@@ -21,9 +26,17 @@ export default function Home() {
           name: p.product_name,
           price: p.selling_price,
           image: `${BASE_URL.replace("/api", "")}/product_images/${p.product_image}`,
+          color_id: p.color_id,
+          color_name: p.color_name,
+          color_code: p.color_code,
         }));
-
         setProducts(formatted);
+
+        const top = [...formatted]
+          .sort((a, b) => b.sold - a.sold)
+          .slice(0, 6);
+
+        setTopSellers(top);
       })
       .catch((err) => {
         console.error("Failed to load products:", err);
@@ -57,6 +70,23 @@ export default function Home() {
   
   
 
+  // Handle sort change
+  const handleSortChange = (order) => {
+    setSortOrder(order);
+  };
+
+  // Apply color filter
+  let filteredProducts = selectedColorIds.length > 0
+    ? products.filter((p) => selectedColorIds.includes(p.color_id))
+    : [...products];
+
+  // Apply sorting
+  if (sortOrder === "low-to-high") {
+    filteredProducts.sort((a, b) => a.price - b.price);
+  } else if (sortOrder === "high-to-low") {
+    filteredProducts.sort((a, b) => b.price - a.price);
+  }
+
   return (
     <Layout>
       <div className="max-w-6xl mx-auto px-4 py-6">
@@ -78,6 +108,24 @@ export default function Home() {
             ))}
           </div>
         )}
+
+        <div className="flex-1 pl-6">
+          <h2 className="text-2xl font-bold mb-6">Products</h2>
+
+          {filteredProducts.length === 0 ? (
+            <p className="text-gray-500">No products to show.</p>
+          ) : (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              {filteredProducts.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className={`toast ${toast.show ? "show" : ""}`}>
+        {toast.message}
       </div>
     </Layout>
   );
