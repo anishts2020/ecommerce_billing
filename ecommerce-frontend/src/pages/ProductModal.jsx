@@ -86,11 +86,13 @@ export default function ProductModal() {
     setSizes(uniqueSizes);
 
     let finalSize = null;
+
     if (preselectedSizeId) {
       finalSize = uniqueSizes.find(
         s => String(s.size_id) === String(preselectedSizeId)
       );
     }
+
     if (!finalSize && uniqueSizes.length > 0) {
       finalSize = uniqueSizes[0];
     }
@@ -107,6 +109,7 @@ export default function ProductModal() {
   const handleMouseMove = (e) => {
     if (!imgRef.current) return;
     const rect = imgRef.current.getBoundingClientRect();
+
     setZoomPos({
       x: ((e.clientX - rect.left) / rect.width) * 100,
       y: ((e.clientY - rect.top) / rect.height) * 100,
@@ -142,6 +145,20 @@ export default function ProductModal() {
                 onError={(e) => (e.target.src = "/fallback-image.png")}
               />
             </div>
+
+            {showZoom && (
+              <div className="hidden lg:block w-96 h-96 overflow-hidden bg-white">
+                <div
+                  className="w-full h-full"
+                  style={{
+                    backgroundImage: `url(${mainImage})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "500%",
+                    backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* DETAILS */}
@@ -153,20 +170,19 @@ export default function ProductModal() {
             </div>
 
             <span className="inline-block rounded-full bg-gray-100 px-0 py-1 text-sm">
-            Material: {product.material}
+              Material: {product.material}
             </span>
 
             {/* SIZE */}
             <div>
-              
-
-              {/* Selected size label */}
+              {/* ✅ DISPLAY SELECTED SIZE (ONLY ADDITION) */}
               {selectedSize && (
-                <p className="font-medium mb-1">
-                  Size:  <span className="font-semibold">{selectedSize.size_name}</span>
+                 <p className="font-medium mb-3">Size:{" "}
+                  <span className="font-medium">
+                    {selectedSize.size_name}
+                  </span>
                 </p>
               )}
-              <br/>
               <div className="flex flex-wrap items-center gap-3">
                 {sizes.map((s) => {
                   const selected = selectedSize?.size_id === s.size_id;
@@ -178,15 +194,16 @@ export default function ProductModal() {
                         setPrice(s.price);
                       }}
                       className={`
-                        w-14 h-14 rounded-lg border text-center font-semibold transition
+                        w-20 py-2 rounded-full border text-center transition
                         ${
                           selected
-                            ? "bg-black text-white border-black"
-                            : "border-gray-300 text-gray-800"
+                            ? "border-blue-600 text-blue-600"
+                            : "border-gray-400 text-gray-800"
                         }
                       `}
                     >
-                      {s.size_name}
+                      <div className="font-semibold">{s.size_name}</div>
+                      <div className="text-sm">₹{s.price}</div>
                     </button>
                   );
                 })}
@@ -244,11 +261,24 @@ export default function ProductModal() {
               disabled={!selectedColor || sizes.length === 0}
               className="px-10 py-3 rounded-lg font-semibold text-base flex items-center justify-center gap-3 border-2 border-blue-600 text-blue-600 hover:border-blue-700 hover:text-blue-700 hover:bg-blue-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2zM7.16 14h9.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49-1.75-.97L16.65 12H7.53L4.27 4H1v2h2l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12z" />
+              </svg>
               Add to Cart
             </button>
           </div>
         </div>
       </div>
+
+      {/* MOBILE ZOOM */}
+      {mobileZoom && (
+        <div
+          onClick={() => setMobileZoom(false)}
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 overflow-auto"
+        >
+          <img src={mainImage} alt="Zoom" />
+        </div>
+      )}
     </Layout>
   );
 }
