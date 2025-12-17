@@ -49,6 +49,7 @@ use App\Http\Controllers\Api\TopSaleProductController;
 use App\Http\Controllers\Api\StichingTypeController;
 use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\CarouselController;
 
 /*
 |--------------------------------------------------------------------------
@@ -241,7 +242,8 @@ Route::get('/top-selling-products', [TopSaleProductController::class, 'index']);
 */
 Route::post('/cart/checkout', [CartController::class, 'checkout']);
 Route::get('/cart/latest', [CartController::class, 'latest']);
-Route::get('/cart/{id}', [CartController::class, 'show']);
+Route::get('/cart/{id}', [CartController::class, 'show'])
+    ->whereNumber('id'); // ⭐ THIS LINE FIXES EVERYTHING
 Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
 Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
 
@@ -252,6 +254,13 @@ Route::delete('/cart/items/{id}', [CartController::class, 'deleteItem']);
 */
 
 Route::apiResource('stiching-types', StichingTypeController::class);
+
+
+Route::post('/carousels', [CarouselController::class, 'store']);
+Route::get('/carousels', [CarouselController::class, 'index']);
+Route::delete('/carousels/{id}', [CarouselController::class, 'destroy']);
+Route::put('/carousels/{id}', [CarouselController::class, 'update']);
+Route::post('/carousels/{id}/swap', [CarouselController::class, 'swapOrder']);
 
 /*
 |--------------------------------------------------------------------------
