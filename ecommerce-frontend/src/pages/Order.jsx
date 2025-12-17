@@ -33,10 +33,34 @@ function Order() {
     payment_mode: "",        // ⭐ IMPORTANT
     order_status: "processing",
     billing_address: "",
-    shipping_address: ""
+    shipping_address: "",
+     items: []
   });
 
   const [expanded, setExpanded] = useState("flipkart_upi");
+  
+
+  useEffect(() => {
+  const pendingOrder = JSON.parse(sessionStorage.getItem("pending_order"));
+
+  if (!pendingOrder) {
+    alert("Order data missing. Please go back.");
+    navigate("/cart");
+    return;
+  }
+
+  setForm((prev) => ({
+    ...prev,
+    user_id: 1,                      // ✅ dummy user id (VISIBLE)
+    total_amount: pendingOrder.total_amount,
+    gst_amount: pendingOrder.gst_amount,
+    grand_total: pendingOrder.grand_total,
+    billing_address: pendingOrder.billing_address,
+    shipping_address: pendingOrder.shipping_address,
+    items: pendingOrder.items        // ✅ CRITICAL
+  }));
+}, []);
+
 
   // PAYMENT STATE
   const [upiApp, setUpiApp] = useState("");
@@ -143,17 +167,20 @@ const upiMap = {
 
         <div style={fieldBox}>
           <label style={label}>Total Amount</label>
-          <input type="number" name="total_amount" value={form.total_amount} onChange={handleChange} style={input} />
+          <input type="number" name="total_amount" value={form.total_amount} readOnly
+  style={readOnlyInput} onChange={handleChange} />
         </div>
 
         <div style={fieldBox}>
           <label style={label}>GST Amount</label>
-          <input type="number" name="gst_amount" value={form.gst_amount} onChange={handleChange} style={input} />
+          <input type="number" name="gst_amount" value={form.gst_amount} onChange={handleChange} readOnly
+  style={readOnlyInput} />
         </div>
 
         <div style={fieldBox}>
           <label style={label}>Grand Total</label>
-          <input type="number" name="grand_total" value={form.grand_total} onChange={handleChange} style={input} />
+          <input type="number" name="grand_total" value={form.grand_total} onChange={handleChange} readOnly
+  style={readOnlyInput} />
         </div>
 
         {/* PAYMENT SECTION */}
