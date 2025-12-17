@@ -240,7 +240,8 @@ Route::apiResource('reference', ReferenceController::class);
 | COUPONS
 |--------------------------------------------------------------------------
 */
-
+Route::get('/coupons', [CouponMasterController::class, 'index']);          
+Route::post('/coupons', [CouponMasterController::class, 'store']);
 Route::apiResource('coupon', CouponMasterController::class);
 Route::apiResource('coupon-products', CouponProductsController::class);
 Route::apiResource('coupon-users', CouponUserController::class);
