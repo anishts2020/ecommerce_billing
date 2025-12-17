@@ -50,6 +50,9 @@ use App\Http\Controllers\Api\PurchaseChartController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\CustomerOrderTaskController; 
+use App\Http\Controllers\Api\CartController; 
+use App\Http\Controllers\Api\OrderItemController; 
 /*
 |--------------------------------------------------------------------------
 | AUTH
@@ -313,3 +316,19 @@ Route::post('/place-order', [OrderController::class, 'placeOrder']);
 
 
 Route::post('/payments', [PaymentController::class, 'store']);
+Route::get('/customer-order-tasks', [CustomerOrderTaskController::class, 'index']);
+Route::get('/customer-order-tasks/{id}', [CustomerOrderTaskController::class,'show']);
+Route::post('/customer-order-tasks', [CustomerOrderTaskController::class, 'store']);
+Route::get('/order-items/{order_id}', [CustomerOrderTaskController::class, 'getOrderItems']);
+Route::put('/customer-order-tasks/{id}/status', [CustomerOrderTaskController::class, 'updateStatus']);
+Route::post('/cart/update-qty', [CartController::class, 'updateQty']);
+
+
+
+Route::post('/cart/add', [CartController::class, 'addItem']);
+Route::get('/cart/{cart_id}', [CartController::class, 'getCart']);
+Route::get('/orders/{orderId}/items', [OrderItemController::class, 'byOrder']);
+Route::put(
+    '/customer-order-tasks/{id}/status',
+    [CustomerOrderTaskController::class, 'updateStatus']
+);
